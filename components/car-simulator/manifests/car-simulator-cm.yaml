@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  labels:
+    app: car-simulator
+  name: car-simulator-config
+data:
+  CAR_ID: replaceme
+
+  

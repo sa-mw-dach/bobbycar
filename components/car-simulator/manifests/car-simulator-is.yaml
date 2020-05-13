@@ -1,0 +1,9 @@
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  labels:
+    app: car-simulator
+  name: car-simulator
+spec:
+  lookupPolicy:
+    local: false

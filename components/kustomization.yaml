@@ -5,6 +5,7 @@ namespace: bobbycar
 
 bases:
 - amq-broker/
+- car-simulator/manifests/
 
 resources:
 - namespace.yaml

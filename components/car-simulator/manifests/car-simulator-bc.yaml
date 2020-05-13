@@ -1,0 +1,34 @@
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata:
+  labels:
+    app: car-simulator
+  name: car-simulator
+spec:
+  failedBuildsHistoryLimit: 5
+  nodeSelector: {}
+  output:
+    to:
+      kind: ImageStreamTag
+      name: car-simulator:latest
+  postCommit: {}
+  runPolicy: Serial
+  source:
+    git:
+      ref: master
+      uri: https://github.com/sa-mw-dach/bobbycar.git
+    type: Git
+    contextDir: "components/car-simulator"
+  strategy:
+    sourceStrategy:
+      forcePull: true
+      from:
+        kind: ImageStreamTag
+        name: 'ubi-quarkus-native-s2i:19.3.1-java11'
+    type: Source     
+  successfulBuildsHistoryLimit: 5
+  triggers:
+  - type: ConfigChange
+  - type: ImageChange
+status: 
+  lastVersion: 0

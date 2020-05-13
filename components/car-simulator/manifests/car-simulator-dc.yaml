@@ -1,0 +1,82 @@
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  labels:
+    app: car-simulator
+    app.kubernetes.io/part-of: Bobbycar
+  name: car-simulator
+  annotations:
+    app.openshift.io/connects-to: bobbycar-amq-mqtt-ss
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    deploymentConfig: car-simulator
+  strategy:
+    activeDeadlineSeconds: 21600
+    resources: {}
+    type: Rolling
+    rollingParams:
+      updatePeriodSeconds: 1
+      intervalSeconds: 1
+      timeoutSeconds: 600
+      maxUnavailable: 25%
+      maxSurge: 25%
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: car-simulator
+        deploymentConfig: car-simulator
+      name: car-simulator
+    spec:
+      containers:
+      - name: car-simulator
+        image: car-simulator:latest
+        imagePullPolicy: Always
+        ports:
+          - containerPort: 8080
+            name: http
+            protocol: TCP
+        envFrom:
+          - configMapRef: 
+              name: car-simulator-config
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        livenessProbe: 
+          httpGet:   
+            path: /health/live
+            port: 8080
+            scheme: HTTP
+          initialDelaySeconds: 15  
+          timeoutSeconds: 1
+          periodSeconds: 10
+          successThreshold: 1
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /health/ready
+            port: 8080
+            scheme: HTTP
+          initialDelaySeconds: 15
+          timeoutSeconds: 1
+          periodSeconds: 10
+          successThreshold: 1
+          failureThreshold: 3
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+  test: false
+  triggers:
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+          - car-simulator
+        from:
+          kind: ImageStreamTag
+          name: 'car-simulator:latest'
+      type: ImageChange
+    - type: ConfigChange
