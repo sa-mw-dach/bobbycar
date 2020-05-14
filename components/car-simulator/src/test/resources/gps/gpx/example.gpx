@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<gpx version="1.0">
+<gpx version="1.0" xmlns="http://www.topografix.com/GPX/1/1">
+  <metadata>
   <name>Example gpx</name>
+  </metadata>
   <wpt lat="46.57638889" lon="8.89263889">
     <ele>2372</ele>
     <name>LAGORETICO</name>
