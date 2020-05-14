@@ -3,5 +3,4 @@ kind: Kustomization
 
 resources:
 - amq-operator-subscription.yaml
-- amq-operator-group.yaml
 - amq-broker-cr.yaml

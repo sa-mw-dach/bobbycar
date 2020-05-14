@@ -5,10 +5,12 @@ namespace: bobbycar
 
 bases:
 - amq-broker/
+- amq-streams/
 - car-simulator/manifests/
 
 resources:
 - namespace.yaml
+- operator-group.yaml
 
 
 
