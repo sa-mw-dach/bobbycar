@@ -1,0 +1,14 @@
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  name: kafka-bridge
+  namespace: bobbycar
+spec:
+  host: kafka-bridge-bobbycar.apps.ocp3.stormshift.coe.muc.redhat.com
+  to:
+    kind: Service
+    name: bobbycar-bridge-service
+    weight: 100
+  port:
+    targetPort: rest-api
+  wildcardPolicy: None
