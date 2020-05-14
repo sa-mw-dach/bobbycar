@@ -1,8 +1,8 @@
 package com.redhat.bobbycar.carsim;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,7 +34,7 @@ public class CarSimulatorApp {
 	long cars;
 	
 	@ConfigProperty(name = "com.redhat.bobbycar.carsim.route")
-	URL pathToRoutFile;
+	String pathToRoutFile;
 	
 	@Inject
     @RestClient
@@ -49,7 +49,7 @@ public class CarSimulatorApp {
 	
 	void onStart(@Observes StartupEvent ev) throws FileNotFoundException, JAXBException, IOException {               
         LOGGER.info("The application is starting... {} ", pathToRoutFile);
-        Route route = reader.readGpx(pathToRoutFile.openStream());
+        Route route = reader.readGpx(new File(pathToRoutFile));
         Driver driver = new Driver(route, new TimedDrivingStrategy());
         Thread driverThread = new Thread(driver);
         driverThread.start();
