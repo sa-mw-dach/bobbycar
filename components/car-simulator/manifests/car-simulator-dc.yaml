@@ -30,10 +30,22 @@ spec:
         deploymentConfig: car-simulator
       name: car-simulator
     spec:
+      volumes:
+        - name: config
+          configMap:
+            name: car-simulator-config
+            defaultMode: 420
       containers:
       - name: car-simulator
         image: car-simulator:latest
         imagePullPolicy: Always
+        volumeMounts:
+            - name: config
+              readOnly: true
+              mountPath: /opt/routes
+        env:
+            - name: com.redhat.bobbycar.carsim.route
+              value: /opt/routes/route.gpx
         ports:
           - containerPort: 8080
             name: http
