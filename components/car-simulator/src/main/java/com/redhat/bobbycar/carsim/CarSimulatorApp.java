@@ -1,7 +1,6 @@
 package com.redhat.bobbycar.carsim;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -66,7 +65,7 @@ public class CarSimulatorApp {
 	            Driver driver = new Driver(route, new TimedDrivingStrategy());
 	            driver.registerCarEventListener(evt -> {
 	            	 List<KafkaCarRecord> records = new ArrayList<>();
-	                 records.add(new KafkaCarRecord(driver.getId().toString(), new KafkaCarPosition(evt.getLatitude().doubleValue(), evt.getLongitude().doubleValue(), evt.getElevation().doubleValue()),  evt.getTime().orElse(null)));
+	                 records.add(new KafkaCarRecord(driver.getId().toString(), new KafkaCarPosition(evt.getLatitude().doubleValue(), evt.getLongitude().doubleValue(), evt.getElevation().doubleValue(), evt.getTime().orElse(null))));
 	                 KafkaCarEvent event = new KafkaCarEvent(records);
 	                 kafkaService.publishCarEvent(event);
 	            });
