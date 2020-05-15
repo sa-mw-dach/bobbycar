@@ -7,3 +7,5 @@ resources:
 - car-simulator-cm.yaml
 - car-simulator-bc.yaml
 - car-simulator-dc.yaml
+- car-simulator-svc.yaml
+- car-simulator-route.yaml
