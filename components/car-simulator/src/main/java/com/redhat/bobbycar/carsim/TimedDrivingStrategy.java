@@ -38,13 +38,13 @@ public class TimedDrivingStrategy implements DrivingStrategy{
 		));
 		duration.ifPresent(remainingWaitTime -> {
 			try {
-				LOGGER.error("Waiting {}ms to arrive at next route point", remainingWaitTime);
+				LOGGER.debug("Waiting {}ms to arrive at next route point", remainingWaitTime);
 				long sleepTime = Math.round(remainingWaitTime / factor);
 				if (sleepTime > 0) {
 					TimeUnit.MILLISECONDS.sleep(sleepTime);
 				}
 				
-				consumer.accept(new CarEvent(to.getLongitude(), to.getLatitude(), Optional.of(ZonedDateTime.now())));
+				consumer.accept(new CarEvent(to.getLongitude(), to.getLatitude(), to.getElevation(), Optional.of(ZonedDateTime.now())));
 			}catch (InterruptedException e) {
 				//TODO Error handling
 				LOGGER.error("", e);
@@ -52,7 +52,7 @@ public class TimedDrivingStrategy implements DrivingStrategy{
 		});
 		if (from.isEmpty()) {
 			LOGGER.debug("First event, driving instantly");
-			consumer.accept(new CarEvent(to.getLongitude(), to.getLatitude(), Optional.of(ZonedDateTime.now())));
+			consumer.accept(new CarEvent(to.getLongitude(), to.getLatitude(), to.getElevation(), Optional.of(ZonedDateTime.now())));
 		}
 		lastActionTimeMillis = Optional.of(System.currentTimeMillis());
 	}

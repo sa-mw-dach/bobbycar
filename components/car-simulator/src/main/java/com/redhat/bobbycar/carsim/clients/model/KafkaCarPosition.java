@@ -8,15 +8,18 @@ public class KafkaCarPosition {
 	private double latitude;
 	@JsonbProperty("long")
 	private double longitude;
+	@JsonbProperty("elev")
+	private double elevation;
 	
 	public KafkaCarPosition() {
 		
 	}
 	
-	public KafkaCarPosition(double latitude, double longitude) {
+	public KafkaCarPosition(double latitude, double longitude, double elevation) {
 		super();
 		this.latitude = latitude;
 		this.longitude = longitude;
+		this.elevation = elevation;
 	}
 	public double getLatitude() {
 		return latitude;
@@ -30,6 +33,12 @@ public class KafkaCarPosition {
 	public void setLongitude(double longitude) {
 		this.longitude = longitude;
 	}
-	
-	
+
+	public double getElevation() {
+		return elevation;
+	}
+
+	public void setElevation(double elevation) {
+		this.elevation = elevation;
+	}
 }

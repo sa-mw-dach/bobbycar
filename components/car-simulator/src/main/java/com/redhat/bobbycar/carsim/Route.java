@@ -11,8 +11,6 @@ public class Route {
 	private final List<RoutePoint> points = new ArrayList<>();
 	private String name;
 	
-	
-	
 	public Route(String name, List<RoutePoint> points) {
 		this.points.addAll(points);
 		this.name = name;
@@ -25,6 +23,14 @@ public class Route {
 
 	public Stream<RoutePoint> getPoints() {
 		return points.stream();
+	}
+	
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	@Override
