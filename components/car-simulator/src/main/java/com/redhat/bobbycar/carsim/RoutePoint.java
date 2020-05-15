@@ -9,22 +9,29 @@ public class RoutePoint {
 	
 	private final BigDecimal longitude;
 	private final BigDecimal latitude;
+	private final BigDecimal elevation;
 	private final Optional<ZonedDateTime> time;
 	
-	public RoutePoint(BigDecimal longitude, BigDecimal latitude) {
+	public RoutePoint(BigDecimal longitude, BigDecimal latitude, BigDecimal elevation) {
 		super();
 		this.longitude = longitude;
 		this.latitude = latitude;
+		this.elevation = elevation;
 		this.time = Optional.empty();
 	}
 
-	public RoutePoint(BigDecimal longitude, BigDecimal latitude, ZonedDateTime time) {
+	public RoutePoint(BigDecimal longitude, BigDecimal latitude, BigDecimal elevation, ZonedDateTime time) {
 		super();
 		this.longitude = longitude;
 		this.latitude = latitude;
+		this.elevation = elevation;
 		this.time = Optional.ofNullable(time);
 	}
 	
+	public BigDecimal getElevation() {
+		return elevation;
+	}
+
 	public BigDecimal getLongitude() {
 		return longitude;
 	}

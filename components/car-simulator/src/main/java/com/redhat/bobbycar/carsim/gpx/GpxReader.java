@@ -42,7 +42,7 @@ public class GpxReader {
 	
 	private List<RoutePoint> transform(List<TrkType> trks) {
 		return trks.stream().flatMap(trk -> trk.getTrkseg().stream().flatMap(seg -> seg.getTrkpt().stream()))
-				.map(trk -> new RoutePoint(trk.getLon(), trk.getLat(), trk.getTime() != null ? trk.getTime().toGregorianCalendar().toZonedDateTime() : null))
+				.map(trk -> new RoutePoint(trk.getLon(), trk.getLat(), trk.getEle(), trk.getTime() != null ? trk.getTime().toGregorianCalendar().toZonedDateTime() : null))
 				.collect(Collectors.toList());
 				
 	}

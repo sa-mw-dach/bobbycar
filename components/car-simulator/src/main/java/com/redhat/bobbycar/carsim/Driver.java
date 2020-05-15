@@ -1,8 +1,10 @@
 package com.redhat.bobbycar.carsim;
 
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Stream;
 
 import org.slf4j.Logger;
@@ -15,11 +17,15 @@ public class Driver implements Runnable{
 	private Stream<RoutePoint> routeStream;
 	private Optional<RoutePoint> lastPoint = Optional.empty();
 	private final DrivingStrategy drivingStrategy;
+	private final DriverMetrics metrics = new DriverMetrics();
+	private final UUID id = UUID.randomUUID();
+	private final String routeName;
 	
 	public Driver(Route route, DrivingStrategy drivingStrategy) {
 		super();
 		this.routeStream = route.getPoints();
 		this.drivingStrategy = drivingStrategy;
+		this.routeName = route.getName();
 		if(!drivingStrategy.supports(route)) {
 			throw new RouteNotSupportedException("Route not supported for driving strategy", route);
 		}
@@ -31,12 +37,14 @@ public class Driver implements Runnable{
 
 	@Override
 	public void run() {
+		metrics.setStart(ZonedDateTime.now());
 		LOGGER.debug("I am driving");
 		routeStream.forEach(to -> {
 			LOGGER.debug("to {}", to);
 			drivingStrategy.drive(lastPoint, to, this::notifyListeners);
 			lastPoint = Optional.of(to);
 		});
+		metrics.setEnd(ZonedDateTime.now());
 	}
 	
 	private void notifyListeners(CarEvent event) {
@@ -44,4 +52,17 @@ public class Driver implements Runnable{
 			carEventListener.update(event);
 		}
 	}
+
+	public DriverMetrics getMetrics() {
+		return metrics;
+	}
+
+	public UUID getId() {
+		return id;
+	}
+
+	public String getRouteName() {
+		return routeName;
+	}
+
 }

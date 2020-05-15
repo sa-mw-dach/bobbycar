@@ -38,9 +38,9 @@ public class DriverTest {
 	private static Stream<Route> driveRoute() {
 		ZonedDateTime now = ZonedDateTime.now();
 		ZonedDateTime nowPlus5 = now.plusSeconds(5);
-		return Stream.of(new Route("SinglePointTimed", new RoutePoint(new BigDecimal("8.89322222"), new BigDecimal("46.57652778"), now)),
-				new Route("DualPointTimed", new RoutePoint(new BigDecimal("8.89322222"), new BigDecimal("46.57652778"), now),
-						new RoutePoint(new BigDecimal("8.89344444"), new BigDecimal("46.57661111"), nowPlus5)));
+		return Stream.of(new Route("SinglePointTimed", new RoutePoint(new BigDecimal("8.89322222"), new BigDecimal("46.57652778"), new BigDecimal("100"), now)),
+				new Route("DualPointTimed", new RoutePoint(new BigDecimal("8.89322222"), new BigDecimal("46.57652778"), new BigDecimal("100"), now),
+						new RoutePoint(new BigDecimal("8.89344444"), new BigDecimal("46.57661111"), new BigDecimal("100"), nowPlus5)));
 	}
 	
 	@ParameterizedTest
