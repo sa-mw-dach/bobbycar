@@ -1,20 +1,17 @@
 package com.redhat.bobbycar.carsim.clients.model;
 
-import java.time.ZonedDateTime;
-
 public class KafkaCarRecord {
 	private String key;
 	private KafkaCarPosition value;
-	private long eventTime;
+	
 	
 	public KafkaCarRecord() {
 		super();
 	}
-	public KafkaCarRecord(String key, KafkaCarPosition value, ZonedDateTime time) {
+	public KafkaCarRecord(String key, KafkaCarPosition value) {
 		super();
 		this.key = key;
 		this.value = value;
-		this.eventTime = time.toInstant().toEpochMilli();
 	}
 	public String getKey() {
 		return key;
