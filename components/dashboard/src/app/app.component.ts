@@ -9,31 +9,15 @@ import { StatusBar } from '@ionic-native/status-bar/ngx';
   templateUrl: 'app.component.html',
   styleUrls: ['app.component.scss']
 })
-export class AppComponent implements OnInit {
+export class AppComponent {
   public selectedIndex = 0;
   public appPages = [
     {
-      title: 'Dashboard',
-      url: '/folder/Dashboard',
-      icon: 'map'
-    },
-    {
-      title: 'Car Details',
-      url: '/folder/Details',
-      icon: 'paper-plane'
-    },
-    {
-      title: 'Zone Administration',
-      url: '/folder/Admin',
-      icon: 'settings'
-    },
-    {
-      title: 'Realtime Search',
-      url: '/folder/Search',
-      icon: 'search'
+      title: 'Home',
+      url: '/home',
+      icon: 'home'
     }
   ];
-  public labels = ['OpenShift', 'Kafka', 'MQTT', 'Quarkus', 'Datagrid', 'Angular'];
 
   constructor(
     private platform: Platform,
@@ -50,10 +34,4 @@ export class AppComponent implements OnInit {
     });
   }
 
-  ngOnInit() {
-    const path = window.location.pathname.split('folder/')[1];
-    if (path !== undefined) {
-      this.selectedIndex = this.appPages.findIndex(page => page.title.toLowerCase() === path.toLowerCase());
-    }
-  }
 }
