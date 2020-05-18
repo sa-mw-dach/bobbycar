@@ -1,0 +1,64 @@
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  labels:
+    app: dashboard
+    app.kubernetes.io/part-of: Bobbycar
+  name: dashboard
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    app: dashboard
+    deploymentconfig: dashboard
+  strategy:
+    activeDeadlineSeconds: 21600
+    resources: {}
+    rollingParams:
+      intervalSeconds: 1
+      maxSurge: 25%
+      maxUnavailable: 25%
+      timeoutSeconds: 600
+      updatePeriodSeconds: 1
+    type: Rolling
+  template:
+    metadata:
+      labels:
+        app: dashboard
+        deploymentconfig: dashboard
+    spec:
+      containers:
+      - image: dashboard:latest
+        #imagePullPolicy: Always
+        name: dashboard
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+            - mountPath: /opt/app-root/output/conf/config.json
+              name: dashboard-cfg-vol
+              subPath: config.json
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+        - configMap:
+            defaultMode: 438
+            name: dashboard-config
+          name: dashboard-cfg-vol
+  test: false
+  triggers:
+  - type: ConfigChange
+  - imageChangeParams:
+      automatic: true
+      containerNames:
+      - dashboard
+      from:
+        kind: ImageStreamTag
+        name: dashboard:latest
+    type: ImageChange

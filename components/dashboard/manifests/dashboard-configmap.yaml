@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dashboard-config
+data:
+  config.json: |-
+    {
+        "websocketHost": "http://localhost",
+        "websocketPath": "/api/service-web/socket",
+        "SERVER_TIMEOUT": 20000
+    }
