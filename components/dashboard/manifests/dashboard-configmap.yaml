@@ -5,7 +5,5 @@ metadata:
 data:
   config.json: |-
     {
-        "websocketHost": "http://localhost",
-        "websocketPath": "/api/service-web/socket",
-        "SERVER_TIMEOUT": 20000
+        "GOOGLE_API_KEY": "replaceme"
     }
