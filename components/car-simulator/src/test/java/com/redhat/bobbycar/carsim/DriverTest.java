@@ -25,7 +25,8 @@ public class DriverTest {
 	@ParameterizedTest
 	@MethodSource
 	public void driveRoute(Route route) throws InterruptedException {
-		Driver driver = new Driver(route, new TimedDrivingStrategy());
+		DrivingStrategy strategy = TimedDrivingStrategy.builder().build();
+		Driver driver = Driver.builder().withRoute(route).withDrivingStrategy(strategy).build();
 		driver.registerCarEventListener(evt -> {
 			LOGGER.error("Event is {}", evt);
 			assertNotNull(evt);
@@ -46,7 +47,8 @@ public class DriverTest {
 	@ParameterizedTest
 	@MethodSource
 	public void driveGpxRoute(Route route) throws InterruptedException {
-		Driver driver = new Driver(route, new TimedDrivingStrategy(100));
+		TimedDrivingStrategy strategy = TimedDrivingStrategy.builder().withFactor(100).build();
+		Driver driver = Driver.builder().withRoute(route).withDrivingStrategy(strategy).build();
 		driver.registerCarEventListener(evt -> {
 			LOGGER.error("Event is {}", evt);
 			assertNotNull(evt);

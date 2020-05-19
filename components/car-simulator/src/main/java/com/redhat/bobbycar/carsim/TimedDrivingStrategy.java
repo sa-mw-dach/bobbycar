@@ -14,14 +14,9 @@ public class TimedDrivingStrategy implements DrivingStrategy{
 	private final double factor;
 	private Optional<Long> lastActionTimeMillis = Optional.empty();
 	
-	public TimedDrivingStrategy() {
-		factor = 1;
-	}
-	
-	
-	public TimedDrivingStrategy(double factor) {
-		super();
-		this.factor = factor;
+	private TimedDrivingStrategy(Builder builder) {
+		this.factor = builder.factor;
+		this.lastActionTimeMillis = builder.lastActionTimeMillis;
 	}
 
 	@Override
@@ -62,4 +57,33 @@ public class TimedDrivingStrategy implements DrivingStrategy{
 					.flatMap(lt -> to.getTime()
 						.map(tp -> Duration.between(lt, tp)));
 	}
+
+	public static Builder builder() {
+		return new Builder();
+	}
+
+	public static final class Builder {
+		private double factor = 1;
+		private Optional<Long> lastActionTimeMillis = Optional.empty();
+
+		private Builder() {
+		}
+
+		public Builder withFactor(double factor) {
+			this.factor = factor;
+			return this;
+		}
+
+		public Builder withLastActionTimeMillis(Optional<Long> lastActionTimeMillis) {
+			this.lastActionTimeMillis = lastActionTimeMillis;
+			return this;
+		}
+
+		public TimedDrivingStrategy build() {
+			return new TimedDrivingStrategy(this);
+		}
+	}
+
+
+	
 }

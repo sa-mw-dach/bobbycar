@@ -12,6 +12,8 @@ public class KafkaCarPosition {
 	private double longitude;
 	@JsonbProperty("elev")
 	private double elevation;
+	@JsonbProperty("carid")
+	private String carId;
 	
 	private long eventTime;
 	
@@ -19,12 +21,13 @@ public class KafkaCarPosition {
 		
 	}
 	
-	public KafkaCarPosition(double latitude, double longitude, double elevation, ZonedDateTime time) {
+	public KafkaCarPosition(double latitude, double longitude, double elevation, String carId, ZonedDateTime time) {
 		super();
 		this.latitude = latitude;
 		this.longitude = longitude;
 		this.elevation = elevation;
 		this.eventTime = time.toInstant().toEpochMilli();
+		this.carId = carId;
 	}
 	public double getLatitude() {
 		return latitude;
@@ -49,6 +52,12 @@ public class KafkaCarPosition {
 	}
 	public void setEventTime(long eventTime) {
 		this.eventTime = eventTime;
+	}
+	public String getCarId() {
+		return carId;
+	}
+	public void setCarId(String carId) {
+		this.carId = carId;
 	}
 	
 }
