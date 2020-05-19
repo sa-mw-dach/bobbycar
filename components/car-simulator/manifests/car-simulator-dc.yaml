@@ -45,7 +45,13 @@ spec:
               mountPath: /opt/routes
         env:
             - name: com.redhat.bobbycar.carsim.route
-              value: /opt/routes/route.gpx
+              value: /opt/routes
+            - name: com.redhat.bobbycar.carsim.cars
+              value: '3'
+            - name: com.redhat.bobbycar.carsim.factor
+              value: '5'
+            - name: com.redhat.bobbycar.carsim.repeat
+              value: 'true'
         ports:
           - containerPort: 8080
             name: http
