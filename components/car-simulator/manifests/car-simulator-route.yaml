@@ -3,6 +3,8 @@ kind: Route
 metadata:
   labels:
     app: car-simulator
+  annotations:
+    haproxy.router.openshift.io/timeout: 10000ms
   name: car-simulator
 spec:
   port:
