@@ -43,6 +43,12 @@ public class CarSimulatorApp {
 	@ConfigProperty(name = "com.redhat.bobbycar.carsim.route")
 	String pathToRoutes;
 	
+	@ConfigProperty(name = "com.redhat.bobbycar.carsim.factor", defaultValue = "1.0")
+	double factor;
+	
+	@ConfigProperty(name = "com.redhat.bobbycar.carsim.repeat", defaultValue = "false")
+	boolean repeat;
+	
 	@Inject
     @RestClient
     KafkaService kafkaService;
@@ -62,15 +68,19 @@ public class CarSimulatorApp {
         LongStream.range(0, cars).forEach(c -> {
         	try {
 	        	Route route = pickRoute();
-	            Driver driver = new Driver(route, new TimedDrivingStrategy());
+	        	TimedDrivingStrategy strategy = TimedDrivingStrategy.builder().withFactor(factor).build();
+	            Driver driver = Driver.builder().withRoute(route).withDrivingStrategy(strategy).withRepeat(repeat).build();
 	            driver.registerCarEventListener(evt -> {
 	            	 List<KafkaCarRecord> records = new ArrayList<>();
-	                 records.add(new KafkaCarRecord(driver.getId().toString(), new KafkaCarPosition(evt.getLatitude().doubleValue(), evt.getLongitude().doubleValue(), evt.getElevation().doubleValue(), evt.getTime().orElse(null))));
+	                 records.add(new KafkaCarRecord(driver.getId().toString(), new KafkaCarPosition(evt.getLatitude().doubleValue(), evt.getLongitude().doubleValue(), evt.getElevation().doubleValue(), driver.getId().toString(), evt.getTime().orElse(null))));
 	                 KafkaCarEvent event = new KafkaCarEvent(records);
 	                 kafkaService.publishCarEvent(event);
 	            });
 	            futures.put(driver.getId(), CompletableFuture.runAsync(driver));
 	            drivers.put(driver.getId(), driver);
+	            if (repeat && LOGGER.isInfoEnabled()) {
+	            	LOGGER.info("Repeating route");
+	            }
         	} catch (IOException | JAXBException e) {
         		LOGGER.error("Error reading route", e);
         	}
