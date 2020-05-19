@@ -6,6 +6,7 @@ namespace: bobbycar
 bases:
 - amq-broker/
 - amq-streams/
+- api-gateway/
 - car-simulator/manifests/
 - dashboard/manifests/
 - kafka-streaming-service/manifests/
