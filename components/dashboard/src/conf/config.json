@@ -1,3 +1,5 @@
 {
-    "GOOGLE_API_KEY": "replaceme"
+    "GOOGLE_API_KEY": "replaceme",
+    "SSE_ENDPOINT": "http://localhost:8080",
+    "WS_ENDPOINT": "ws://kafka-sse-route-bobbycar.apps.ocp3.stormshift.coe.muc.redhat.com/api/carevents"
 }
