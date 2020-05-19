@@ -1,0 +1,14 @@
+apiVersion: camel.apache.org/v1
+kind: Integration
+metadata:
+  name: kafka-sse-route
+  uid: 45d23019-41dd-4e0a-8155-3102ea237f6e
+spec:
+  configuration:
+    - type: property
+      value: com.redhat.bobbycar.camelk.kafka.topic=bobbycar-gps
+  dependencies:
+    - 'camel:undertow'
+  sources:
+    - content: "package com.redhat.bobbycar.routes;\nimport org.apache.camel.builder.RouteBuilder;\n\npublic class KafkaSseRoute extends RouteBuilder {\n\t\n\t@Override\n\tpublic void configure() throws Exception {\n\t\tfrom(\"kafka:{{com.redhat.bobbycar.camelk.kafka.topic}}?clientId=kafkaSseCamelClient&brokers=bobbycar-cluster-kafka-brokers:9092\")\n\t\t\t.log(\"Message received from Kafka : ${body}\")\n\t\t\t.to(\"undertow:ws://0.0.0.0:8080/api/carevents?sendToAll=true\");\n\t\tfrom(\"undertow:ws://0.0.0.0:8080/api/carevents?sendToAll=true\")\n\t\t\t.log(\"Message received from Websocket : ${body}\");\n\t}\n\t\n\t\n}\n"
+      name: KafkaSseRoute.java

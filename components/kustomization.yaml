@@ -8,6 +8,7 @@ bases:
 - amq-streams/
 - car-simulator/manifests/
 - dashboard/manifests/
+- kafka-streaming-service/manifests/
 
 resources:
 - namespace.yaml

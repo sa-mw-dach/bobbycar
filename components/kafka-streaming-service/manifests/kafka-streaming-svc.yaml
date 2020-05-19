@@ -1,0 +1,25 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: kafka-sse-route
+  labels:
+    camel.apache.org/generation: '1'
+    camel.apache.org/integration: kafka-sse-route
+    camel.apache.org/service.type: user
+  ownerReferences:
+    - apiVersion: camel.apache.org/v1
+      kind: Integration
+      name: kafka-sse-route
+      uid: 9d8b7f3a-3b74-4e97-80e1-84433da0ead9
+      controller: true
+      blockOwnerDeletion: true
+spec:
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: http
+  selector:
+    camel.apache.org/integration: kafka-sse-route
+  type: ClusterIP
+  sessionAffinity: None

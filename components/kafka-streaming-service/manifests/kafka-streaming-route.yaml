@@ -1,0 +1,22 @@
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  name: kafka-sse-route
+  labels:
+    camel.apache.org/integration: kafka-sse-route
+  ownerReferences:
+    - apiVersion: camel.apache.org/v1
+      kind: Integration
+      name: kafka-sse-route
+      uid: 9d8b7f3a-3b74-4e97-80e1-84433da0ead9
+      controller: true
+      blockOwnerDeletion: true
+spec:
+  host: kafka-sse-route-bobbycar.apps.ocp3.stormshift.coe.muc.redhat.com
+  to:
+    kind: Service
+    name: kafka-sse-route
+    weight: 100
+  port:
+    targetPort: http
+  wildcardPolicy: None
