@@ -74,7 +74,11 @@ public class CarSimulatorApp {
 	            	 List<KafkaCarRecord> records = new ArrayList<>();
 	                 records.add(new KafkaCarRecord(driver.getId().toString(), new KafkaCarPosition(evt.getLatitude().doubleValue(), evt.getLongitude().doubleValue(), evt.getElevation().doubleValue(), driver.getId().toString(), evt.getTime().orElse(null))));
 	                 KafkaCarEvent event = new KafkaCarEvent(records);
-	                 kafkaService.publishCarEvent(event);
+	                 try {
+	                	 kafkaService.publishCarEvent(event);
+	                 } catch(Exception e) {
+	                	 LOGGER.error("Error publishing car event to kafka", e);
+	                 }
 	            });
 	            futures.put(driver.getId(), CompletableFuture.runAsync(driver));
 	            drivers.put(driver.getId(), driver);
