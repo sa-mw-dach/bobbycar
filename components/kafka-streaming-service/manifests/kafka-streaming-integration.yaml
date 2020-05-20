@@ -3,6 +3,7 @@ kind: Integration
 metadata:
   name: kafka-streaming-service
   namespace: bobbycar
+  app.kubernetes.io/part-of: Bobbycar
 spec:
   configuration:
     - type: property
