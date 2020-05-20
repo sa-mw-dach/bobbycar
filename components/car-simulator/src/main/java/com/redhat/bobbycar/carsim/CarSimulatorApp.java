@@ -10,6 +10,8 @@ import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.stream.LongStream;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -38,7 +40,7 @@ public class CarSimulatorApp {
 	private static final Logger LOGGER = LoggerFactory.getLogger(CarSimulatorApp.class);
 	
 	@ConfigProperty(name = "com.redhat.bobbycar.carsim.cars", defaultValue = "1")
-	long cars;
+	int cars;
 	
 	@ConfigProperty(name = "com.redhat.bobbycar.carsim.route")
 	String pathToRoutes;
@@ -57,12 +59,15 @@ public class CarSimulatorApp {
 	private final Map<UUID, CompletableFuture<Void>> futures = new HashMap<>();
 	private GpxReader reader;
 	private Random random = new Random();
+	private ThreadPoolExecutor executor;
 	
 	public CarSimulatorApp() throws JAXBException {
 		reader = new GpxReader();
+		
 	}
 	
-	void onStart(@Observes StartupEvent ev) throws JAXBException {               
+	void onStart(@Observes StartupEvent ev) throws JAXBException {  
+		executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(cars);
         LOGGER.info("The application is starting... ");
         LOGGER.info("Reading routes from {}", pathToRoutes);
         LongStream.range(0, cars).forEach(c -> {
@@ -76,11 +81,12 @@ public class CarSimulatorApp {
 	                 KafkaCarEvent event = new KafkaCarEvent(records);
 	                 try {
 	                	 kafkaService.publishCarEvent(event);
+	                	 
 	                 } catch(Exception e) {
 	                	 LOGGER.error("Error publishing car event to kafka", e);
 	                 }
 	            });
-	            futures.put(driver.getId(), CompletableFuture.runAsync(driver));
+	            futures.put(driver.getId(), CompletableFuture.runAsync(driver, executor));
 	            drivers.put(driver.getId(), driver);
 	            if (repeat && LOGGER.isInfoEnabled()) {
 	            	LOGGER.info("Repeating route");

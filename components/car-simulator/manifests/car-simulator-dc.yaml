@@ -96,6 +96,8 @@ spec:
               value: '/var/run/secrets/java.io/keystores/truststore.jks'
             - name: com.redhat.bobbycar.carsim.kafka.trustStorePassword
               value: 'xVu212U35%?sseTrwsaahh21'
+            - name: quarkus.log.level
+              value: 'INFO'
         ports:
           - containerPort: 8080
             name: http
