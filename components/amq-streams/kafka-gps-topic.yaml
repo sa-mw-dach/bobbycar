@@ -2,7 +2,6 @@ apiVersion: kafka.strimzi.io/v1beta1
 kind: KafkaTopic
 metadata:
   name: bobbycar-gps
-  namespace: bobbycar
   labels:
     strimzi.io/cluster: bobbycar-cluster
 spec:

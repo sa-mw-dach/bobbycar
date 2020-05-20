@@ -2,7 +2,6 @@ apiVersion: kafka.strimzi.io/v1alpha1
 kind: KafkaBridge
 metadata:
   name: bobbycar
-  namespace: bobbycar
 spec:
   replicas: 2
   bootstrapServers: bobbycar-cluster-kafka-bootstrap:9092

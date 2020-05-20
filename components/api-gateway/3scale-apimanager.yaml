@@ -2,7 +2,6 @@ apiVersion: apps.3scale.net/v1alpha1
 kind: APIManager
 metadata:
   name: bobbycar-apimanager
-  namespace: bobbycar-api
 spec:
   wildcardDomain: apps.ocp3.stormshift.coe.muc.redhat.com
   resourceRequirementsEnabled: false

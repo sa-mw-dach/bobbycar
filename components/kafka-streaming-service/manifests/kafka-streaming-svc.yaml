@@ -2,7 +2,6 @@ kind: Service
 apiVersion: v1
 metadata:
   name: kafka-streaming-service
-  namespace: bobbycar
   labels:
     camel.apache.org/generation: '1'
     camel.apache.org/integration: kafka-streaming-service

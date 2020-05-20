@@ -4,7 +4,6 @@ metadata:
   name: bobbycar-crw
   annotations:
     olm.providedAPIs: CheCluster.v1.org.eclipse.che
-  namespace: bobbycar-crw
 spec:
   targetNamespaces:
     - bobbycar-crw
