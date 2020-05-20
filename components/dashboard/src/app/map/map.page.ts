@@ -12,31 +12,24 @@ export class MapPage implements OnInit {
 
     map: google.maps.Map;
     marker: google.maps.Marker;
-    position = { lat: 50.1146997, lng: 8.6185411 };
+    initialPosition = { lat: 50.1146997, lng: 8.6185411 };
+    bobbycars = new Map();
 
     constructor(
         private platform: Platform,
         private socketService: WSService,
         private configService: ConfigService) {
 
-        this.initialize();
+        this.initializeMap();
         this.socketService.connect();
     }
 
-    initialize() {
+    initializeMap() {
         setTimeout(() => {
 
             this.map = new google.maps.Map(document.getElementById('map'), {
-                center: this.position,
-                zoom: 16
-            });
-
-            this.marker = new google.maps.Marker({
-                position: new google.maps.LatLng(this.position),
-                title: 'Quarkus Car',
-                map: this.map,
-                label: 'Quarkus Car',
-                draggable: true
+                center: this.initialPosition,
+                zoom: 13
             });
 
             const cityCircle = new google.maps.Circle({
@@ -52,16 +45,27 @@ export class MapPage implements OnInit {
         }, 10);
     }
 
-    updatePosition() {
-        this.position = { lat: this.position.lat + 0.0001, lng: this.position.lng + 0.0002 };
-        // this.map.setCenter(this.position);
-        this.marker.setPosition(this.position);
+    createOrUpdateMarker(data){
+
+        if(this.bobbycars.has(data.carid)){
+            this.bobbycars.get(data.carid).setPosition(new google.maps.LatLng({ lat: data.lat, lng: data.long }));
+        } else {
+            console.debug('create marker for carid: ' + data.carid);
+            const marker = new google.maps.Marker({
+                position: new google.maps.LatLng({ lat: data.lat, lng: data.long }),
+                title: data.carid,
+                map: this.map,
+                // label: data.carid,
+                draggable: false
+            });
+            this.bobbycars.set(data.carid, marker);
+        }
+
     }
 
-    updateMarkerPosition(point: any) {
-        this.position = { lat: point.lat, lng: point.long};
-        // this.map.setCenter(this.position);
-        this.marker.setPosition(this.position);
+    ionViewWillLeave(){
+        console.debug('ionViewWillLeave()');
+        this.socketService.close();
     }
 
     async ngOnInit() {
@@ -71,19 +75,16 @@ export class MapPage implements OnInit {
             console.log(this.position);
         }, 2000);
         */
-
         this.socketService.getMessages().subscribe(
             msg => {
-                console.log('message received: ' + msg);
-                const point = msg;
-                this.updateMarkerPosition(point);
+                console.debug('message received from: ' + msg.carid);
+                this.createOrUpdateMarker(msg);
             }, // Called whenever there is a message from the server.
-            err => console.log(err), // Called if at any point WebSocket API signals some kind of error.
+            err => console.error(err), // Called if at any point WebSocket API signals some kind of error.
             () => console.log('complete') // Called when connection is closed (for whatever reason).
         );
 
     }
-
 
 
 }
