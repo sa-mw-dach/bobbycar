@@ -3,6 +3,7 @@ kind: Kustomization
 
 resources:
 - camel-k-operator-subscription.yaml
+- camel-k-integration-platform.yaml
 - kafka-streaming-integration.yaml
 - kafka-streaming-route.yaml
 - kafka-streaming-svc.yaml
