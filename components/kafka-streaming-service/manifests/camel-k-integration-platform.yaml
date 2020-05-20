@@ -2,6 +2,5 @@ apiVersion: camel.apache.org/v1
 kind: IntegrationPlatform
 metadata:
   name: camel-k
-  namspace: bobbycar
   labels:
     app: "camel-k"

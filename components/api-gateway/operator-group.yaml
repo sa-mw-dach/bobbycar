@@ -5,7 +5,6 @@ metadata:
     olm.providedAPIs: ""
   generateName: bobbycar-og-
   name: bobbycar-og
-  namespace: bobbycar-api
 spec:
   targetNamespaces:
   - bobbycar-api

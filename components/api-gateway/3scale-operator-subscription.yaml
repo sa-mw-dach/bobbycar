@@ -2,7 +2,6 @@ apiVersion: operators.coreos.com/v1alpha1
 kind: Subscription
 metadata:
   name: 3scale-operator
-  namespace: bobbycar-api
 spec:
   channel: threescale-2.8
   installPlanApproval: Automatic
