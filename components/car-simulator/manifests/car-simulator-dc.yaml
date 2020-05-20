@@ -35,6 +35,44 @@ spec:
           configMap:
             name: car-simulator-config
             defaultMode: 420
+        - name: keystore-volume
+          emptyDir: {}
+      initContainers:
+      - resources: {}
+        terminationMessagePath: /dev/termination-log
+        name: pem-to-truststore
+        command:
+          - /bin/bash
+        env:
+          - name: ca_bundle
+            value: /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
+          - name: truststore_jks
+            value: /var/run/secrets/java.io/keystores/truststore.jks
+          - name: password
+            value: 'xVu212U35%?sseTrwsaahh21'
+        securityContext:
+          capabilities:
+            drop:
+              - KILL
+              - MKNOD
+              - SETGID
+              - SETUID
+          runAsUser: 1000630000
+        imagePullPolicy: IfNotPresent
+        volumeMounts:
+          - name: keystore-volume
+            mountPath: /var/run/secrets/java.io/keystores
+          - name: default-token-lj4gz
+            readOnly: true
+            mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        terminationMessagePolicy: File
+        image: 'registry.access.redhat.com/redhat-sso-7/sso71-openshift:1.1-16'
+        args:
+          - '-c'
+          - >-
+            csplit -z -f crt- $ca_bundle '/-----BEGIN CERTIFICATE-----/' '{*}' &&
+            for file in crt-*; do keytool -import -noprompt -keystore
+            $truststore_jks -file $file -storepass $password -alias service-$file;
       containers:
       - name: car-simulator
         image: car-simulator:latest
@@ -43,6 +81,8 @@ spec:
             - name: config
               readOnly: true
               mountPath: /opt/routes
+            - name: keystore-volume
+              mountPath: /var/run/secrets/java.io/keystores
         env:
             - name: com.redhat.bobbycar.carsim.route
               value: /opt/routes
@@ -52,6 +92,10 @@ spec:
               value: '5'
             - name: com.redhat.bobbycar.carsim.repeat
               value: 'true'
+            - name: com.redhat.bobbycar.carsim.kafka.truststore
+              value: '/var/run/secrets/java.io/keystores/truststore.jks'
+            - name: com.redhat.bobbycar.carsim.kafka.trustStorePassword
+              value: 'xVu212U35%?sseTrwsaahh21'
         ports:
           - containerPort: 8080
             name: http
