@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Platform } from '@ionic/angular';
+import { Router } from '@angular/router';
 import { ConfigService } from '../providers/config.service';
 import { WSService } from '../providers/ws.service';
 
@@ -12,13 +13,14 @@ export class MapPage implements OnInit {
 
     map: google.maps.Map;
     marker: google.maps.Marker;
+    infowindow: google.maps.InfoWindow;
     initialPosition = { lat: 50.1146997, lng: 8.6185411 };
     bobbycars = new Map();
 
     constructor(
         private platform: Platform,
         private socketService: WSService,
-        private configService: ConfigService) {
+        private router: Router) {
 
         this.initializeMap();
         this.socketService.connect();
@@ -32,16 +34,10 @@ export class MapPage implements OnInit {
                 zoom: 13
             });
 
-            const cityCircle = new google.maps.Circle({
-                strokeColor: '#FF0000',
-                strokeOpacity: 0.8,
-                strokeWeight: 2,
-                fillColor: '#FF0000',
-                fillOpacity: 0.35,
-                map: this.map,
-                center: { lat: 50.1115432, lng: 8.6965495 },
-                radius: 5000
+            this.infowindow = new google.maps.InfoWindow({
+                content: ''
             });
+
         }, 10);
     }
 
@@ -58,9 +54,57 @@ export class MapPage implements OnInit {
                 // label: data.carid,
                 draggable: false
             });
+
+            google.maps.event.addListener(marker, 'click', (function(marker, content, infowindow) {
+                return function() {
+                    infowindow.setContent(
+                        `<span style="color: #000000;">
+                            <h4>Bobbycar Id:</h4><br/>
+                            <p>`+content+`</p>
+                            <ion-button href="/home">Car Detail</ion-button>
+                        </span>`);
+                    infowindow.open(this.map, marker);
+                }
+            })(marker, data.carid, this.infowindow));
+
             this.bobbycars.set(data.carid, marker);
         }
+    }
 
+    realtimeSearch(){
+        const circle = new google.maps.Circle({
+            strokeColor: '#eeeeee',
+            strokeOpacity: 0.7,
+            strokeWeight: 1,
+            fillColor: '#444444',
+            fillOpacity: 0.35,
+            map: this.map,
+            center: this.map.getCenter(),
+            editable: true,
+            radius: 3000
+        });
+    }
+
+    createZone(){
+        const circle = new google.maps.Circle({
+            strokeColor: '#FF0000',
+            strokeOpacity: 0.7,
+            strokeWeight: 1,
+            fillColor: '#FF0000',
+            fillOpacity: 0.35,
+            map: this.map,
+            center: this.map.getCenter(),
+            editable: true,
+            radius: 3000
+        });
+    }
+
+    resetMap() {
+        console.debug('resetMap()');
+        this.bobbycars.forEach(el => {
+            el.setMap(null);
+        });
+        this.bobbycars.clear();
     }
 
     ionViewWillLeave(){
