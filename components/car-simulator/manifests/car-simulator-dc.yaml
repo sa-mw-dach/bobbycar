@@ -38,41 +38,38 @@ spec:
         - name: keystore-volume
           emptyDir: {}
       initContainers:
-      - resources: {}
-        terminationMessagePath: /dev/termination-log
-        name: pem-to-truststore
-        command:
-          - /bin/bash
-        env:
-          - name: ca_bundle
-            value: /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
-          - name: truststore_jks
-            value: /var/run/secrets/java.io/keystores/truststore.jks
-          - name: password
-            value: 'xVu212U35%?sseTrwsaahh21'
-        securityContext:
-          capabilities:
-            drop:
-              - KILL
-              - MKNOD
-              - SETGID
-              - SETUID
-          runAsUser: 1000630000
-        imagePullPolicy: IfNotPresent
-        volumeMounts:
-          - name: keystore-volume
-            mountPath: /var/run/secrets/java.io/keystores
-          - name: default-token-lj4gz
-            readOnly: true
-            mountPath: /var/run/secrets/kubernetes.io/serviceaccount
-        terminationMessagePolicy: File
-        image: 'registry.access.redhat.com/redhat-sso-7/sso71-openshift:1.1-16'
-        args:
-          - '-c'
-          - >-
-            csplit -z -f crt- $ca_bundle '/-----BEGIN CERTIFICATE-----/' '{*}' &&
-            for file in crt-*; do keytool -import -noprompt -keystore
-            $truststore_jks -file $file -storepass $password -alias service-$file;
+        - resources: {}
+          terminationMessagePath: /dev/termination-log
+          name: pem-to-truststore
+          command:
+            - /bin/bash
+          env:
+            - name: svc_ca_bundle
+              value: /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
+            - name: truststore_jks
+              value: /var/run/secrets/java.io/keystores/truststore.jks
+            - name: password
+              value: xVu212U35%?sseTrwsaahh21
+            - name: router_url
+              value: oauth-openshift.apps.ocp3.stormshift.coe.muc.redhat.com
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+            - name: keystore-volume
+              mountPath: /var/run/secrets/java.io/keystores
+          terminationMessagePolicy: File
+          image: 'registry.access.redhat.com/redhat-sso-7/sso71-openshift:1.1-16'
+          args:
+            - '-c'
+            - >-
+              router_ca_bundle=/var/run/secrets/java.io/keystores/router-ca.crt;
+              all_ca_bundle=/var/run/secrets/java.io/keystores/all-ca.crt &&
+              echo | openssl s_client -showcerts -connect $router_url:443
+              2>/dev/null | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p'
+              >  $router_ca_bundle && cat $router_ca_bundle $svc_ca_bundle >
+              $all_ca_bundle  && csplit -z -f crt- $all_ca_bundle '/-----BEGIN
+              CERTIFICATE-----/' '{*}' && for file in crt-*; do keytool -import
+              -noprompt -keystore $truststore_jks -file $file -storepass
+              $password -alias service-$file; done
       containers:
       - name: car-simulator
         image: car-simulator:latest

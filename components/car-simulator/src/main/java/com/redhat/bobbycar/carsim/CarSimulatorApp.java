@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -17,6 +18,7 @@ import java.util.stream.LongStream;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
+import javax.net.ssl.SSLException;
 import javax.xml.bind.JAXBException;
 
 import org.apache.commons.io.FilenameUtils;
@@ -51,6 +53,10 @@ public class CarSimulatorApp {
 	@ConfigProperty(name = "com.redhat.bobbycar.carsim.repeat", defaultValue = "false")
 	boolean repeat;
 	
+	@ConfigProperty(name = "com.redhat.bobbycar.carsim.kafka.apiKey")
+	Optional<String> apiKey;
+	
+	
 	@Inject
     @RestClient
     KafkaService kafkaService;
@@ -80,10 +86,13 @@ public class CarSimulatorApp {
 	                 records.add(new KafkaCarRecord(driver.getId().toString(), new KafkaCarPosition(evt.getLatitude().doubleValue(), evt.getLongitude().doubleValue(), evt.getElevation().doubleValue(), driver.getId().toString(), evt.getTime().orElse(null))));
 	                 KafkaCarEvent event = new KafkaCarEvent(records);
 	                 try {
-	                	 kafkaService.publishCarEvent(event);
-	                	 
+	                	 kafkaService.publishCarEvent(apiKey.orElse(null), event);
 	                 } catch(Exception e) {
 	                	 LOGGER.error("Error publishing car event to kafka", e);
+	                	 if (e.getCause() instanceof SSLException) {
+	                		 LOGGER.error("Cannot recover from SSL error. Shutting down.");
+	                		 throw e;
+	                	 }
 	                 }
 	            });
 	            futures.put(driver.getId(), CompletableFuture.runAsync(driver, executor));
