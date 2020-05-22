@@ -1,6 +1,20 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>Bobbycar - Map</ion-title>
+    <ion-title>Bobbycar - Map ({{bobbycars.size}})</ion-title>
+  </ion-toolbar>
+  <ion-toolbar>
+    <ion-button (click)="realtimeSearch()">
+      <ion-icon name="search"></ion-icon> 
+      Realtime Search
+    </ion-button>
+    <ion-button (click)="createZone()">
+      <ion-icon name="create-outline"></ion-icon> 
+      Create Zone
+    </ion-button>
+    <ion-button color="danger" (click)="resetMap()">
+      <ion-icon name="refresh-outline"></ion-icon> 
+      Reset Map
+    </ion-button>
   </ion-toolbar>
 </ion-header>
 

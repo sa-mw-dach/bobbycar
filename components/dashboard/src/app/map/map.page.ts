@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Platform } from '@ionic/angular';
+import { Router } from '@angular/router';
 import { ConfigService } from '../providers/config.service';
 import { WSService } from '../providers/ws.service';
 
@@ -12,56 +13,103 @@ export class MapPage implements OnInit {
 
     map: google.maps.Map;
     marker: google.maps.Marker;
-    position = { lat: 50.1146997, lng: 8.6185411 };
+    infowindow: google.maps.InfoWindow;
+    initialPosition = { lat: 50.1146997, lng: 8.6185411 };
+    bobbycars = new Map();
 
     constructor(
         private platform: Platform,
         private socketService: WSService,
-        private configService: ConfigService) {
+        private router: Router) {
 
-        this.initialize();
+        this.initializeMap();
         this.socketService.connect();
     }
 
-    initialize() {
+    initializeMap() {
         setTimeout(() => {
 
             this.map = new google.maps.Map(document.getElementById('map'), {
-                center: this.position,
-                zoom: 16
+                center: this.initialPosition,
+                zoom: 13
             });
 
-            this.marker = new google.maps.Marker({
-                position: new google.maps.LatLng(this.position),
-                title: 'Quarkus Car',
-                map: this.map,
-                label: 'Quarkus Car',
-                draggable: true
+            this.infowindow = new google.maps.InfoWindow({
+                content: ''
             });
 
-            const cityCircle = new google.maps.Circle({
-                strokeColor: '#FF0000',
-                strokeOpacity: 0.8,
-                strokeWeight: 2,
-                fillColor: '#FF0000',
-                fillOpacity: 0.35,
-                map: this.map,
-                center: { lat: 50.1115432, lng: 8.6965495 },
-                radius: 5000
-            });
         }, 10);
     }
 
-    updatePosition() {
-        this.position = { lat: this.position.lat + 0.0001, lng: this.position.lng + 0.0002 };
-        // this.map.setCenter(this.position);
-        this.marker.setPosition(this.position);
+    createOrUpdateMarker(data){
+
+        if(this.bobbycars.has(data.carid)){
+            this.bobbycars.get(data.carid).setPosition(new google.maps.LatLng({ lat: data.lat, lng: data.long }));
+        } else {
+            console.debug('create marker for carid: ' + data.carid);
+            const marker = new google.maps.Marker({
+                position: new google.maps.LatLng({ lat: data.lat, lng: data.long }),
+                title: data.carid,
+                map: this.map,
+                // label: data.carid,
+                draggable: false
+            });
+
+            google.maps.event.addListener(marker, 'click', (function(marker, content, infowindow) {
+                return function() {
+                    infowindow.setContent(
+                        `<span style="color: #000000;">
+                            <h4>Bobbycar Id:</h4><br/>
+                            <p>`+content+`</p>
+                            <ion-button href="/home">Car Detail</ion-button>
+                        </span>`);
+                    infowindow.open(this.map, marker);
+                }
+            })(marker, data.carid, this.infowindow));
+
+            this.bobbycars.set(data.carid, marker);
+        }
     }
 
-    updateMarkerPosition(point: any) {
-        this.position = { lat: point.lat, lng: point.long};
-        // this.map.setCenter(this.position);
-        this.marker.setPosition(this.position);
+    realtimeSearch(){
+        const circle = new google.maps.Circle({
+            strokeColor: '#eeeeee',
+            strokeOpacity: 0.7,
+            strokeWeight: 1,
+            fillColor: '#444444',
+            fillOpacity: 0.35,
+            map: this.map,
+            center: this.map.getCenter(),
+            editable: true,
+            radius: 3000
+        });
+    }
+
+    createZone(){
+        const circle = new google.maps.Circle({
+            strokeColor: '#FF0000',
+            strokeOpacity: 0.7,
+            strokeWeight: 1,
+            fillColor: '#FF0000',
+            fillOpacity: 0.35,
+            map: this.map,
+            center: this.map.getCenter(),
+            editable: true,
+            radius: 3000
+        });
+    }
+
+    resetMap() {
+        console.debug('resetMap()');
+        this.bobbycars.forEach(el => {
+            el.setMap(null);
+        });
+        this.bobbycars.clear();
+    }
+
+    ionViewWillLeave(){
+        console.debug('ionViewWillLeave()');
+        this.socketService.close();
     }
 
     async ngOnInit() {
@@ -71,19 +119,16 @@ export class MapPage implements OnInit {
             console.log(this.position);
         }, 2000);
         */
-
         this.socketService.getMessages().subscribe(
             msg => {
-                console.log('message received: ' + msg);
-                const point = msg;
-                this.updateMarkerPosition(point);
+                console.debug('message received from: ' + msg.carid);
+                this.createOrUpdateMarker(msg);
             }, // Called whenever there is a message from the server.
-            err => console.log(err), // Called if at any point WebSocket API signals some kind of error.
+            err => console.error(err), // Called if at any point WebSocket API signals some kind of error.
             () => console.log('complete') // Called when connection is closed (for whatever reason).
         );
 
     }
-
 
 
 }
