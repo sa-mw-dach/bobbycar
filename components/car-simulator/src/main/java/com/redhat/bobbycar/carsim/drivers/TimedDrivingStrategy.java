@@ -45,8 +45,8 @@ public class TimedDrivingStrategy implements DrivingStrategy{
 				
 				consumer.accept(new CarEvent(to.getLongitude(), to.getLatitude(), to.getElevation(), Optional.of(ZonedDateTime.now())));
 			}catch (InterruptedException e) {
-				//TODO Error handling
-				LOGGER.error("", e);
+				LOGGER.error("Cannot pause thread to wait for next point", e);
+				Thread.currentThread().interrupt();
 			}
 		});
 		if (from.isEmpty()) {

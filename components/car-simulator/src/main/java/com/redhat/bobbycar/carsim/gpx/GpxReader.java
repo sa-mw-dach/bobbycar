@@ -2,7 +2,6 @@ package com.redhat.bobbycar.carsim.gpx;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
@@ -28,13 +27,13 @@ public class GpxReader {
 		unmarshaller = jaxbContext.createUnmarshaller();
 	}
 
-	public Route readGpx(File input) throws JAXBException, FileNotFoundException, IOException {
+	public Route readGpx(File input) throws JAXBException, IOException {
 		try (FileInputStream fis = new FileInputStream(input)) {
 			return readGpx(fis);
 		}
 	}
 	
-	public Route readGpx(InputStream input) throws JAXBException, FileNotFoundException, IOException {
+	public Route readGpx(InputStream input) throws JAXBException {
 			Source source = new StreamSource(input);
 			JAXBElement<GpxType> element = unmarshaller.unmarshal(source, GpxType.class);
 			GpxType gpx = element.getValue();
