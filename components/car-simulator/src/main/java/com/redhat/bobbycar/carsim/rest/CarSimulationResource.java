@@ -31,7 +31,7 @@ public class CarSimulationResource {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public List<CarSimulationDto> getAll() {
-		return driverDao.getAllDrivers().stream().map(d -> new CarSimulationDto(d.getId(), d.getMetrics().getStart(), d.getMetrics().getEnd(),
+		return driverDao.getAllDrivers().stream().map(d -> new CarSimulationDto(d.getId(), d.getStart(), d.getEnd(),
 				new CarDto("12345678901234567"), new RouteDto(d.getRouteName()))).collect(Collectors.toList());
 	}
 	

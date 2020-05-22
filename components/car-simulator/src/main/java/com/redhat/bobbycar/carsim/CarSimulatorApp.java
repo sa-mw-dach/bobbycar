@@ -10,7 +10,6 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.LongStream;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -30,7 +29,9 @@ import com.redhat.bobbycar.carsim.clients.model.KafkaCarPosition;
 import com.redhat.bobbycar.carsim.clients.model.KafkaCarRecord;
 import com.redhat.bobbycar.carsim.data.DriverDao;
 import com.redhat.bobbycar.carsim.drivers.Driver;
+import com.redhat.bobbycar.carsim.drivers.DriverMetrics;
 import com.redhat.bobbycar.carsim.drivers.TimedDrivingStrategy;
+import com.redhat.bobbycar.carsim.drivers.TimedDrivingStrategyMetrics;
 import com.redhat.bobbycar.carsim.gpx.GpxReader;
 import com.redhat.bobbycar.carsim.routes.RandomRouteSeclector;
 import com.redhat.bobbycar.carsim.routes.Route;
@@ -72,6 +73,12 @@ public class CarSimulatorApp {
 	@Inject
 	GpxReader gpxReader;
 	
+	@Inject
+	TimedDrivingStrategyMetrics timedDrivingStrategyMetrics;
+	
+	@Inject
+	DriverMetrics driverMetrics;
+	
     private RouteSelectionStrategy routeSelectionStrategy;
 	
 	private final Map<UUID, CompletableFuture<Void>> futures;
@@ -94,11 +101,16 @@ public class CarSimulatorApp {
         LongStream.range(0, cars).forEach(c -> {
         	try {
 	        	Route route = getRouteSelectionStrategy().selectRoute();
-	        	TimedDrivingStrategy strategy = TimedDrivingStrategy.builder().withFactor(factor).build();
+	        	TimedDrivingStrategy strategy = TimedDrivingStrategy.builder()
+	        			.withFactor(factor)
+	        			.withMetrics(timedDrivingStrategyMetrics)
+	        			.build();
 	            Driver driver = Driver.builder()
 	            		.withRoute(route)
 	            		.withDrivingStrategy(strategy)
 	            		.withRepeat(repeat)
+	            		.withMetrics(driverMetrics)
+	            		.withStartDelay(delay * (c + 1))
 	            		.build();
 	            registerListenerForKafka(driver);
 	            futures.put(driver.getId(), CompletableFuture.runAsync(driver, executor));
@@ -106,13 +118,9 @@ public class CarSimulatorApp {
 	            if (repeat && LOGGER.isInfoEnabled()) {
 	            	LOGGER.info("Will repeat route when finished");
 	            }
-	            delayIfNecessary();
         	} catch (IOException | JAXBException e) {
         		LOGGER.error("Error reading route", e);
-        	} catch (InterruptedException e) {
-        		LOGGER.warn("Error delaying route by pausing thread", e);
-        		Thread.currentThread().interrupt();
-			}
+        	} 
         });
     }
 
@@ -133,12 +141,7 @@ public class CarSimulatorApp {
 		});
 	}
 
-	private void delayIfNecessary() throws InterruptedException {
-		if (delay > 0) {
-			LOGGER.info("Next car starts with delay of {}ms", delay);
-			TimeUnit.MILLISECONDS.sleep(delay);
-		}
-	}
+	
 
 	void onStop(@Observes ShutdownEvent ev) {               
         LOGGER.info("The application is stopping...");
