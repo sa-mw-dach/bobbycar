@@ -1,4 +1,4 @@
-package com.redhat.bobbycar.carsim;
+package com.redhat.bobbycar.carsim.drivers;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;
@@ -8,6 +8,10 @@ import java.util.function.Consumer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.redhat.bobbycar.carsim.CarEvent;
+import com.redhat.bobbycar.carsim.routes.Route;
+import com.redhat.bobbycar.carsim.routes.RoutePoint;
 
 public class TimedDrivingStrategy implements DrivingStrategy{
 	private static final Logger LOGGER = LoggerFactory.getLogger(DrivingStrategy.class);

@@ -1,4 +1,4 @@
-package com.redhat.bobbycar.carsim;
+package com.redhat.bobbycar.carsim.drivers;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -8,6 +8,11 @@ import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.redhat.bobbycar.carsim.CarEvent;
+import com.redhat.bobbycar.carsim.CarEventListener;
+import com.redhat.bobbycar.carsim.routes.Route;
+import com.redhat.bobbycar.carsim.routes.RoutePoint;
 
 public class Driver implements Runnable{
 	

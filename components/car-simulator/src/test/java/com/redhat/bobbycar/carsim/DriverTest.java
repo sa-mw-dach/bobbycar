@@ -17,7 +17,12 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.redhat.bobbycar.carsim.drivers.Driver;
+import com.redhat.bobbycar.carsim.drivers.DrivingStrategy;
+import com.redhat.bobbycar.carsim.drivers.TimedDrivingStrategy;
 import com.redhat.bobbycar.carsim.gpx.GpxReader;
+import com.redhat.bobbycar.carsim.routes.Route;
+import com.redhat.bobbycar.carsim.routes.RoutePoint;
 
 public class DriverTest {
 	private static final Logger LOGGER = LoggerFactory.getLogger(DriverTest.class);

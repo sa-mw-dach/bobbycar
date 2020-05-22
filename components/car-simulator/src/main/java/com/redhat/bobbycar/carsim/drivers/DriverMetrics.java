@@ -1,4 +1,4 @@
-package com.redhat.bobbycar.carsim;
+package com.redhat.bobbycar.carsim.drivers;
 
 import java.time.ZonedDateTime;
 

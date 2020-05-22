@@ -1,4 +1,4 @@
-package com.redhat.bobbycar.carsim;
+package com.redhat.bobbycar.carsim.routes;
 
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
