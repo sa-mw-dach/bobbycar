@@ -10,6 +10,7 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.LongStream;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -48,6 +49,9 @@ public class CarSimulatorApp {
 	
 	@ConfigProperty(name = "com.redhat.bobbycar.carsim.route")
 	String pathToRoutes;
+	
+	@ConfigProperty(name = "com.redhat.bobbycar.carsim.delay", defaultValue = "0")
+	int delay;
 	
 	@ConfigProperty(name = "com.redhat.bobbycar.carsim.factor", defaultValue = "1.0")
 	double factor;
@@ -91,31 +95,50 @@ public class CarSimulatorApp {
         	try {
 	        	Route route = getRouteSelectionStrategy().selectRoute();
 	        	TimedDrivingStrategy strategy = TimedDrivingStrategy.builder().withFactor(factor).build();
-	            Driver driver = Driver.builder().withRoute(route).withDrivingStrategy(strategy).withRepeat(repeat).build();
-	            driver.registerCarEventListener(evt -> {
-	            	 List<KafkaCarRecord> records = new ArrayList<>();
-	                 records.add(new KafkaCarRecord(driver.getId().toString(), new KafkaCarPosition(evt.getLatitude().doubleValue(), evt.getLongitude().doubleValue(), evt.getElevation().doubleValue(), driver.getId().toString(), evt.getTime().orElse(null))));
-	                 KafkaCarEvent event = new KafkaCarEvent(records);
-	                 try {
-	                	 kafkaService.publishCarEvent(apiKey.orElse(null), event);
-	                 } catch(Exception e) {
-	                	 LOGGER.error("Error publishing car event to kafka", e);
-	                	 if (e.getCause() instanceof SSLException) {
-	                		 LOGGER.error("Cannot recover from SSL error. Shutting down.");
-	                		 throw e;
-	                	 }
-	                 }
-	            });
+	            Driver driver = Driver.builder()
+	            		.withRoute(route)
+	            		.withDrivingStrategy(strategy)
+	            		.withRepeat(repeat)
+	            		.build();
+	            registerListenerForKafka(driver);
 	            futures.put(driver.getId(), CompletableFuture.runAsync(driver, executor));
 	            driverDao.create(driver.getId(), driver);
 	            if (repeat && LOGGER.isInfoEnabled()) {
 	            	LOGGER.info("Will repeat route when finished");
 	            }
+	            delayIfNecessary();
         	} catch (IOException | JAXBException e) {
         		LOGGER.error("Error reading route", e);
-        	}
+        	} catch (InterruptedException e) {
+        		LOGGER.warn("Error delaying route by pausing thread", e);
+        		Thread.currentThread().interrupt();
+			}
         });
     }
+
+	private void registerListenerForKafka(Driver driver) {
+		driver.registerCarEventListener(evt -> {
+			 List<KafkaCarRecord> records = new ArrayList<>();
+		     records.add(new KafkaCarRecord(driver.getId().toString(), new KafkaCarPosition(evt.getLatitude().doubleValue(), evt.getLongitude().doubleValue(), evt.getElevation().doubleValue(), driver.getId().toString(), evt.getTime().orElse(null))));
+		     KafkaCarEvent event = new KafkaCarEvent(records);
+		     try {
+		    	 kafkaService.publishCarEvent(apiKey.orElse(null), event);
+		     } catch(Exception e) {
+		    	 LOGGER.error("Error publishing car event to kafka", e);
+		    	 if (e.getCause() instanceof SSLException) {
+		    		 LOGGER.error("Cannot recover from SSL error. Shutting down.");
+		    		 throw e;
+		    	 }
+		     }
+		});
+	}
+
+	private void delayIfNecessary() throws InterruptedException {
+		if (delay > 0) {
+			LOGGER.info("Next car starts with delay of {}ms", delay);
+			TimeUnit.MILLISECONDS.sleep(delay);
+		}
+	}
 
 	void onStop(@Observes ShutdownEvent ev) {               
         LOGGER.info("The application is stopping...");

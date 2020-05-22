@@ -10,7 +10,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-import javax.xml.bind.JAXBException;
 
 import org.jboss.resteasy.annotations.SseElementType;
 
@@ -40,7 +39,7 @@ public class CarSimulationResource {
 	@Path("/{id}/route")
 	@Produces(MediaType.SERVER_SENT_EVENTS)
 	@SseElementType(MediaType.APPLICATION_JSON)
-	public Multi<CarEventDto> getRoute(@PathParam("id") UUID id) throws JAXBException {
+	public Multi<CarEventDto> getRoute(@PathParam("id") UUID id) {
 		return Multi.createFrom().emitter(em -> 
 			driverDao.getById(id).ifPresent(d -> d.registerCarEventListener(evt -> em.emit(new CarEventDto(evt))))
 		);

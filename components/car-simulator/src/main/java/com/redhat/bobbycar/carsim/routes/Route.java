@@ -1,13 +1,18 @@
 package com.redhat.bobbycar.carsim.routes;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 
-public class Route {
+public class Route implements Serializable{
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private final List<RoutePoint> points = new ArrayList<>();
 	private String name;
 	

@@ -1,12 +1,17 @@
 package com.redhat.bobbycar.carsim.routes;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.Objects;
 import java.util.Optional;
 
-public class RoutePoint {
+public class RoutePoint implements Serializable{
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private final BigDecimal longitude;
 	private final BigDecimal latitude;
 	private final BigDecimal elevation;
