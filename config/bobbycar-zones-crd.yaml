@@ -9,6 +9,7 @@ spec:
     plural: zones
     singular: zone
     kind: BobbycarZone
+    listKind: BobbycarZoneList
     shortNames: 
     - bz
   scope: Namespaced
