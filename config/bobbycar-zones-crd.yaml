@@ -1,0 +1,68 @@
+kind: CustomResourceDefinition
+apiVersion: apiextensions.k8s.io/v1beta1
+metadata:
+  name: zones.bobbycar.redhat.com
+spec:
+  subresources:
+    status: {}
+  names:
+    plural: zones
+    singular: zone
+    kind: BobbycarZone
+    shortNames: 
+    - bz
+  scope: Namespaced
+  conversion:
+    strategy: None
+  preserveUnknownFields: true
+  version: v1alpha1
+  group: bobbycar.redhat.com
+  validation:
+    openAPIV3Schema:
+      type: object
+      properties:
+        apiVersion:
+          description: >-
+            APIVersion defines the versioned schema of this representation of an
+            object. Servers should convert recognized schemas to the latest
+            internal value, and may reject unrecognized values. More info:
+            https://git.k8s.io/community/contributors/devel/api-conventions.md#resources
+          type: string
+        kind:
+          description: >-
+            Kind is a string value representing the REST resource this object
+            represents. Servers may infer this from the endpoint the client
+            submits requests to. Cannot be updated. In CamelCase. More info:
+            https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds
+          type: string
+        metadata:
+          type: object
+        spec:
+          description: >-
+            Desired configuration of the Bobbycar Zone.
+          type: object
+          required: ["name", "type"]
+          properties:
+            name:
+              description: >-
+                The name of the zone.
+              type: string
+            type:
+              description: >-
+                The type of the zone. Possible values are circle, rectangle or polygon.
+              type: string
+            priority:
+              type: integer  
+            position:
+              description: >-
+                The lat, lng coordinates of the center.
+              type: object  
+              properties:
+                lat:
+                  type: number
+                lng:
+                  type: number  
+            radius:
+              description: >-
+                The radius in meter.
+              type: integer      
