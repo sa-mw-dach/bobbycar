@@ -25,7 +25,7 @@ The CRD extends the Kubernetes API as follows:
 Test the API extension with:
 
 ```sh
-curl -k -H "Authorization: Bearer yourtoken" "https://api.ocp3.stormshift.coe.muc.redhat.com:6443/apis/bobbycar.redhat.com/v1alpha1/namespaces/*/zones/"
+curl -k -H "Authorization: Bearer yourtoken" "https://api.ocp3.stormshift.coe.muc.redhat.com:6443/apis/bobbycar.redhat.com/v1alpha1/namespaces/bobbycar/zones/"
 ```
 
 or

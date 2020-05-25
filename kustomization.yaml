@@ -3,5 +3,6 @@ kind: Kustomization
 
 bases:
 - components
+- config
 - crw
 - tekton
