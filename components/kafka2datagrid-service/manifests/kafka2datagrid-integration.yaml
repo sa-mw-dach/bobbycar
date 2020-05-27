@@ -1,0 +1,11 @@
+apiVersion: camel.apache.org/v1
+kind: Integration
+metadata:
+  name: kafka-to-datagrid-route
+spec:
+  configuration:
+    - type: secret
+      value: bobbycar-kafka2datagrid-secret
+  sources:
+    - content: "package com.redhat.bobbycar.routes;\nimport java.util.Properties;\n\nimport org.apache.camel.builder.RouteBuilder;\nimport org.apache.camel.component.infinispan.InfinispanConstants;\nimport org.apache.camel.component.infinispan.InfinispanOperation;\nimport org.infinispan.client.hotrod.configuration.ConfigurationBuilder;\n\npublic class KafkaToDatagridRoute extends RouteBuilder {\n\t\n\t@Override\n\tpublic void configure() throws Exception {\n\t\tProperties properties = new Properties();\n\t\tproperties.put(\"infinispan.client.hotrod.auth_username\", propertyInject(\"{{com.redhat.bobbycar.camelk.dg.user}}\", String.class));\n\t\tproperties.put(\"infinispan.client.hotrod.auth_password\", propertyInject(\"{{com.redhat.bobbycar.camelk.dg.password}}\", String.class));\n\t\tConfigurationBuilder hotRodBuilder = new ConfigurationBuilder();\n\t\thotRodBuilder.addServer()\n\t        .host(propertyInject(\"{{com.redhat.bobbycar.camelk.dg.host}}\", String.class))\n\t        .port(9999)\n\t        .withProperties(properties)\n\t        .version(org.infinispan.client.hotrod.ProtocolVersion.PROTOCOL_VERSION_30)\n\t    .build();\n\t\t\n\t\tfrom(\"kafka:{{com.redhat.bobbycar.camelk.kafka.topic}}?clientId=kafkaSseCamelClient&brokers={{com.redhat.bobbycar.camelk.kafka.brokers}}:9092\")\n\t\t\t.setHeader(InfinispanConstants.OPERATION).constant(InfinispanOperation.PUT)\n\t\t    .setHeader(InfinispanConstants.KEY).expression(simple(\"${headers[kafka.KEY]}\"))\n\t\t    .setHeader(InfinispanConstants.VALUE).expression(simple(\"${body}\"))\n\t\t    .log(\"Saving data to cache with key: ${headers[kafka.KEY]} and value: ${body}\")\n\t\t\t.to(\"infinispan://{{com.redhat.bobbycar.camelk.dg.cacheName}}\");\n\t}\n\t\n\t\n}\n"
+      name: KafkaToDatagridRoute.java
