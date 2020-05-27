@@ -1,0 +1,29 @@
+apiVersion: infinispan.org/v1
+kind: Infinispan
+metadata:
+  name: bobbycar-dg
+spec:
+  container:
+    cpu: ''
+    extraJvmOpts: ''
+    memory: ''
+  expose: {}
+  image: ''
+  logging:
+    categories: null
+  replicas: 1
+  security:
+    endpointEncryption:
+      certSecretName: ''
+      certServiceName: ''
+      type: ''
+  endpointSecretName: bobbycar-dg-generated-secret
+  service:
+    container:
+      storage: ''
+    sites:
+      local:
+        expose: {}
+        name: ''
+      locations: null
+    type: Cache
