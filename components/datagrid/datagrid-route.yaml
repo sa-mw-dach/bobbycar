@@ -1,0 +1,20 @@
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  name: datagrid
+  labels:
+    app: infinispan-service
+    clusterName: bobbycar-dg
+    infinispan_cr: bobbycar-dg
+spec:
+  host: datagrid-bobbycar.apps.ocp3.stormshift.coe.muc.redhat.com
+  to:
+    kind: Service
+    name: bobbycar-dg
+    weight: 100
+  port:
+    targetPort: 11222
+  tls:
+    termination: passthrough
+    insecureEdgeTerminationPolicy: None
+  wildcardPolicy: None

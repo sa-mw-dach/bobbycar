@@ -5,6 +5,7 @@ namespace: bobbycar
 
 resources:
 - datagrid-subscription.yaml
+- datagrid-route.yaml
 - datagrid.yaml
 
 

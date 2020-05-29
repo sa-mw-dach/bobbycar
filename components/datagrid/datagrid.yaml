@@ -10,13 +10,14 @@ spec:
   expose: {}
   image: ''
   logging:
-    categories: null
+    categories: 
+      org.infinispan: info
   replicas: 1
   security:
     endpointEncryption:
-      certSecretName: ''
-      certServiceName: ''
-      type: ''
+      certSecretName: bobbycar-dg-certs-secret
+      certServiceName: service.beta.openshift.io
+      type: service
   endpointSecretName: bobbycar-dg-generated-secret
   service:
     container:
