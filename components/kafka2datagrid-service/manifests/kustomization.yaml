@@ -8,7 +8,8 @@ resources:
 - camel-k-integration-platform.yaml
 - kafka2datagrid-integration.yaml
 - kafka2datagrid-secret.yaml
-
+- sa-rolebinding.yaml
+- view-zones-role.yaml
 
 
 
