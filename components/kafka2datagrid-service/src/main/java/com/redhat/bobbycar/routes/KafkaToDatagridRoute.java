@@ -49,6 +49,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class KafkaToDatagridRoute extends RouteBuilder {
 	
+	private static final String CACHE_TEMPLATE = "default";
 	private static final String PATH_TO_SERVICE_CA = "/var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt";
 	private static final Logger LOGGER = LoggerFactory.getLogger(KafkaToDatagridRoute.class);
 	@PropertyInject("com.redhat.bobbycar.camelk.dg.host")
@@ -61,9 +62,17 @@ public class KafkaToDatagridRoute extends RouteBuilder {
 	private long aggregationInterval;
 	@PropertyInject(value = "com.redhat.bobbycar.camelk.dg.aggregationDistinct", defaultValue = "true")
     private boolean aggregationDistinct;
+	@PropertyInject(value = "com.redhat.bobbycar.camelk.dg.car.cacheName")
+	private String carsCacheName;
+	@PropertyInject(value = "com.redhat.bobbycar.camelk.dg.car.snapshot.cacheName")
+	private String carsnapshotCacheName;
+	@PropertyInject(value = "com.redhat.bobbycar.camelk.dg.zone.cacheName")
+	private String zonesCacheName;
+	
 	private RemoteCacheManager cacheManager;
 	private RemoteCache<String, String> zonesCache;
 	private RemoteCache<String, String> carsCache;
+	private RemoteCache<String, String> carsnapshotsCache; 
 	private ObjectMapper mapper = new ObjectMapper();
 	
 	public static class CarEvent implements Comparable<CarEvent>{
@@ -305,7 +314,7 @@ public class KafkaToDatagridRoute extends RouteBuilder {
 			.setHeader(InfinispanConstants.OPERATION).constant(InfinispanOperation.PUT)
 			.setHeader(InfinispanConstants.KEY).expression(simple("aggregated"))
 		    .setHeader(InfinispanConstants.VALUE).expression(simple("${body}"))
-			.to("infinispan://{{com.redhat.bobbycar.camelk.dg.car.cacheName}}?cacheContainerConfiguration=#cacheContainerConfiguration");
+			.to("infinispan://{{com.redhat.bobbycar.camelk.dg.car.snapshot.cacheName}}?cacheContainerConfiguration=#cacheContainerConfiguration");
 	}
 	
 	private void storeZonesInCacheRoute() throws IOException {
@@ -366,8 +375,9 @@ public class KafkaToDatagridRoute extends RouteBuilder {
 	private void initRemoteCache(Configuration cacheConfig) {
 		cacheManager = new RemoteCacheManager(cacheConfig);
 		cacheManager.start();
-		zonesCache = cacheManager.administration().getOrCreateCache("zones", "default");
-		carsCache = cacheManager.administration().getOrCreateCache("cars", "default");
+		zonesCache = cacheManager.administration().getOrCreateCache(zonesCacheName, CACHE_TEMPLATE);
+		carsCache = cacheManager.administration().getOrCreateCache(carsCacheName, CACHE_TEMPLATE);
+		carsnapshotsCache = cacheManager.administration().getOrCreateCache(carsnapshotCacheName, CACHE_TEMPLATE);
 		cacheManager.start();
 	}
 	
@@ -381,7 +391,7 @@ public class KafkaToDatagridRoute extends RouteBuilder {
 	        		.authentication().enable()
 	        		.username(datagridUsername)
 	        		.password(datagridPassword)
-	        		.realm("default")
+	        		.realm(CACHE_TEMPLATE)
 	        		.serverName("infinispan")
 	        		.saslQop(SaslQop.AUTH)
 	        		.saslMechanism("DIGEST-MD5")
