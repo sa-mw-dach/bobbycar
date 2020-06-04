@@ -1,0 +1,15 @@
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  name: datagrid-to-rest-route
+  labels:
+    camel.apache.org/integration: datagrid-to-rest-route
+spec:
+  host: datagrid-to-rest-route-bobbycar.apps.ocp3.stormshift.coe.muc.redhat.com
+  to:
+    kind: Service
+    name: datagrid-to-rest-route
+    weight: 100
+  port:
+    targetPort: http
+  wildcardPolicy: None
