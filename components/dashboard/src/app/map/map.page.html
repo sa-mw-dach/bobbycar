@@ -3,13 +3,13 @@
     <ion-title>Bobbycar - Map ({{bobbycars.size}})</ion-title>
   </ion-toolbar>
   <ion-toolbar>
-    <ion-button (click)="realtimeSearch()">
-      <ion-icon name="search"></ion-icon> 
-      Realtime Search
-    </ion-button>
     <ion-button (click)="createZone()">
       <ion-icon name="create-outline"></ion-icon> 
       Create Zone
+    </ion-button>
+    <ion-button (click)="realtimeQuery()">
+      <ion-icon name="search"></ion-icon> 
+      Realtime Query
     </ion-button>
     <ion-button color="danger" (click)="resetMap()">
       <ion-icon name="refresh-outline"></ion-icon> 
@@ -20,6 +20,42 @@
 
 <ion-content padding color="light">
 
-  <div id="map"></div>
+  <div style="position: absolute; top: 39%; left: 60%; 
+    width: 19%; z-index: 1000; border-radius: 20px;
+    background-color: #222;  color: #000000;" 
+    *ngIf="searchArea?.getVisible()">
+    <ion-list>
+      <ion-list-header lines="full">
+        <ion-label>Search Criteria</ion-label>
+        <ion-button>Select All</ion-button>
+      </ion-list-header>
+      <ion-item>
+        <ion-label>Average Speed</ion-label>
+        <ion-checkbox slot="end"></ion-checkbox>
+      </ion-item>
+      <ion-item>
+        <ion-label>Average Carbon Dioxide</ion-label>
+        <ion-checkbox slot="end"></ion-checkbox>
+      </ion-item>
+      <ion-item>
+        <ion-label>Average Fuel Consumption</ion-label>
+        <ion-checkbox slot="end"></ion-checkbox>
+      </ion-item>
+      <ion-item>
+        <ion-label>Max. Carbon Dioxide</ion-label>
+        <ion-checkbox slot="end"></ion-checkbox>
+      </ion-item>
+    </ion-list>
+    <ion-button color="success">
+      <ion-icon name="search"></ion-icon> 
+      Start
+    </ion-button>
+    <ion-button color="danger">
+      <ion-icon name="end"></ion-icon> 
+      cancel
+    </ion-button>
+  </div>
+
+ <div id="map"></div>
 
 </ion-content>

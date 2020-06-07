@@ -1,0 +1,49 @@
+
+  #map, #pano {
+    float: left;
+    height: 100%;
+    width: 100%;
+  }
+
+  .image-box {
+
+    /* Here's the trick */
+    /* box-shadow: inset 0 0 0 100vw rgba(0, 0, 0, 0.5);
+
+    /* Basic background styles */
+    background: var(--image-url) center center no-repeat;
+    background-size: cover;
+
+    /* Here's the same styles we applied to our content-div earlier */
+    min-height: 100vh;
+
+ }
+ .navi {
+    position: absolute;
+    top: 39%;
+    left: 60%;
+    width: 18%;
+    height: 27%;
+    border: 1px solid #000;
+    border-radius: 20px;
+    background-color: #eee;
+    opacity: 1.0;
+ }
+ .window {
+    position: absolute;
+    top: 0px;
+    left: 24%;
+    width: 75%;
+    height: 33%;
+    border: 1px solid #000;
+    border-radius: 5px;
+    background-color: #eee;
+    opacity: 0.95;
+ }
+
+ .menu {
+  position: absolute;
+  top: 57%;
+  left: 30%;
+  opacity: 0.9;
+}

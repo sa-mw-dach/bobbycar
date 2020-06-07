@@ -16,6 +16,8 @@ export class MapPage implements OnInit {
     infowindow: google.maps.InfoWindow;
     initialPosition = { lat: 50.1146997, lng: 8.6185411 };
     bobbycars = new Map();
+    zones = [];
+    searchArea: google.maps.Circle;
 
     constructor(
         private platform: Platform,
@@ -31,7 +33,7 @@ export class MapPage implements OnInit {
 
             this.map = new google.maps.Map(document.getElementById('map'), {
                 center: this.initialPosition,
-                zoom: 13
+                zoom: 11
             });
 
             this.infowindow = new google.maps.InfoWindow({
@@ -41,8 +43,25 @@ export class MapPage implements OnInit {
         }, 10);
     }
 
-    createOrUpdateMarker(data){
+    getDistanceFromLatLonInKm(lat1,lon1,lat2,lon2) {
+        const R = 6371; // Radius of the earth in km
+        const dLat = this.deg2rad(lat2-lat1);  // deg2rad below
+        const dLon = this.deg2rad(lon2-lon1);
+        const a =
+            Math.sin(dLat/2) * Math.sin(dLat/2) +
+            Math.cos(this.deg2rad(lat1)) * Math.cos(this.deg2rad(lat2)) *
+            Math.sin(dLon/2) * Math.sin(dLon/2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        const d = R * c; // Distance in km
+        return d;
+    }
 
+    // degree to radius
+    deg2rad(deg) {
+        return deg * (Math.PI/180);
+    }
+
+    createOrUpdateMarker(data){
         if(this.bobbycars.has(data.carid)){
             this.bobbycars.get(data.carid).setPosition(new google.maps.LatLng({ lat: data.lat, lng: data.long }));
         } else {
@@ -61,7 +80,7 @@ export class MapPage implements OnInit {
                         `<span style="color: #000000;">
                             <h4>Bobbycar Id:</h4><br/>
                             <p>`+content+`</p>
-                            <ion-button href="/home">Car Detail</ion-button>
+                            <ion-button href="/car-detail/`+content+`">Car Detail</ion-button>
                         </span>`);
                     infowindow.open(this.map, marker);
                 }
@@ -71,18 +90,26 @@ export class MapPage implements OnInit {
         }
     }
 
-    realtimeSearch(){
-        const circle = new google.maps.Circle({
-            strokeColor: '#eeeeee',
-            strokeOpacity: 0.7,
-            strokeWeight: 1,
-            fillColor: '#444444',
-            fillOpacity: 0.35,
-            map: this.map,
-            center: this.map.getCenter(),
-            editable: true,
-            radius: 3000
-        });
+    realtimeQuery(){
+        if(!this.searchArea) {
+            this.searchArea = new google.maps.Circle({
+                strokeColor: '#eeeeee',
+                strokeOpacity: 0.7,
+                strokeWeight: 1,
+                fillColor: '#444444',
+                fillOpacity: 0.35,
+                map: this.map,
+                center: this.map.getCenter(),
+                editable: true,
+                radius: 3000
+            });
+        } else if(this.searchArea && !this.searchArea.getVisible()) {
+            this.searchArea.setCenter(this.map.getCenter());
+            this.searchArea.setVisible(true);
+        } else {
+            this.searchArea.setVisible(false);
+        }
+
     }
 
     createZone(){
@@ -97,14 +124,31 @@ export class MapPage implements OnInit {
             editable: true,
             radius: 3000
         });
+        this.addCircleListener(circle);
+        this.zones.push(circle);
+    }
+
+    addCircleListener(circle: google.maps.Circle) {
+        google.maps.event.addListener(circle, 'click', (event) => {
+            console.log(event.latLng.toString());
+            console.log(circle.getCenter().toString());
+            console.log(circle.getRadius());
+            console.log(this.getDistanceFromLatLonInKm(event.latLng.lat(), event.latLng.lng(), circle.getCenter().lat(), circle.getCenter().lng()))
+          });
     }
 
     resetMap() {
         console.debug('resetMap()');
+
         this.bobbycars.forEach(el => {
             el.setMap(null);
         });
         this.bobbycars.clear();
+
+        this.zones.forEach(element => {
+            element.setMap(null);
+        });
+        this.zones = [];
     }
 
     ionViewWillLeave(){
@@ -113,15 +157,8 @@ export class MapPage implements OnInit {
     }
 
     async ngOnInit() {
-        /*
-        setInterval(() => {
-            this.updatePosition();
-            console.log(this.position);
-        }, 2000);
-        */
         this.socketService.getMessages().subscribe(
             msg => {
-                console.debug('message received from: ' + msg.carid);
                 this.createOrUpdateMarker(msg);
             }, // Called whenever there is a message from the server.
             err => console.error(err), // Called if at any point WebSocket API signals some kind of error.
