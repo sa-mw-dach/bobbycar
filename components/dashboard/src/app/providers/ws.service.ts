@@ -1,6 +1,7 @@
 import { ConfigService } from './config.service';
 import { Injectable } from '@angular/core';
 import { webSocket, WebSocketSubject } from 'rxjs/webSocket';
+import { Observable } from 'rxjs';
 
 
 @Injectable({
@@ -22,16 +23,16 @@ export class WSService {
     }
   }
 
-  private getNewWebSocket() {
+  private getNewWebSocket(): WebSocketSubject<any> {
     return webSocket(this.WS_ENDPOINT);
   }
 
-  getMessages() {
+  getMessages(): Observable<any> {
     return this.socket$.asObservable();
   }
   sendMessage(msg: any) {
     this.socket$.next(msg);
   }
-  close() {
+  close(): void {
     this.socket$.complete(); }
 }
