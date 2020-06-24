@@ -10,6 +10,7 @@ export class ConfigService {
     GOOGLE_API_KEY;
     SSE_ENDPOINT;
     WS_ENDPOINT;
+    CACHE_ENDPOINT;
 
     constructor(public http: HttpClient) {}
 
@@ -23,6 +24,7 @@ export class ConfigService {
         this.GOOGLE_API_KEY = data.GOOGLE_API_KEY;
         this.SSE_ENDPOINT = data.SSE_ENDPOINT;
         this.WS_ENDPOINT = data.WS_ENDPOINT;
+        this.CACHE_ENDPOINT = data.CACHE_ENDPOINT;
     }
 
 }
