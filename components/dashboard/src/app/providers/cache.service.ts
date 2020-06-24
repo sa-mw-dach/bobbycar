@@ -14,11 +14,11 @@ export class CacheService {
     }
 
     getZones() {
-        return this.http.get(this.configService.CACHE_ENDPOINT+this.zonesUrl);
+        return this.http.get<any[]>(this.configService.CACHE_ENDPOINT+this.zonesUrl);
     }
 
     getCars() {
-        return this.http.get(this.configService.CACHE_ENDPOINT+this.carsUrl);
+        return this.http.get<any[]>(this.configService.CACHE_ENDPOINT+this.carsUrl);
     }
 
 }
