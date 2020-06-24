@@ -28,15 +28,24 @@ public class DatagridToRestRoute extends RouteBuilder {
 	@Override
 	public void configure() throws Exception {
 		
-		restConfiguration().host("0.0.0.0").port(8080).component("undertow").bindingMode(RestBindingMode.json).dataFormatProperty("prettyPrint", "true").contextPath("/");
+		restConfiguration().host("0.0.0.0").port(8080).component("undertow")
+			//.enableCORS(true)
+			//.corsAllowCredentials(true)
+			//.corsHeaderProperty("Access-Control-Allow-Origin","*")
+			//.corsHeaderProperty("Access-Control-Allow-Headers","Origin, Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers, Authorization")
+			.bindingMode(RestBindingMode.json)
+			.dataFormatProperty("prettyPrint", "true")
+			.contextPath("/");
 		Configuration cacheConfig = createCacheConfig();
 		bindToRegistry("cacheManager", cacheConfig);
 		initRemoteCache(cacheConfig);
 		from("rest:get:cars")
+			.setHeader("Access-Control-Allow-Origin",constant("*"))
 			.process(ex -> {
 				ex.getIn().setBody("[" + carsCache.values().stream().collect(Collectors.joining(",")) + "]");
 			});
 		from("rest:get:zones")
+			.setHeader("Access-Control-Allow-Origin",constant("*"))
 			.process(ex -> {
 				ex.getIn().setBody("[" + zonesCache.values().stream().collect(Collectors.joining(",")) + "]");
 			});	
