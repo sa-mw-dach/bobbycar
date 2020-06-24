@@ -3,6 +3,7 @@ import { Platform } from '@ionic/angular';
 import { Router } from '@angular/router';
 import { ConfigService } from '../providers/config.service';
 import { WSService } from '../providers/ws.service';
+import { CacheService } from '../providers/cache.service';
 
 @Component({
     selector: 'app-map',
@@ -22,6 +23,7 @@ export class MapPage implements OnInit {
     constructor(
         private platform: Platform,
         private socketService: WSService,
+        private cacheService: CacheService,
         private router: Router) {
 
         this.initializeMap();
@@ -149,6 +151,14 @@ export class MapPage implements OnInit {
             element.setMap(null);
         });
         this.zones = [];
+
+        this.cacheService.getCars()
+        .subscribe((data) => {
+            console.log(data);
+            data.forEach(element => {
+                this.createOrUpdateMarker(element);
+            });
+        });
     }
 
     ionViewWillLeave(){
@@ -157,6 +167,34 @@ export class MapPage implements OnInit {
     }
 
     async ngOnInit() {
+
+        this.cacheService.getZones()
+        .subscribe((data) => {
+            if(this.map){
+                data.forEach(element => {
+                    let circle = new google.maps.Circle({
+                        strokeColor: '#FF0000',
+                        strokeOpacity: 0.7,
+                        strokeWeight: 1,
+                        fillColor: '#FF0000',
+                        fillOpacity: 0.35,
+                        map: this.map,
+                        center: { lat: element.spec.position.lat, lng: element.spec.position.lng },
+                        editable: false,
+                        radius: element.spec.radius
+                    });
+                });
+            }
+        });
+
+        this.cacheService.getCars()
+        .subscribe((data) => {
+            console.log(data);
+            data.forEach(element => {
+                this.createOrUpdateMarker(element);
+            });
+        });
+
         this.socketService.getMessages().subscribe(
             msg => {
                 this.createOrUpdateMarker(msg);
