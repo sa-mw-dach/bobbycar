@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { WSService } from '../providers/ws.service';
 
 @Component({
@@ -15,7 +16,7 @@ export class CarDetailPage implements OnInit {
   panorama: google.maps.StreetViewPanorama;
   sv = new google.maps.StreetViewService();
 
-  constructor(private socketService: WSService) {
+  constructor(private socketService: WSService, private route: ActivatedRoute) {
     this.initializeMap();
     this.socketService.connect();
    }
@@ -79,6 +80,8 @@ export class CarDetailPage implements OnInit {
 }
 
   ngOnInit() {
+    this.carId = this.route.snapshot.paramMap.get('id');
+
     this.socketService.getMessages().subscribe(
       msg => {
           this.createOrUpdateMarker(msg);
