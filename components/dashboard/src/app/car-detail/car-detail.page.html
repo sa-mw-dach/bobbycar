@@ -13,11 +13,14 @@
     <div class="navi">
       <div id="map"></div>
     </div>
-    <div class="window">
+    <div class="window" [style.visibility]="streetName ==''? 'hidden': 'visible'">
       <div id="pano"></div>
     </div>
-    <ion-button class="menu">
-      Menu
+    <div class="instruments" *ngIf="showHUD">
+      {{streetName}}
+    </div>
+    <ion-button class="menu" (click)="toggleHUD()">
+      HUD
     </ion-button>
  </div>
 

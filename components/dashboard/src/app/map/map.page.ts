@@ -24,18 +24,15 @@ export class MapPage implements OnInit {
         private platform: Platform,
         private socketService: WSService,
         private cacheService: CacheService,
-        private router: Router) {
-
-        this.initializeMap();
-        this.socketService.connect();
-    }
+        private router: Router) {}
 
     initializeMap() {
         setTimeout(() => {
 
             this.map = new google.maps.Map(document.getElementById('map'), {
                 center: this.initialPosition,
-                zoom: 11
+                zoom: 11,
+                // mapTypeId: google.maps.MapTypeId.HYBRID,
             });
 
             this.infowindow = new google.maps.InfoWindow({
@@ -72,6 +69,7 @@ export class MapPage implements OnInit {
                 position: new google.maps.LatLng({ lat: data.lat, lng: data.long }),
                 title: data.carid,
                 map: this.map,
+                animation: google.maps.Animation.DROP,
                 // label: data.carid,
                 draggable: false
             });
@@ -80,13 +78,14 @@ export class MapPage implements OnInit {
                 return function() {
                     infowindow.setContent(
                         `<span style="color: #000000;">
-                            <h4>Bobbycar Id:</h4><br/>
-                            <p>`+content+`</p>
-                            <ion-button href="/car-detail/`+content+`">Car Detail</ion-button>
+                            <h4>Bobbycar Id:</h4>
+                            <p>`+content.carid+`<br/>
+                            <h4>Zone:</h4>`+content?.zone?.spec.name+`</p><br/>
+                            <ion-button href="/car-detail/`+content.carid+`">Car Detail</ion-button>
                         </span>`);
                     infowindow.open(this.map, marker);
                 }
-            })(marker, data.carid, this.infowindow));
+            })(marker, data, this.infowindow));
 
             this.bobbycars.set(data.carid, marker);
         }
@@ -126,7 +125,8 @@ export class MapPage implements OnInit {
             editable: true,
             radius: 3000
         });
-        this.addCircleListener(circle);
+        // this.addCircleListener(circle);
+        this.addZoneContextListener(circle);
         this.zones.push(circle);
     }
 
@@ -135,7 +135,15 @@ export class MapPage implements OnInit {
             console.log(event.latLng.toString());
             console.log(circle.getCenter().toString());
             console.log(circle.getRadius());
-            console.log(this.getDistanceFromLatLonInKm(event.latLng.lat(), event.latLng.lng(), circle.getCenter().lat(), circle.getCenter().lng()))
+            console.log(this.getDistanceFromLatLonInKm(event.latLng.lat(), event.latLng.lng(),
+                circle.getCenter().lat(), circle.getCenter().lng()))
+          });
+    }
+
+    addZoneContextListener(circle: google.maps.Circle) {
+        google.maps.event.addListener(circle, 'rightclick', (event) => {
+            // alert(circle.getCenter().toString()+' '+circle.getRadius());
+            circle.setMap(null);
           });
     }
 
@@ -168,11 +176,15 @@ export class MapPage implements OnInit {
 
     async ngOnInit() {
 
+        this.initializeMap();
+        this.socketService.connect();
+
         this.cacheService.getZones()
         .subscribe((data) => {
             if(this.map){
                 data.forEach(element => {
-                    let circle = new google.maps.Circle({
+                    // tslint:disable-next-line:no-unused-expression
+                    new google.maps.Circle({
                         strokeColor: '#FF0000',
                         strokeOpacity: 0.7,
                         strokeWeight: 1,
