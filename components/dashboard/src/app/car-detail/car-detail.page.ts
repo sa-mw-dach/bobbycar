@@ -70,7 +70,6 @@ export class CarDetailPage implements OnInit {
     if(data.carid === this.carId){
       this.marker.setPosition(new google.maps.LatLng({ lat: data.lat, lng: data.long }));
       this.map.setCenter({ lat: data.lat, lng: data.long });
-      this.panorama.setPosition({ lat: data.lat, lng: data.long });
 
       this.sv.getPanorama({
         location: { lat: data.lat, lng: data.long },
@@ -78,11 +77,12 @@ export class CarDetailPage implements OnInit {
     }, (result, status) => {
           console.log(result);
           if (status === google.maps.StreetViewStatus.OK) {
+              this.panorama.setPosition({ lat: data.lat, lng: data.long });
               this.streetName = result.location.description;
-              const calcHeading = google.maps.geometry.spherical.computeHeading(result.location.latLng, result.location.latLng);
+              // const calcHeading = google.maps.geometry.spherical.computeHeading(result.location.latLng, result.location.latLng);
                 this.panorama.setPov({
-                  heading: result.tiles.originHeading,
-                  pitch: result.tiles.originPitch
+                  heading: result.tiles.centerHeading,
+                  pitch: -2
               });
           }
      });
