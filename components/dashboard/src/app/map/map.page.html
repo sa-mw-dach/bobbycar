@@ -16,45 +16,36 @@
       Reset Map
     </ion-button>
   </ion-toolbar>
-</ion-header>
-
-<ion-content padding color="light">
-
-  <div style="position: absolute; top: 39%; left: 60%; 
-    width: 19%; z-index: 1000; border-radius: 20px;
-    background-color: #222;  color: #000000;" 
-    *ngIf="searchArea?.getVisible()">
+  <ion-toolbar *ngIf="searchArea?.getVisible()">
     <ion-list>
-      <ion-list-header lines="full">
-        <ion-label>Search Criteria</ion-label>
+      <ion-list-header lines="none">
+        <ion-label>Search area: {{searchArea.getCenter().toString()}} radius: {{searchArea.getRadius()}}</ion-label>
         <ion-button>Select All</ion-button>
       </ion-list-header>
       <ion-item>
         <ion-label>Average Speed</ion-label>
-        <ion-checkbox slot="end"></ion-checkbox>
+        <ion-checkbox slot="start"></ion-checkbox>
+        <ion-label *ngIf="isQuery">89 km/h</ion-label>
       </ion-item>
       <ion-item>
         <ion-label>Average Carbon Dioxide</ion-label>
-        <ion-checkbox slot="end"></ion-checkbox>
+        <ion-checkbox slot="start"></ion-checkbox>
+        <ion-label *ngIf="isQuery">168 g/km</ion-label>
       </ion-item>
       <ion-item>
         <ion-label>Average Fuel Consumption</ion-label>
-        <ion-checkbox slot="end"></ion-checkbox>
-      </ion-item>
-      <ion-item>
-        <ion-label>Max. Carbon Dioxide</ion-label>
-        <ion-checkbox slot="end"></ion-checkbox>
+        <ion-checkbox slot="start"></ion-checkbox>
+        <ion-label *ngIf="isQuery">7.6 l/100km</ion-label>
       </ion-item>
     </ion-list>
-    <ion-button color="success">
+    <ion-button (click)="simulateQuery()">
       <ion-icon name="search"></ion-icon> 
-      Start
+      Start Query
     </ion-button>
-    <ion-button color="danger">
-      <ion-icon name="end"></ion-icon> 
-      cancel
-    </ion-button>
-  </div>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content padding color="light">
 
  <div id="map"></div>
 
