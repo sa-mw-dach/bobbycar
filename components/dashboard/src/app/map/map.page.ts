@@ -19,27 +19,34 @@ export class MapPage implements OnInit {
     bobbycars = new Map();
     zones = [];
     searchArea: google.maps.Circle;
+    isQuery = false;
 
     constructor(
         private platform: Platform,
         private socketService: WSService,
         private cacheService: CacheService,
-        private router: Router) {}
+        private router: Router
+        ) {}
 
     initializeMap() {
         setTimeout(() => {
-
             this.map = new google.maps.Map(document.getElementById('map'), {
                 center: this.initialPosition,
                 zoom: 11,
                 // mapTypeId: google.maps.MapTypeId.HYBRID,
             });
-
             this.infowindow = new google.maps.InfoWindow({
                 content: ''
             });
-
         }, 10);
+    }
+
+    simulateQuery(){
+        if(this.isQuery){
+            this.isQuery = false;
+        } else {
+            this.isQuery = true;
+        }
     }
 
     getDistanceFromLatLonInKm(lat1,lon1,lat2,lon2) {
@@ -61,6 +68,7 @@ export class MapPage implements OnInit {
     }
 
     createOrUpdateMarker(data){
+
         if(this.bobbycars.has(data.carid)){
             this.bobbycars.get(data.carid).setPosition(new google.maps.LatLng({ lat: data.lat, lng: data.long }));
         } else {
@@ -74,6 +82,7 @@ export class MapPage implements OnInit {
                 draggable: false
             });
 
+            // tslint:disable-next-line:only-arrow-functions
             google.maps.event.addListener(marker, 'click', (function(marker, content, infowindow) {
                 return function() {
                     infowindow.setContent(
@@ -148,8 +157,6 @@ export class MapPage implements OnInit {
     }
 
     resetMap() {
-        console.debug('resetMap()');
-
         this.bobbycars.forEach(el => {
             el.setMap(null);
         });
@@ -167,6 +174,26 @@ export class MapPage implements OnInit {
                 this.createOrUpdateMarker(element);
             });
         });
+
+        this.cacheService.getZones()
+        .subscribe((data) => {
+            if(this.map){
+                data.forEach(element => {
+                    const zone = new google.maps.Circle({
+                        strokeColor: '#FF0000',
+                        strokeOpacity: 0.7,
+                        strokeWeight: 1,
+                        fillColor: '#FF0000',
+                        fillOpacity: 0.35,
+                        map: this.map,
+                        center: { lat: element.spec.position.lat, lng: element.spec.position.lng },
+                        editable: false,
+                        radius: element.spec.radius
+                    });
+                    this.zones.push(zone);
+                });
+            }
+        });
     }
 
     ionViewWillLeave(){
@@ -183,8 +210,7 @@ export class MapPage implements OnInit {
         .subscribe((data) => {
             if(this.map){
                 data.forEach(element => {
-                    // tslint:disable-next-line:no-unused-expression
-                    new google.maps.Circle({
+                    const zone = new google.maps.Circle({
                         strokeColor: '#FF0000',
                         strokeOpacity: 0.7,
                         strokeWeight: 1,
@@ -195,6 +221,7 @@ export class MapPage implements OnInit {
                         editable: false,
                         radius: element.spec.radius
                     });
+                    this.zones.push(zone);
                 });
             }
         });
