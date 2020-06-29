@@ -49,6 +49,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class KafkaToDatagridRoute extends RouteBuilder {
 	
+	private static final String ZONE_CHANGE_HEADER = "zoneChange";
 	private static final String CACHE_TEMPLATE = "default";
 	private static final String PATH_TO_SERVICE_CA = "/var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt";
 	private static final Logger LOGGER = LoggerFactory.getLogger(KafkaToDatagridRoute.class);
@@ -186,6 +187,25 @@ public class KafkaToDatagridRoute extends RouteBuilder {
 		public void setResourceVersion(String resourceVersion) {
 			this.resourceVersion = resourceVersion;
 		}
+		@Override
+		public int hashCode() {
+			return Objects.hash(name, resourceVersion);
+		}
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			Metadata other = (Metadata) obj;
+			return Objects.equals(name, other.name) && Objects.equals(resourceVersion, other.resourceVersion);
+		}
+		@Override
+		public String toString() {
+			return String.format("Metadata [name=%s, resourceVersion=%s]", name, resourceVersion);
+		}
 	}
 	
 	@JsonIgnoreProperties(ignoreUnknown = true)
@@ -233,6 +253,25 @@ public class KafkaToDatagridRoute extends RouteBuilder {
 		public int compareTo(Zone o) {
 			return Integer.compare(this.getSpec().getPriority(), o.getSpec().getPriority());
 		}
+		@Override
+		public int hashCode() {
+			return Objects.hash(metadata);
+		}
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			Zone other = (Zone) obj;
+			return Objects.equals(metadata, other.metadata);
+		}
+		@Override
+		public String toString() {
+			return String.format("Zone [metadata=%s, spec=%s]", metadata, spec);
+		}
 	}
 	
 	public static class ZoneSpec {
@@ -272,7 +311,27 @@ public class KafkaToDatagridRoute extends RouteBuilder {
 		public void setType(String type) {
 			this.type = type;
 		}
-		
+		@Override
+		public int hashCode() {
+			return Objects.hash(name, position, priority, radius, type);
+		}
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			ZoneSpec other = (ZoneSpec) obj;
+			return Objects.equals(name, other.name) && Objects.equals(position, other.position)
+					&& priority == other.priority && radius == other.radius && Objects.equals(type, other.type);
+		}
+		@Override
+		public String toString() {
+			return String.format("ZoneSpec [name=%s, position=%s, priority=%s, radius=%s, type=%s]", name, position,
+					priority, radius, type);
+		}
 	}
 	
 	@Override
@@ -363,13 +422,23 @@ public class KafkaToDatagridRoute extends RouteBuilder {
 		    		.filter(z -> z.isInside(lng, lat))
 		    		.sorted()
 		    		.findFirst();
-		    	matchingZone.ifPresent(car::setZone);
+		    	
+		    	matchingZone.ifPresent(z -> {
+		    		Zone previousZone = car.getZone();
+		    		if (!z.equals(previousZone)) {
+		    			ex.getIn().setHeader(ZONE_CHANGE_HEADER, true);
+		    		}
+		    		car.setZone(z);
+		    	});
 		    })
-		    
 		    .marshal().json(JsonLibrary.Jackson, String.class)
 		    .setHeader(InfinispanConstants.VALUE).expression(simple("${body}"))
 		    .log("Saving data to cache with key: ${headers[CamelInfinispanKey]} and value: ${body} of type  ${body.class}")
-			.to("infinispan://{{com.redhat.bobbycar.camelk.dg.car.cacheName}}?cacheContainerConfiguration=#cacheContainerConfiguration");
+			.to("infinispan://{{com.redhat.bobbycar.camelk.dg.car.cacheName}}?cacheContainerConfiguration=#cacheContainerConfiguration")
+			.choice()
+				.when(header(ZONE_CHANGE_HEADER).isEqualTo(true))
+				.log("MQTT")
+			;
 	}
 
 	private void initRemoteCache(Configuration cacheConfig) {
