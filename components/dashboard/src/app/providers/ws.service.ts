@@ -24,7 +24,7 @@ export class WSService {
   }
 
   private getNewWebSocket(): WebSocketSubject<any> {
-    return webSocket(this.WS_ENDPOINT);
+    return webSocket(this.WS_ENDPOINT+'?user_key='+this.configService.BOBBYCAR_API_KEY);
   }
 
   getMessages(): Observable<any> {

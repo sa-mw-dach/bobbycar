@@ -1,6 +1,7 @@
 {
     "GOOGLE_API_KEY": "replaceme",
+    "BOBBYCAR_API_KEY": "replaceme",
     "SSE_ENDPOINT": "http://localhost:8080",
-    "WS_ENDPOINT": "ws://kafka-streaming-service-bobbycar.apps.ocp3.stormshift.coe.muc.redhat.com/api/carevents",
-    "CACHE_ENDPOINT": "http://datagrid-to-rest-route-bobbycar.apps.ocp3.stormshift.coe.muc.redhat.com"
+    "WS_ENDPOINT": "wss://kafka-bridge-3scale-apicast-staging.apps.ocp3.stormshift.coe.muc.redhat.com/realtime/api/carevents",
+    "CACHE_ENDPOINT": "https://kafka-bridge-3scale-apicast-staging.apps.ocp3.stormshift.coe.muc.redhat.com/cache"
 }
