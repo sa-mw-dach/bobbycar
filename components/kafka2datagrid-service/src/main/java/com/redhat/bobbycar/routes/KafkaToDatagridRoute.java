@@ -381,6 +381,9 @@ public class KafkaToDatagridRoute extends RouteBuilder {
 		bindToRegistry("sslConfiguration", configureSslForApiAccess());
 		String token = retrieveServiceAccountToken();
 		from("scheduler://foo?delay=60000")
+			.process(ex -> {
+				zonesCache.clear();
+			})
 			.setHeader("Authorization").constant("Bearer " + token)
 			.setHeader(Exchange.HTTP_METHOD, constant("GET"))
 			.setHeader("Connection", constant("Keep-Alive"))
@@ -400,6 +403,9 @@ public class KafkaToDatagridRoute extends RouteBuilder {
 	}
 
 	private void storeCarEventsInCacheRoute() {
+		// clear the cars cache before starting the route
+		carsCache.clear();
+
 		from("kafka:{{com.redhat.bobbycar.camelk.kafka.topic}}?clientId=kafkaToDatagridCamelClient&brokers={{com.redhat.bobbycar.camelk.kafka.brokers}}:9092")
 			.log("Received ${body} from Kafka")	
 			.setHeader(InfinispanConstants.OPERATION).constant(InfinispanOperation.PUT)
@@ -437,7 +443,7 @@ public class KafkaToDatagridRoute extends RouteBuilder {
 			.to("infinispan://{{com.redhat.bobbycar.camelk.dg.car.cacheName}}?cacheContainerConfiguration=#cacheContainerConfiguration")
 			.choice()
 				.when(header(ZONE_CHANGE_HEADER).isEqualTo(true))
-				.log("MQTT")
+				.log("ZONE CHANGE!!!")
 			;
 	}
 
