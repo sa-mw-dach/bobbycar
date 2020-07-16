@@ -1,6 +1,6 @@
 # About Bobbycar
 
-(c) Bobby Car is a registered tracemark in Germany
+(t) Bobby Car is a registered trademark in Germany
 
 The research result is here
 
