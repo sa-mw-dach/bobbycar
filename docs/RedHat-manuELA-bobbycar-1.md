@@ -1,17 +1,15 @@
 ![Red Hat logo supposed to be here][logo]
 
-# Bobbycar - A hitchikers guide in one page
+# Bobbycar - A hitchikers guide - quick overview
 
 IoT Transportation demo using Red Hat OpenShift and Middleware technologies.
 
 In this demo you will see a fleet management system to track vehicles (called bobbycars). Special zones are implemented ( called BobbycarZone) and based on the location data shared by the bobbycar special rules and restrictions apply for the bobbycar(s) beeing located by the system in the BobycarZone.
 
+![Map view][map_view]
+<div style="text-align: left"><sup><span style="color:blue">(c) Google maps</span></sup></div>
 
-![map view][02_map] <div style="text-align: right"><sup><span style="color:blue">(c) Google maps</span></sup></div>
-
-[02_map]: images/02_map.png "bobbycar map view"
-
-**WHY?** you might ask.
+## Background info
 
 We try to cover several scenarios in a simplified way at the same time.
 
@@ -28,5 +26,42 @@ In order to achieve the above view on your fleet you need:
 
 Depending on the data you refer to also different software components need to be used in order to address the several data stream constraints and applying security needs.
 
+## Architectural components
+
+The following architectural overview is meant to be a first overview to help understand the components we integrate
+
+![Architectural overview][arch_overview]
+
+The boxes in a slight red color show components where Red Hat products are used.
+
+# Sources
+
+**SA DACH Manufacturing repository** The Red Hat Manufacturing team maintains a GITHUB repository, where all the information is available. https://github.com/sa-mw-dach/bobbycar
+
+**Quarkus** https://quarkus.io/ and https://github.com/quarkusio/quarkus
+
+**AMQ** https://www.youtube.com/watch?v=CbBMocHD3p4
+
+**Red Hat Datagrid** https://www.redhat.com/cms/managed-files/mi-jdg-tech-overview-us95017at-201607-en.pdf
+
+**Red Hat OpenJDK** https://www.redhat.com/cms/managed-files/mi-openjdk-datasheet-f17057ck-201905-us.pdf
+
+**Red Hat - Single Sign On - SSO** https://developers.redhat.com/blog/2018/03/19/sso-made-easy-keycloak-rhsso/
+
+**Red Hat 3Scale** API management https://www.redhat.com/en/technologies/jboss-middleware/3scale
+
+**Red Hat Fuse** https://www.redhat.com/en/technologies/jboss-middleware/fuse
+
+**Red Hat Code ready Studio** https://www.redhat.com/en/technologies/jboss-middleware/developer-studio
+
+**Code Ready Workspaces** https://developers.redhat.com/products/codeready-workspaces/overview/
+
+**Visual Studio Extensions** https://developers.redhat.com/products/vscode_extensions/overview
+
+**Camel K** https://camel.apache.org/camel-k/latest/index.html
+
+**Opendatahub** https://opendatahub.io/
 
 [logo]: images/rh_manuela_logo.png "I should be on the top"
+[arch_overview]: images/bobbycar_architecture.png "I should show an architectural overview"
+[map_view]: images/map_small.png "I should show a map here"
