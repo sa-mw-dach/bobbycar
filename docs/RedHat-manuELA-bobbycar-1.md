@@ -29,4 +29,4 @@ In order to achieve the above view on your fleet you need:
 Depending on the data you refer to also different software components need to be used in order to address the several data stream constraints and applying security needs.
 
 
-[logo]: images/Logo-RedHat-A-Color-RGB.png "I should be on the top"
+[logo]: images/rh_manuela_logo.png "I should be on the to
