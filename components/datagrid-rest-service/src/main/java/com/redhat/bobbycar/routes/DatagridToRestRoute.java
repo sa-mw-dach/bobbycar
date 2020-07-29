@@ -4,6 +4,8 @@ import java.util.stream.Collectors;
 
 import org.apache.camel.PropertyInject;
 import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.component.infinispan.InfinispanConstants;
+import org.apache.camel.component.infinispan.InfinispanOperation;
 import org.apache.camel.model.rest.RestBindingMode;
 import org.infinispan.client.hotrod.RemoteCache;
 import org.infinispan.client.hotrod.RemoteCacheManager;
@@ -38,17 +40,26 @@ public class DatagridToRestRoute extends RouteBuilder {
 			.contextPath("/");
 		Configuration cacheConfig = createCacheConfig();
 		bindToRegistry("cacheManager", cacheConfig);
+		bindToRegistry("cacheContainerConfiguration", cacheConfig);
 		initRemoteCache(cacheConfig);
 		from("rest:get:cars")
 			.setHeader("Access-Control-Allow-Origin",constant("*"))
 			.process(ex -> {
 				ex.getIn().setBody("[" + carsCache.values().stream().collect(Collectors.joining(",")) + "]");
 			});
+		from("rest:get:cars/{carid}")
+			 .setHeader(InfinispanConstants.OPERATION).constant(InfinispanOperation.GET)
+			 .setHeader(InfinispanConstants.KEY).expression(simple("${headers[carid]}"))
+			.to("infinispan://{{com.redhat.bobbycar.camelk.dg.car.cacheName}}?cacheContainerConfiguration=#cacheContainerConfiguration");
 		from("rest:get:zones")
 			.setHeader("Access-Control-Allow-Origin",constant("*"))
 			.process(ex -> {
 				ex.getIn().setBody("[" + zonesCache.values().stream().collect(Collectors.joining(",")) + "]");
 			});	
+		from("rest:get:zones/{zoneid}")	
+		 	.setHeader(InfinispanConstants.OPERATION).constant(InfinispanOperation.GET)
+		 	.setHeader(InfinispanConstants.KEY).expression(simple("${headers[zoneid]}"))
+		 	.to("infinispan://{{com.redhat.bobbycar.camelk.dg.zone.cacheName}}?cacheContainerConfiguration=#cacheContainerConfiguration");
 	}
 
 	private void initRemoteCache(Configuration cacheConfig) {
