@@ -45,6 +45,7 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class KafkaToDatagridRoute extends RouteBuilder {
@@ -429,22 +430,34 @@ public class KafkaToDatagridRoute extends RouteBuilder {
 		    		.sorted()
 		    		.findFirst();
 		    	
-		    	matchingZone.ifPresent(z -> {
-		    		Zone previousZone = car.getZone();
-		    		if (!z.equals(previousZone)) {
-		    			ex.getIn().setHeader(ZONE_CHANGE_HEADER, true);
-		    		}
-		    		car.setZone(z);
-		    	});
+		    	
+		    	Optional<Zone> previousZone = getPreviousZoneFromCache(car.carId);
+		    	if (!previousZone.equals(matchingZone)) {
+		    		LOGGER.error("Zone changed from {} to {}", previousZone, matchingZone);
+	    			ex.getIn().setHeader(ZONE_CHANGE_HEADER, true);
+		    	}
+		    	car.setZone(matchingZone.orElse(null));
 		    })
 		    .marshal().json(JsonLibrary.Jackson, String.class)
 		    .setHeader(InfinispanConstants.VALUE).expression(simple("${body}"))
+		    .setHeader(InfinispanConstants.RESULT_HEADER).expression(simple("dummyAvoidOverwritingBody"))
 		    .log("Saving data to cache with key: ${headers[CamelInfinispanKey]} and value: ${body} of type  ${body.class}")
 			.to("infinispan://{{com.redhat.bobbycar.camelk.dg.car.cacheName}}?cacheContainerConfiguration=#cacheContainerConfiguration")
 			.choice()
 				.when(header(ZONE_CHANGE_HEADER).isEqualTo(true))
-				.log("ZONE CHANGE!!!")
+				.log("Publishing ${body} to mqtt")
+				.to("paho:{{com.redhat.bobbycar.camelk.mqtt.topic}}?brokerUrl={{com.redhat.bobbycar.camelk.mqtt.brokerUrl}}")
 			;
+	}
+	
+	private Optional<Zone> getPreviousZoneFromCache(String carId) {
+		try {
+			CarEvent carEventFromCache = mapper.readValue(carsCache.get(carId), CarEvent.class);
+			return Optional.ofNullable(carEventFromCache.getZone());
+		} catch (JsonProcessingException e) {
+			LOGGER.error("Error marshalling carevent", e);
+			return Optional.empty();
+		}
 	}
 
 	private void initRemoteCache(Configuration cacheConfig) {
