@@ -452,8 +452,13 @@ public class KafkaToDatagridRoute extends RouteBuilder {
 	
 	private Optional<Zone> getPreviousZoneFromCache(String carId) {
 		try {
-			CarEvent carEventFromCache = mapper.readValue(carsCache.get(carId), CarEvent.class);
-			return Optional.ofNullable(carEventFromCache.getZone());
+			if (carsCache.containsKey(carId)) {
+				CarEvent carEventFromCache = mapper.readValue(carsCache.get(carId), CarEvent.class);
+				return Optional.ofNullable(carEventFromCache.getZone());
+			}
+			else {
+				return Optional.empty();
+			}
 		} catch (JsonProcessingException e) {
 			LOGGER.error("Error marshalling carevent", e);
 			return Optional.empty();
