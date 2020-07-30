@@ -8,19 +8,14 @@ public class ZoneChangeEvent implements Serializable{
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private String previousZoneId;
-	private String nextZoneId;
-	private String carId;
+	String previousZoneId;
+	String nextZoneId;
+	String carId;
 	
 	public ZoneChangeEvent() {
 		super();
 	}
-	public ZoneChangeEvent(String previousZoneId, String nextZoneId, String carId) {
-		super();
-		this.previousZoneId = previousZoneId;
-		this.nextZoneId = nextZoneId;
-		this.carId = carId;
-	}
+
 	public String getPreviousZoneId() {
 		return previousZoneId;
 	}
