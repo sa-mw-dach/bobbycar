@@ -4,6 +4,7 @@ kind: Kustomization
 bases:
 - amq-broker/
 - amq-streams/
+- amq-streams-mirror/
 - api-gateway/
 - car-simulator/manifests/
 - dashboard/manifests/

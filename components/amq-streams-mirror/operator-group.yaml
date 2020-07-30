@@ -1,0 +1,10 @@
+apiVersion: operators.coreos.com/v1
+kind: OperatorGroup
+metadata:
+  annotations:
+    olm.providedAPIs: ""
+  generateName: bobbycar-og-
+  name: bobbycar-og
+spec:
+  targetNamespaces:
+  - bobbycar-machine-learning
