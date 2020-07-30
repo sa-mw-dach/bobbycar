@@ -2,15 +2,25 @@ package com.redhat.bobbycar.carsim.clients.model;
 
 import java.util.Objects;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class ZoneSpec {
 	private String name;
 	private Position position;
 	private int priority;
 	private int radius;
 	private String type;
+
+	public ZoneSpec() {
+		super();
+	}
+
+	public ZoneSpec(String name, Position position, int priority, int radius, String type) {
+		super();
+		this.name = name;
+		this.position = position;
+		this.priority = priority;
+		this.radius = radius;
+		this.type = type;
+	}
 
 	public String getName() {
 		return name;

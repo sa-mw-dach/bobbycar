@@ -1,11 +1,18 @@
 package com.redhat.bobbycar.carsim.clients.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class Position {
 	private double lat;
 	private double lng;
+
+	public Position() {
+		super();
+	}
+
+	public Position(double lat, double lng) {
+		super();
+		this.lat = lat;
+		this.lng = lng;
+	}
 
 	public double getLat() {
 		return lat;
