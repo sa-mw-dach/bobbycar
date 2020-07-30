@@ -3,17 +3,11 @@ package com.redhat.bobbycar.carsim.clients.model;
 import java.util.Objects;
 
 public class Metadata {
-	private String name;
-	private String resourceVersion;
+	String name;
+	String resourceVersion;
 
 	public Metadata() {
 		super();
-	}
-
-	public Metadata(String name, String resourceVersion) {
-		super();
-		this.name = name;
-		this.resourceVersion = resourceVersion;
 	}
 
 	public String getName() {

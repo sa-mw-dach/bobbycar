@@ -3,17 +3,11 @@ package com.redhat.bobbycar.carsim.clients.model;
 import java.util.Objects;
 
 public class Zone implements Comparable<Zone> {
-	private Metadata metadata;
-	private ZoneSpec spec;
+	Metadata metadata;
+	ZoneSpec spec;
 	
 	public Zone() {
 		super();
-	}
-
-	public Zone(Metadata metadata, ZoneSpec spec) {
-		super();
-		this.metadata = metadata;
-		this.spec = spec;
 	}
 
 	public Metadata getMetadata() {
