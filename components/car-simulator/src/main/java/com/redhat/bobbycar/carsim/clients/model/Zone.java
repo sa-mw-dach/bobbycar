@@ -2,12 +2,19 @@ package com.redhat.bobbycar.carsim.clients.model;
 
 import java.util.Objects;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class Zone implements Comparable<Zone> {
 	private Metadata metadata;
 	private ZoneSpec spec;
+	
+	public Zone() {
+		super();
+	}
+
+	public Zone(Metadata metadata, ZoneSpec spec) {
+		super();
+		this.metadata = metadata;
+		this.spec = spec;
+	}
 
 	public Metadata getMetadata() {
 		return metadata;
