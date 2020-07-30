@@ -51,6 +51,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class KafkaToDatagridRoute extends RouteBuilder {
 	
 	private static final String ZONE_CHANGE_HEADER = "zoneChange";
+	private static final String ZONE_PREV_HEADER = "previousZone";
+	private static final String ZONE_NXT_HEADER = "nextZone";
+	private static final String CAR_ID_HEADER = "carid";
 	private static final String CACHE_TEMPLATE = "default";
 	private static final String PATH_TO_SERVICE_CA = "/var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt";
 	private static final Logger LOGGER = LoggerFactory.getLogger(KafkaToDatagridRoute.class);
@@ -76,6 +79,28 @@ public class KafkaToDatagridRoute extends RouteBuilder {
 	private RemoteCache<String, String> carsCache;
 	private RemoteCache<String, String> carsnapshotsCache; 
 	private ObjectMapper mapper = new ObjectMapper();
+	
+	public static class ZoneChangeEvent {
+		private final String previousZoneId;
+		private final String nextZoneId;
+		private final String carId;
+		
+		public ZoneChangeEvent(String previousZoneId, String nextZoneId, String carId) {
+			super();
+			this.previousZoneId = previousZoneId;
+			this.nextZoneId = nextZoneId;
+			this.carId = carId;
+		}
+		public String getPreviousZoneId() {
+			return previousZoneId;
+		}
+		public String getNextZoneId() {
+			return nextZoneId;
+		}
+		public String getCarId() {
+			return carId;
+		}
+	}
 	
 	public static class CarEvent implements Comparable<CarEvent>{
 		@JsonProperty("lat")
@@ -413,31 +438,7 @@ public class KafkaToDatagridRoute extends RouteBuilder {
 			.setHeader(InfinispanConstants.KEY).expression(jsonpath("$.carid"))
 			.unmarshal().json(JsonLibrary.Jackson, CarEvent.class)
 			.log("Received ${body} from  ${body.class}")	
-		    .process(ex -> {
-		    	CarEvent car = ex.getIn().getBody(CarEvent.class);
-		    	double lat = car.getLatitude();
-		    	double lng = car.getLongitude();
-		    	Optional<Zone> matchingZone = zonesCache.values().stream()
-		    		.map(zs -> {
-						try {
-							return mapper.readValue(zs, Zone.class);
-						} catch (JsonProcessingException e) {
-							LOGGER.error("Error marshalling zone", e);
-							return null;
-						}
-					})
-		    		.filter(z -> z.isInside(lng, lat))
-		    		.sorted()
-		    		.findFirst();
-		    	
-		    	
-		    	Optional<Zone> previousZone = getPreviousZoneFromCache(car.carId);
-		    	if (!previousZone.equals(matchingZone)) {
-		    		LOGGER.error("Zone changed from {} to {}", previousZone, matchingZone);
-	    			ex.getIn().setHeader(ZONE_CHANGE_HEADER, true);
-		    	}
-		    	car.setZone(matchingZone.orElse(null));
-		    })
+		    .process(this::processZoneData)
 		    .marshal().json(JsonLibrary.Jackson, String.class)
 		    .setHeader(InfinispanConstants.VALUE).expression(simple("${body}"))
 		    .setHeader(InfinispanConstants.RESULT_HEADER).expression(simple("dummyAvoidOverwritingBody"))
@@ -445,9 +446,47 @@ public class KafkaToDatagridRoute extends RouteBuilder {
 			.to("infinispan://{{com.redhat.bobbycar.camelk.dg.car.cacheName}}?cacheContainerConfiguration=#cacheContainerConfiguration")
 			.choice()
 				.when(header(ZONE_CHANGE_HEADER).isEqualTo(true))
+				.process(this::transformToZoneChangeEvent)
+				.marshal().json(JsonLibrary.Jackson, String.class)
 				.log("Publishing ${body} to mqtt")
 				.to("paho:{{com.redhat.bobbycar.camelk.mqtt.topic}}?brokerUrl={{com.redhat.bobbycar.camelk.mqtt.brokerUrl}}")
 			;
+	}
+	
+	@SuppressWarnings("unchecked")
+	private void transformToZoneChangeEvent(Exchange ex) {	
+		Optional<Zone> previousZone = (Optional<Zone>) ex.getIn().getHeader(ZONE_PREV_HEADER);
+		Optional<Zone> nextZone = (Optional<Zone>) ex.getIn().getHeader(ZONE_NXT_HEADER);
+		String carId = (String) ex.getIn().getHeader(CAR_ID_HEADER);
+		ex.getIn().setBody(new ZoneChangeEvent(previousZone.map(z -> z.getMetadata().getName()).orElse(null), 
+				nextZone.map(z -> z.getMetadata().getName()).orElse(null), carId));
+	}
+
+	private void processZoneData(Exchange ex) {
+		CarEvent car = ex.getIn().getBody(CarEvent.class);
+		double lat = car.getLatitude();
+		double lng = car.getLongitude();
+		ex.getIn().setHeader(CAR_ID_HEADER, car.getCarId());
+		Optional<Zone> matchingZone = zonesCache.values().stream()
+			.map(zs -> {
+				try {
+					return mapper.readValue(zs, Zone.class);
+				} catch (JsonProcessingException e) {
+					LOGGER.error("Error marshalling zone", e);
+					return null;
+				}
+			})
+			.filter(z -> z.isInside(lng, lat))
+			.sorted()
+			.findFirst();
+		Optional<Zone> previousZone = getPreviousZoneFromCache(car.carId);
+		if (!previousZone.equals(matchingZone)) {
+			LOGGER.error("Zone changed from {} to {}", previousZone, matchingZone);
+			ex.getIn().setHeader(ZONE_CHANGE_HEADER, true);
+			ex.getIn().setHeader(ZONE_PREV_HEADER, previousZone);
+			ex.getIn().setHeader(ZONE_NXT_HEADER, matchingZone);
+		}
+		car.setZone(matchingZone.orElse(null));
 	}
 	
 	private Optional<Zone> getPreviousZoneFromCache(String carId) {
