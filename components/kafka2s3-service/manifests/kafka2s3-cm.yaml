@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: bobbycar-kafka2s3-config
+data:
+  application.properties: |
+    
+    kafka.broker.uri=bobbycar-cluster-kafka-bootstrap:9092
+    kafka.broker.topic.gps=bobbycar-gps
+
+    s3.accessKey=replacme
+    s3.secretKey=replaceme
+    s3.region=eu-central-1
+    s3.bucket.name=bobbycar-ml
+    s3.message.aggregation.interval=10000
+    s3.custom.endpoint.enabled=false
+    s3.custom.endpoint.url=s3-openshift-storage.apps.ocp4.stormshift.coe.muc.redhat.com
+
+    
