@@ -24,7 +24,7 @@ spec:
       forcePull: true
       from:
         kind: ImageStreamTag
-        name: 'ubi-quarkus-native-s2i:19.3.1-java11'
+        name: 'ubi-quarkus-native-s2i:20.1.0-java11'
     type: Source     
   successfulBuildsHistoryLimit: 5
   triggers:
