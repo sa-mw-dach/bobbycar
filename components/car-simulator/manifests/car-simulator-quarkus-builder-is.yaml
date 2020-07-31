@@ -15,3 +15,10 @@ spec:
       importPolicy: {}
       referencePolicy:
         type: Source
+    - name: 20.1.0-java11
+      from:
+        kind: DockerImage
+        name: 'quay.io/quarkus/ubi-quarkus-native-s2i:20.1.0-java11'
+      importPolicy: {}
+      referencePolicy:
+        type: Source
