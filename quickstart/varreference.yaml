@@ -7,6 +7,23 @@ varReference:
 - path: metadata/namespace
   kind: Secret   
 
+- path: metadata/namespace
+  kind: BuildConfig
+
+- path: metadata/namespace
+  kind: DeploymentConfig
+
+- path: metadata/namespace
+  kind: ImageStream
+
+- path: metadata/namespace
+  kind: Service
+
+- path: metadata/namespace
+  kind: ConfigMap
+- path: data/config.json
+  kind: ConfigMap       
+
 - path: metadata/name
   kind: Namespace   
 
