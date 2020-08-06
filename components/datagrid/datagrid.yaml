@@ -2,6 +2,7 @@ apiVersion: infinispan.org/v1
 kind: Infinispan
 metadata:
   name: bobbycar-dg
+  namespace: $(NS_BOBBYCAR)
 spec:
   container:
     cpu: ''
