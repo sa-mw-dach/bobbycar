@@ -4,8 +4,6 @@ kind: Kustomization
 namespace: bobbycar
 
 resources:
-- camel-k-operator-subscription.yaml
-- camel-k-integration-platform.yaml
 - kafka2datagrid-integration.yaml
 - kafka2datagrid-secret.yaml
 - sa-rolebinding.yaml

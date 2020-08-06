@@ -4,8 +4,6 @@ kind: Kustomization
 namespace: bobbycar
 
 resources:
-- camel-k-operator-subscription.yaml
-- camel-k-integration-platform.yaml
 - datagrid2rest-integration.yaml
 - datagrid2rest-route.yaml
 - datagrid2rest-svc.yaml
