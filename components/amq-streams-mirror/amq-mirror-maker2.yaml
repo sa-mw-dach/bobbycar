@@ -2,13 +2,14 @@ apiVersion: kafka.strimzi.io/v1alpha1
 kind: KafkaMirrorMaker2
 metadata:
   name: bobbycar-ml-mirror-maker
+  namespace: $(NS_BOBBYCAR_ML)
 spec:
   version: 2.4.0
   replicas: 1
   connectCluster: my-cluster-target
   clusters:
     - alias: my-cluster-source
-      bootstrapServers: 'bobbycar-cluster-kafka-bootstrap-bobbycar.apps.ocp3.stormshift.coe.muc.redhat.com:443'
+      bootstrapServers: 'bobbycar-cluster-kafka-bootstrap-bobbycar.$(OCP_DOMAIN):443'
       tls:
         trustedCertificates:
         - certificate: ca.crt
