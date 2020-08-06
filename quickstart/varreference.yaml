@@ -1,0 +1,45 @@
+varReference:
+- path: spec/host
+  kind: Route
+- path: metadata/namespace
+  kind: Route 
+
+- path: metadata/namespace
+  kind: Secret   
+
+- path: metadata/name
+  kind: Namespace   
+
+- path: metadata/namespace
+  kind: ActiveMQArtemis
+
+- path: metadata/namespace
+  kind: Subscription
+
+- path: metadata/namespace
+  kind: OperatorGroup
+- path: spec/targetNamespaces
+  kind: OperatorGroup    
+
+- path: metadata/namespace
+  kind: KafkaTopic
+- path: metadata/namespace
+  kind: Kafka 
+- path: metadata/namespace
+  kind: KafkaBridge
+- path: metadata/namespace
+  kind: KafkaMirrorMaker2  
+- path: spec/clusters[]/bootstrapServers
+  kind: KafkaMirrorMaker2  
+
+- path: metadata/namespace
+  kind: APIManager 
+- path: spec/wildcardDomain
+  kind: APIManager 
+
+- path: metadata/namespace
+  kind: IntegrationPlatform  
+
+- path: metadata/namespace
+  kind: Infinispan           
+           

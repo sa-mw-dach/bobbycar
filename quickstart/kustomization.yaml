@@ -1,0 +1,62 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+commonLabels:
+  app: bobbycar
+
+bases:
+- ../components/amq-broker
+- ../components/amq-streams
+- ../components/amq-streams-mirror
+- ../components/api-gateway
+- ../components/camel-k
+- ../components/datagrid
+
+patchesStrategicMerge:
+- kafka-bridge.yaml
+- 3scale-registry-secret.yaml
+- datagrid-route.yaml
+
+configMapGenerator:
+  - name: bobbycar-deployment-config
+    literals:
+    - OCP_DOMAIN=apps.ocp4.stormshift.coe.muc.redhat.com
+    - NS_BOBBYCAR=bobbycar
+    - NS_BOBBYCAR_API=bobbycar-api
+    - NS_BOBBYCAR_ML=bobbycar-machine-learning
+  
+vars:
+- name: OCP_DOMAIN
+  objref:
+    kind: ConfigMap
+    name: bobbycar-deployment-config
+    apiVersion: v1
+  fieldref:
+    fieldpath: data.OCP_DOMAIN 
+- name: NS_BOBBYCAR
+  objref:
+    kind: ConfigMap
+    name: bobbycar-deployment-config
+    apiVersion: v1
+  fieldref:
+    fieldpath: data.NS_BOBBYCAR
+- name: NS_BOBBYCAR_API
+  objref:
+    kind: ConfigMap
+    name: bobbycar-deployment-config
+    apiVersion: v1
+  fieldref:
+    fieldpath: data.NS_BOBBYCAR_API
+- name: NS_BOBBYCAR_ML
+  objref:
+    kind: ConfigMap
+    name: bobbycar-deployment-config
+    apiVersion: v1
+  fieldref:
+    fieldpath: data.NS_BOBBYCAR_ML              
+    
+generatorOptions:
+  disableNameSuffixHash: true  
+
+configurations:
+- varreference.yaml
