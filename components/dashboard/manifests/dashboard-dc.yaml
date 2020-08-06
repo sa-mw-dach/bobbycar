@@ -5,6 +5,7 @@ metadata:
     app: dashboard
     app.kubernetes.io/part-of: Bobbycar
   name: dashboard
+  namespace: $(NS_BOBBYCAR)
 spec:
   replicas: 1
   revisionHistoryLimit: 10

@@ -4,21 +4,19 @@ kind: Kustomization
 commonLabels:
   app: bobbycar
 
-bases:
-- ../components/amq-broker
-- ../components/amq-streams
-- ../components/amq-streams-mirror
-- ../components/api-gateway
-- ../components/camel-k
-- ../components/datagrid
+resources:
+- ../components
 
 patchesStrategicMerge:
-- kafka-bridge.yaml
-- 3scale-registry-secret.yaml
-- datagrid-route.yaml
+- patches/kafka-bridge.yaml
+- patches/3scale-registry-secret.yaml
+- patches/datagrid-route.yaml
+- patches/dashboard-configmap.yaml
+- patches/dashboard-route.yaml
 
 configMapGenerator:
   - name: bobbycar-deployment-config
+    namespace: bobbycar
     literals:
     - OCP_DOMAIN=apps.ocp4.stormshift.coe.muc.redhat.com
     - NS_BOBBYCAR=bobbycar
