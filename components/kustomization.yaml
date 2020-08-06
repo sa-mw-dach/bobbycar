@@ -4,11 +4,17 @@ kind: Kustomization
 bases:
 - amq-broker/
 - amq-streams/
-- amq-streams-mirror/
+#- amq-streams-mirror/
 - api-gateway/
+- camel-k/
+- datagrid/
 - car-simulator/manifests/
 - dashboard/manifests/
+- datagrid-rest-service/manifests/
 - kafka-streaming-service/manifests/
+- kafka2datagrid-service/manifests/
+- kafka2s3-service/manifests/
+#- keycloak
 
 resources:
 - namespace.yaml

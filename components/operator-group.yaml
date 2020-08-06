@@ -2,10 +2,10 @@ apiVersion: operators.coreos.com/v1
 kind: OperatorGroup
 metadata:
   annotations:
-    olm.providedAPIs: ActiveMQArtemis.v2alpha2.broker.amq.io,ActiveMQArtemisAddress.v2alpha2.broker.amq.io,ActiveMQArtemisScaledown.v2alpha1.broker.amq.io,Kafka.v1beta1.kafka.strimzi.io,KafkaBridge.v1alpha1.kafka.strimzi.io,KafkaConnect.v1beta1.kafka.strimzi.io,KafkaConnectS2I.v1beta1.kafka.strimzi.io,KafkaConnector.v1alpha1.kafka.strimzi.io,KafkaMirrorMaker.v1beta1.kafka.strimzi.io,KafkaMirrorMaker2.v1alpha1.kafka.strimzi.io,KafkaTopic.v1beta1.kafka.strimzi.io,KafkaUser.v1beta1.kafka.strimzi.io
+    olm.providedAPIs: ""
   generateName: bobbycar-og-
   name: bobbycar-og
-  namespace: bobbycar
+  namespace: $(NS_BOBBYCAR)
 spec:
   targetNamespaces:
-  - bobbycar
+  - $(NS_BOBBYCAR)
