@@ -2,6 +2,7 @@ apiVersion: kafka.strimzi.io/v1beta1
 kind: Kafka
 metadata:
   name: bobbycar-cluster
+  namespace: $(NS_BOBBYCAR)
 spec:
   kafka:
     version: 2.4.0
