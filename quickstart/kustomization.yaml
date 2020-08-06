@@ -13,6 +13,7 @@ patchesStrategicMerge:
 - patches/datagrid-route.yaml
 - patches/dashboard-configmap.yaml
 - patches/dashboard-route.yaml
+- patches/kafka2s3-cm.yaml
 
 configMapGenerator:
   - name: bobbycar-deployment-config

@@ -22,7 +22,9 @@ varReference:
 - path: metadata/namespace
   kind: ConfigMap
 - path: data/config.json
-  kind: ConfigMap       
+  kind: ConfigMap 
+- path: data/application.properties
+  kind: ConfigMap         
 
 - path: metadata/name
   kind: Namespace   
@@ -56,6 +58,8 @@ varReference:
 
 - path: metadata/namespace
   kind: IntegrationPlatform  
+- path: metadata/namespace
+  kind: Integration
 
 - path: metadata/namespace
   kind: Infinispan           
