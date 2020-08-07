@@ -1,4 +1,4 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: bobbycar-machine-learning
+  name: $(NS_BOBBYCAR_ML)
