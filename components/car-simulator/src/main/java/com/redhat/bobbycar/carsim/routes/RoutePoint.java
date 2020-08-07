@@ -2,6 +2,7 @@ package com.redhat.bobbycar.carsim.routes;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.Objects;
 import java.util.Optional;
@@ -47,6 +48,30 @@ public class RoutePoint implements Serializable{
 
 	public Optional<ZonedDateTime> getTime() {
 		return time;
+	}
+	
+	public Optional<Duration> durationBetween(RoutePoint other) {
+		return this.time.flatMap(t1 -> other.getTime().map(t2 -> Duration.between(t1, t2)));
+	}
+	
+	public double distanceInMetersTo(RoutePoint other) {
+		double lat1 = this.getLatitude().doubleValue();
+		double lon1 = this.getLatitude().doubleValue();
+		double lat2 = other.getLatitude().doubleValue();
+		double lon2 = other.getLatitude().doubleValue();			
+		
+		int R = 6371000; // metres
+		double phi1 = lat1 * Math.PI/180; // φ, λ in radians
+		double phi2 = lat2 * Math.PI/180;
+		double deltaPhi = (lat2-lat1) * Math.PI/180;
+		double deltaLambda = (lon2-lon1) * Math.PI/180;
+
+		double a = Math.sin(deltaPhi/2) * Math.sin(deltaPhi/2) +
+		          Math.cos(phi1) * Math.cos(phi2) *
+		          Math.sin(deltaLambda/2) * Math.sin(deltaLambda/2);
+		double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+
+		return R * c; // in metres
 	}
 
 	@Override

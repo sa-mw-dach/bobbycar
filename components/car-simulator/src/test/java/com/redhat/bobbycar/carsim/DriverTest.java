@@ -33,7 +33,7 @@ public class DriverTest {
 		DrivingStrategy strategy = TimedDrivingStrategy.builder().build();
 		Driver driver = Driver.builder().withRoute(route).withDrivingStrategy(strategy).build();
 		driver.registerCarEventListener(evt -> {
-			LOGGER.error("Event is {}", evt);
+			LOGGER.info("Event is {}", evt);
 			assertNotNull(evt);
 		});
 		Thread t = new Thread(driver);
@@ -55,7 +55,7 @@ public class DriverTest {
 		TimedDrivingStrategy strategy = TimedDrivingStrategy.builder().withFactor(100).build();
 		Driver driver = Driver.builder().withRoute(route).withDrivingStrategy(strategy).build();
 		driver.registerCarEventListener(evt -> {
-			LOGGER.error("Event is {}", evt);
+			LOGGER.info("Event is {}", evt);
 			assertNotNull(evt);
 		});
 		Thread t = new Thread(driver);
