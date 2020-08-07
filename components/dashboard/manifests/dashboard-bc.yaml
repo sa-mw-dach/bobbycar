@@ -4,6 +4,7 @@ metadata:
   labels:
     app: dashboard
   name: dashboard
+  namespace: $(NS_BOBBYCAR)
 spec:
   failedBuildsHistoryLimit: 5
   nodeSelector: {}

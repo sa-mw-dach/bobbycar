@@ -2,12 +2,11 @@ kind: Route
 apiVersion: route.openshift.io/v1
 metadata:
   name: datagrid
+  namespace: $(NS_BOBBYCAR)
   labels:
-    app: infinispan-service
     clusterName: bobbycar-dg
     infinispan_cr: bobbycar-dg
 spec:
-  host: datagrid-bobbycar.apps.ocp3.stormshift.coe.muc.redhat.com
   to:
     kind: Service
     name: bobbycar-dg
