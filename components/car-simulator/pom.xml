@@ -90,7 +90,7 @@
 	      <version>3.3.0</version>
 	      <executions>
 	          <execution>
-	              <id>xjc</id>
+	              <id>generate gpx 1.1</id>
 	              <phase>generate-sources</phase>
 	              <goals>
 	                  <goal>xsdtojava</goal>
@@ -104,6 +104,21 @@
 	                  </xsdOptions>
 	              </configuration>
 	          </execution>
+	          <execution>
+                   <id>generate gpx 1.0</id>
+                  <phase>generate-sources</phase>
+                  <goals>
+                      <goal>xsdtojava</goal>
+                  </goals>
+                  <configuration>
+                      <xsdOptions>
+                          <xsdOption>
+                              <xsd>${basedir}/src/main/resources/schema/gpx_10.xsd</xsd>
+                              <packagename>com.redhat.bobbycar.carsim.gpx10</packagename>
+                          </xsdOption>
+                      </xsdOptions>
+                  </configuration>
+              </execution>
 	      </executions>                    
 	  </plugin>
       <plugin>

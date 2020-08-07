@@ -1,11 +1,13 @@
 package com.redhat.bobbycar.carsim;
 
-import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
@@ -33,7 +35,9 @@ import com.redhat.bobbycar.carsim.drivers.DriverMetrics;
 import com.redhat.bobbycar.carsim.drivers.TimedDrivingStrategy;
 import com.redhat.bobbycar.carsim.drivers.TimedDrivingStrategyMetrics;
 import com.redhat.bobbycar.carsim.gpx.GpxReader;
-import com.redhat.bobbycar.carsim.routes.RandomRouteSeclector;
+import com.redhat.bobbycar.carsim.routes.CompositeRouteSelector;
+import com.redhat.bobbycar.carsim.routes.FileBasedRouteSelector;
+import com.redhat.bobbycar.carsim.routes.OsmRouteSelector;
 import com.redhat.bobbycar.carsim.routes.Route;
 import com.redhat.bobbycar.carsim.routes.RouteSelectionStrategy;
 
@@ -50,6 +54,9 @@ public class CarSimulatorApp {
 	
 	@ConfigProperty(name = "com.redhat.bobbycar.carsim.route")
 	String pathToRoutes;
+	
+	@ConfigProperty(name = "com.redhat.bobbycar.carsim.route.remote", defaultValue = "")
+	Optional<String[]> remoteRoutes;
 	
 	@ConfigProperty(name = "com.redhat.bobbycar.carsim.delay", defaultValue = "0")
 	int delay;
@@ -74,6 +81,9 @@ public class CarSimulatorApp {
 	GpxReader gpxReader;
 	
 	@Inject
+	OsmRouteSelector osmRouteSelector;
+	
+	@Inject
 	TimedDrivingStrategyMetrics timedDrivingStrategyMetrics;
 	
 	@Inject
@@ -89,9 +99,23 @@ public class CarSimulatorApp {
 	
 	synchronized RouteSelectionStrategy getRouteSelectionStrategy() {
 		if (routeSelectionStrategy == null) {
-			routeSelectionStrategy = new RandomRouteSeclector(gpxReader, pathToRoutes);
+			List<RouteSelectionStrategy> strategies = new ArrayList<>();
+			strategies.add(new FileBasedRouteSelector(gpxReader, pathToRoutes));
+			addRemoteSelectionStrategies(strategies);
+			routeSelectionStrategy = new CompositeRouteSelector(strategies);
 		}
 		return routeSelectionStrategy;
+	}
+
+	private void addRemoteSelectionStrategies(List<RouteSelectionStrategy> strategies) {
+		remoteRoutes.ifPresent(r -> {
+			Set<String> remoteStrategies = new HashSet<>(Arrays.asList(r));
+			if (remoteStrategies.contains("osm")) {
+				strategies.add(osmRouteSelector);
+				 LOGGER.info("Adding osm as remote route source");
+			}
+		});
+		
 	}
 	
 	void onStart(@Observes StartupEvent ev) {  
@@ -99,28 +123,26 @@ public class CarSimulatorApp {
         LOGGER.info("The application is starting... ");
         LOGGER.info("Reading routes from {}", pathToRoutes);
         LongStream.range(0, cars).forEach(c -> {
-        	try {
-	        	Route route = getRouteSelectionStrategy().selectRoute();
-	        	TimedDrivingStrategy strategy = TimedDrivingStrategy.builder()
-	        			.withFactor(factor)
-	        			.withMetrics(timedDrivingStrategyMetrics)
-	        			.build();
-	            Driver driver = Driver.builder()
-	            		.withRoute(route)
-	            		.withDrivingStrategy(strategy)
-	            		.withRepeat(repeat)
-	            		.withMetrics(driverMetrics)
-	            		.withStartDelay(delay * (c + 1))
-	            		.build();
-	            registerListenerForKafka(driver);
-	            futures.put(driver.getId(), CompletableFuture.runAsync(driver, executor));
-	            driverDao.create(driver.getId(), driver);
-	            if (repeat && LOGGER.isInfoEnabled()) {
-	            	LOGGER.info("Will repeat route when finished");
-	            }
-        	} catch (IOException | JAXBException e) {
-        		LOGGER.error("Error reading route", e);
-        	} 
+
+	    	Route route = getRouteSelectionStrategy().selectRoute();
+	    	TimedDrivingStrategy strategy = TimedDrivingStrategy.builder()
+	    			.withFactor(factor)
+	    			.withMetrics(timedDrivingStrategyMetrics)
+	    			.build();
+	        Driver driver = Driver.builder()
+	        		.withRoute(route)
+	        		.withDrivingStrategy(strategy)
+	        		.withRepeat(repeat)
+	        		.withMetrics(driverMetrics)
+	        		.withStartDelay(delay * (c + 1))
+	        		.build();
+	        registerListenerForKafka(driver);
+	        futures.put(driver.getId(), CompletableFuture.runAsync(driver, executor));
+	        driverDao.create(driver.getId(), driver);
+	        if (repeat && LOGGER.isInfoEnabled()) {
+	        	LOGGER.info("Will repeat route when finished");
+	        }
+        	
         });
     }
 

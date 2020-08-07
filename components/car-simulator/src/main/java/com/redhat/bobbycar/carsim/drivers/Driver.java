@@ -59,7 +59,7 @@ public class Driver implements Runnable{
 		}
 		metrics.ifPresent(DriverMetrics::incrementCarsDriving);
 		setStart(ZonedDateTime.now());
-		LOGGER.debug("I am driving");
+		LOGGER.debug("I am driving route {}", route.getName());
 		do {
 			route.getPoints().forEach(to -> {
 				LOGGER.debug("to {}", to);
