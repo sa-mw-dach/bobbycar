@@ -18,7 +18,7 @@ import com.redhat.bobbycar.carsim.routes.RoutePoint;
 public class TimedEngine implements Engine{
 	private static final Logger LOGGER = LoggerFactory.getLogger(TimedEngine.class);
 	private static final String ROUTE_NOT_SUPPORTED_MSG = "Route points must contain time";
-	private final static MathContext MATH_CTX = new MathContext(12);
+	private static final MathContext MATH_CTX = new MathContext(12);
 	
 	private final int speedVariationInKmH;
 	private RoutePoint previous;

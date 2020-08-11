@@ -66,14 +66,14 @@ public class OsmRouteSelector implements RouteSelectionStrategy{
 			if (gpxObj instanceof JAXBElement<?>) {
 				JAXBElement<?> gpx = (JAXBElement<?>) gpxObj;
 				if (gpx.getValue() instanceof Gpx) {
-					return gpxReader.transform((Gpx) gpx.getValue());
+					return gpxReader.transform10((Gpx) gpx.getValue());
 				} else if (gpx.getValue() instanceof GpxType) {
 					return gpxReader.transform((GpxType) gpx.getValue());
 				} else {
 					throw new RouteSelectionException("Cannot determine gpx version from unmarshalled type " + gpx.getValue().getClass());
 				}
 			} else if (gpxObj instanceof Gpx) {
-				return gpxReader.transform((Gpx) gpxObj);
+				return gpxReader.transform10((Gpx) gpxObj);
 			} else if (gpxObj instanceof GpxType) {
 				return gpxReader.transform((GpxType) gpxObj);
 			} else {
