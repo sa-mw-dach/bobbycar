@@ -5,7 +5,7 @@ metadata:
   namespace: $(NS_BOBBYCAR)
 spec:
   channel: techpreview
-  installPlanApproval: Manual
+  installPlanApproval: Automatic
   name: red-hat-camel-k
   source: redhat-operators
   sourceNamespace: openshift-marketplace
