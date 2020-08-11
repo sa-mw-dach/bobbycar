@@ -15,6 +15,9 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.redhat.bobbycar.carsim.gpx10.Gpx;
 import com.redhat.bobbycar.carsim.gpx10.Gpx.Trk;
 import com.redhat.bobbycar.carsim.routes.Route;
@@ -25,6 +28,7 @@ import com.redhat.bobbycar.carsim.routes.RoutePoint;
 @ApplicationScoped
 public class GpxReader {
 	private Unmarshaller unmarshaller;
+	private static final Logger LOGGER = LoggerFactory.getLogger(GpxReader.class);
 	
 	enum GpxVersion {V11, V10}
 
@@ -56,19 +60,22 @@ public class GpxReader {
 		} else {
 			Source source = new StreamSource(input);
 			JAXBElement<Gpx> element = unmarshaller.unmarshal(source, Gpx.class);
-			return transform(element.getValue());
+			return transform10(element.getValue());
 		}
 	}
 
 	public Route transform(GpxType gpx) {
+		LOGGER.info("Transforming gpx into route: {}", gpx.getTrk());
 		return new Route(gpx.getMetadata() != null ? gpx.getMetadata().getName() : null, transform(gpx.getTrk()));
 	}
 	
-	public Route transform(Gpx gpx) {
+	public Route transform10(Gpx gpx) {
+		LOGGER.info("Transforming gpx into route: {}", gpx.getTrk());
 		return new Route(gpx.getName() != null ? gpx.getName() : null, transform10(gpx.getTrk()));
 	}
 
 	private List<RoutePoint> transform10(List<Trk> trks) {
+		LOGGER.info("Transforming trks into route points: {}", trks);
 		return trks.stream().flatMap(trk -> trk.getTrkseg().stream().flatMap(seg -> seg.getTrkpt().stream()))
 				.map(trk -> new RoutePoint(trk.getLon(), trk.getLat(), trk.getEle(),
 						trk.getTime() != null ? trk.getTime().toGregorianCalendar().toZonedDateTime() : null))
@@ -77,6 +84,7 @@ public class GpxReader {
 	}
 
 	private List<RoutePoint> transform(List<TrkType> trks) {
+		LOGGER.info("Transforming trks into route points: {}", trks);
 		return trks.stream().flatMap(trk -> trk.getTrkseg().stream().flatMap(seg -> seg.getTrkpt().stream()))
 				.map(trk -> new RoutePoint(trk.getLon(), trk.getLat(), trk.getEle(),
 						trk.getTime() != null ? trk.getTime().toGregorianCalendar().toZonedDateTime() : null))
