@@ -23,6 +23,9 @@ public class JsonEngineConfiguration {
 	private EngineBehavior engineBehavior;
 	private double rpmToSwitchGear = 4000;
 	private int maxGear;
+	private double consumptionIncreaseSpeedKmH = 40;
+	private double minFuelConsumptionPer100km = 3;
+	private double maxFuelConsumptionPer100km = 15;
 	
 	
 	private static class GearEntry {
@@ -45,6 +48,10 @@ public class JsonEngineConfiguration {
 		
 		public double getSpeed() {
 			return speedPerRpm.getSpeed();
+		}
+		
+		public double rpmAtSpeed(double speed) {
+			return (speedPerRpm.getRpm() / speedPerRpm.getSpeed() * speed);
 		}
 
 		@Override
@@ -84,14 +91,55 @@ public class JsonEngineConfiguration {
 		return jsonb.fromJson(JsonEngineConfiguration.class.getResourceAsStream("/engines/bmw_m3_coupe.json"), EngineBehavior.class);
 	}
 	
+	public Optional<Double> maxSpeed() {
+		return engineBehavior.getGearBehaviors().stream()
+			.flatMap(b -> b.getSpeedPerRpms().stream())
+			.max(Comparator.comparing(SpeedPerRpm::getSpeed))
+			.map(SpeedPerRpm::getSpeed);
+	}
+	
+	
+	public Optional<Double> co2FromSpeed(double speed) {
+		return null;
+	}
+	
+	public Optional<Double> fuelConsumptionPer100KmFromSpeed(double speed) {
+		
+		if (speed >= consumptionIncreaseSpeedKmH) {
+			return maxSpeed()
+					.flatMap(max -> {
+						LOGGER.info("Max speed is {}", max);
+						if (speed > max) {
+							return Optional.empty();
+						} else {
+							double speedRange = max - consumptionIncreaseSpeedKmH;
+							double consumptionRange = maxFuelConsumptionPer100km - minFuelConsumptionPer100km;
+							return Optional.of(consumptionRange / speedRange * (speed - consumptionIncreaseSpeedKmH) + minFuelConsumptionPer100km);
+						}
+					});
+		} 
+		else {
+			return Optional.of(minFuelConsumptionPer100km);
+		}
+	}
+	
+	public Optional<Double> rpmFromSpeed(double speed) {
+		return gearEntryFromSpeed(speed)
+				.map(g -> g.rpmAtSpeed(speed));
+	}
 
 	public Optional<Integer> gearFromSpeed(double speed) {
 		LOGGER.info("Matching {} gear behaviors ", engineBehavior.getGearBehaviors().size());
+		return gearEntryFromSpeed(speed)
+				.map(GearEntry::getGear);
+	}
+
+	private Optional<GearEntry> gearEntryFromSpeed(double speed) {
 		return engineBehavior.getGearBehaviors().stream()
 			.sorted(Comparator.comparing(GearBehavior::getGear))
 			.flatMap(b -> b.getSpeedPerRpms().stream().map(s -> new GearEntry(b.getGear(), s)))
 				.filter(gearAndRpmCanAchieve(speed))
-				.findFirst().map(GearEntry::getGear);
+				.findFirst();
 	}
 	
 	private Predicate<? super GearEntry> gearAndRpmCanAchieve(double speed) {
