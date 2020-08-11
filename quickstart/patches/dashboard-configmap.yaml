@@ -6,7 +6,7 @@ metadata:
 data:
   config.json: |-
     {
-        "GOOGLE_API_KEY": "replaceme"
+        "GOOGLE_API_KEY": "replaceme",
         "BOBBYCAR_API_KEY": "replaceme",
         "SSE_ENDPOINT": "http://localhost:8080",
         "WS_ENDPOINT": "wss://kafka-bridge-3scale-apicast-staging.$(OCP_DOMAIN)/realtime/api/carevents",
