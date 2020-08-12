@@ -1,19 +1,18 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
-commonLabels:
-  app: bobbycar
-
-resources:
+bases:
 - ../components
 
 patchesStrategicMerge:
 - patches/kafka-bridge.yaml
+- patches/amq-mirror-maker2.yaml
 - patches/3scale-registry-secret.yaml
 - patches/datagrid-route.yaml
 - patches/dashboard-configmap.yaml
 - patches/dashboard-route.yaml
 - patches/kafka2s3-cm.yaml
+#- patches/datagrid2rest-route.yaml
 
 configMapGenerator:
   - name: bobbycar-deployment-config
@@ -22,7 +21,7 @@ configMapGenerator:
     - OCP_DOMAIN=apps.ocp4.stormshift.coe.muc.redhat.com
     - NS_BOBBYCAR=bobbycar
     - NS_BOBBYCAR_API=bobbycar-api
-    - NS_BOBBYCAR_ML=bobbycar-machine-learning
+    - NS_BOBBYCAR_ML=bobbycar-ml
   
 vars:
 - name: OCP_DOMAIN
