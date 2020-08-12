@@ -1,27 +1,52 @@
-# bobbycar
+# Bobbycar
 
-IoT Transportation demo using Red Hat OpenShift and Middleware technologies.
+Bobbycar is a Service based cloud-native application and demo, highlighting **Red Hat OpenShift** and most of the **Red Hat Middleware** portfolio in a business relevant IoT context.
 
-In this demo you will see a fleet management system to track vehicles (called bobbycars). Special zones are implemented ( called BobbycarZone) and based on the location data shared by the bobbycar special rules and restrictions apply for the bobbycar(s) beeing located by the system in the BobycarZone.
+It is also a sample implementation of an **IoT Reference Architecture** built with Red Hat products.
 
+## About
+
+Bobbycars are actually vehicle simulators implemented in Quarkus, simulating cars and sending telemetry data to an IoT Cloud Gateway.
+
+The data is then being used in different data processing flows for visualization, realtime analytics, machine learning and other use cases.
+
+## Purpose
+
++ Accelerate customers building IoT solutions faster with Red Hat technologies.
+  
++ Bobbycar aims to showcase the COMPLETE Red Hat Middleware stack on OpenShift in a real world IoT context.
+  
++ Involve customers and partners to extend the demo and integrate with real devices.
+
++ Involve developers getting a more realistic hands-on experience with cloud-native development and OpenShift
+
+## Technologies involved
+
++ OpenShift
++ RH Runtimes, Quarkus
++ AMQ Online
++ AMQ Broker
++ AMQ Streams
++ RH Fuse, Apache Camel
++ Camel-K
++ Datagrid
++ 3scale API Management
++ Red Hat Single Sign On
++ OpenData Hub
++ Prometheus
++ S3 object storage
++ CodeReady Workspaces
++ OpenShift Pipelines
++ Angular, Ionic
++ Google Maps
++ OpenJDK
+
+## Quickstart
+
+If you want to setup Bobbycar in your own environment, please follow the [Quickstart Guide!](https://github.com/sa-mw-dach/bobbycar/tree/master/quickstart)
+
+## Screenshots
 
 ![map view][02_map] <div style="text-align: right"><sup><span style="color:blue">(c) Google maps</span></sup></div>
 
 [02_map]: docs/images/02_map.png "bobbycar map view"
-
-**WHY?** you might ask.
-
-We try to cover several scenarios in a simplified way at the same time.
-
-In order to achieve the above view on your fleet you need:
-+ Connection to external systems like data providers
-+ Connection to systems transferring their data via wire or even completely disconnected via air
-+ There is a mixture of data
-  + real time data
-  + historic data
-  + non real time data with low priority
-  + different data protection needs for several data streams
-  + data with high bandwidth needs (like onboard camera)
-  + data with low bandwidth need (like geo location)
-
-Depending on the data you refer to also different software components need to be used in order to address the several data stream constraints and applying security needs.

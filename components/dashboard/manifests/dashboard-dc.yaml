@@ -2,7 +2,6 @@ apiVersion: apps.openshift.io/v1
 kind: DeploymentConfig
 metadata:
   labels:
-    app: dashboard
     app.kubernetes.io/part-of: Bobbycar
   name: dashboard
   namespace: $(NS_BOBBYCAR)
@@ -10,7 +9,7 @@ spec:
   replicas: 1
   revisionHistoryLimit: 10
   selector:
-    app: dashboard
+    component: dashboard
     deploymentconfig: dashboard
   strategy:
     activeDeadlineSeconds: 21600
@@ -25,7 +24,7 @@ spec:
   template:
     metadata:
       labels:
-        app: dashboard
+        component: dashboard
         deploymentconfig: dashboard
     spec:
       containers:
