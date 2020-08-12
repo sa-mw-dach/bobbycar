@@ -2,9 +2,11 @@
 
 # Bobbycar - A hitchikers guide - quick overview
 
-IoT Transportation demo using Red Hat OpenShift and Middleware technologies.
+Bobbycar is a Microservices based cloud-native application and demo, highlighting OpenShift and most of the RH Middleware portfolio in a business relevant IoT context. It is also a sample implementation of an IoT Reference Architecture built with Red Hat products.
 
-In this demo you will see a fleet management system to track vehicles (called bobbycars). Special zones are implemented ( called BobbycarZone) and based on the location data shared by the bobbycar special rules and restrictions apply for the bobbycar(s) beeing located by the system in the BobycarZone.
+The demo aims to accelerate customers building IoT solutions faster with Red Hat technologies.
+Bobbycars are actually vehicle simulators implemented in Quarkus, simulating cars and sending telemetry data to the IoT Cloud Gateway.
+The data is being used in different data processing flows for visualization, realtime analytics, machine learning and other use cases.
 
 ![Map view][map_view]
 <div style="text-align: left"><sup><span style="color:blue">(c) Google maps</span></sup></div>
