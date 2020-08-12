@@ -1,3 +1,3 @@
-# Bobbycar Quickstart
+# Quickstart Guide
 
-Steps to setup Bobbycar:
+We are currently working on this...
