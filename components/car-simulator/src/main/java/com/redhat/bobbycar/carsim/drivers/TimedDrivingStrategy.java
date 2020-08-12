@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.redhat.bobbycar.carsim.CarEvent;
+import com.redhat.bobbycar.carsim.cars.Car;
 import com.redhat.bobbycar.carsim.routes.Route;
 import com.redhat.bobbycar.carsim.routes.RoutePoint;
 
@@ -18,11 +19,13 @@ public class TimedDrivingStrategy implements DrivingStrategy{
 	private final double factor;
 	private Optional<Long> lastActionTimeMillis = Optional.empty();
 	private final Optional<TimedDrivingStrategyMetrics> metrics;
+	private final Optional<Car> car;
 	
 	private TimedDrivingStrategy(Builder builder) {
 		this.factor = builder.factor;
 		this.lastActionTimeMillis = builder.lastActionTimeMillis;
 		this.metrics = Optional.ofNullable(builder.metrics);
+		this.car = builder.car;
 	}
 
 	@Override
@@ -37,6 +40,7 @@ public class TimedDrivingStrategy implements DrivingStrategy{
 		Optional<Long> duration = from.flatMap(f -> desiredIntervalToLastPoint(f, to).flatMap(d -> 
 			lastActionTimeMillis.map(l -> d.toMillis() - (System.currentTimeMillis() - l))
 		));
+		car.ifPresent(c -> c.driveTo(to));
 		duration.ifPresent(remainingWaitTime -> {
 			try {
 				LOGGER.debug("Waiting {}ms to arrive at next route point", remainingWaitTime);
@@ -73,6 +77,7 @@ public class TimedDrivingStrategy implements DrivingStrategy{
 		private double factor = 1;
 		private Optional<Long> lastActionTimeMillis = Optional.empty();
 		private TimedDrivingStrategyMetrics metrics;
+		private Optional<Car> car = Optional.empty();
 
 		private Builder() {
 		}
@@ -89,6 +94,11 @@ public class TimedDrivingStrategy implements DrivingStrategy{
 
 		public Builder withLastActionTimeMillis(Optional<Long> lastActionTimeMillis) {
 			this.lastActionTimeMillis = lastActionTimeMillis;
+			return this;
+		}
+		
+		public Builder withCar(Car car) {
+			this.car = Optional.ofNullable(car);
 			return this;
 		}
 

@@ -21,10 +21,13 @@ import javax.net.ssl.SSLException;
 import javax.xml.bind.JAXBException;
 
 import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.eclipse.microprofile.metrics.MetricRegistry;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.redhat.bobbycar.carsim.cars.Car;
+import com.redhat.bobbycar.carsim.cars.EngineMetrics;
 import com.redhat.bobbycar.carsim.clients.KafkaService;
 import com.redhat.bobbycar.carsim.clients.model.KafkaCarEvent;
 import com.redhat.bobbycar.carsim.clients.model.KafkaCarPosition;
@@ -81,6 +84,9 @@ public class CarSimulatorApp {
 	GpxReader gpxReader;
 	
 	@Inject
+	MetricRegistry registry;
+	
+	@Inject
 	OsmRouteSelector osmRouteSelector;
 	
 	@Inject
@@ -119,14 +125,18 @@ public class CarSimulatorApp {
 	}
 	
 	void onStart(@Observes StartupEvent ev) {  
-		ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(cars);
+		ThreadPoolExecutor carPoolExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(cars);
+		ThreadPoolExecutor enginePoolExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(cars);
         LOGGER.info("The application is starting... ");
         LOGGER.info("Reading routes from {}", pathToRoutes);
         LongStream.range(0, cars).forEach(c -> {
-
+        	UUID driverId = UUID.randomUUID();
 	    	Route route = getRouteSelectionStrategy().selectRoute();
-	    	TimedDrivingStrategy strategy = TimedDrivingStrategy.builder()
+	    	EngineMetrics engineMetrics = new EngineMetrics(registry, driverId, route.getName());
+			Car car = new Car("M3 Coupe", "BMW", route.getPoints().findFirst().orElse(null), driverId, engineMetrics);
+			TimedDrivingStrategy strategy = TimedDrivingStrategy.builder()
 	    			.withFactor(factor)
+	    			.withCar(car)
 	    			.withMetrics(timedDrivingStrategyMetrics)
 	    			.build();
 	        Driver driver = Driver.builder()
@@ -135,9 +145,11 @@ public class CarSimulatorApp {
 	        		.withRepeat(repeat)
 	        		.withMetrics(driverMetrics)
 	        		.withStartDelay(delay * (c + 1))
+	        		.withId(driverId)
 	        		.build();
 	        registerListenerForKafka(driver);
-	        futures.put(driver.getId(), CompletableFuture.runAsync(driver, executor));
+	        futures.put(driverId, CompletableFuture.runAsync(driver, carPoolExecutor));
+	        car.start(enginePoolExecutor);
 	        driverDao.create(driver.getId(), driver);
 	        if (repeat && LOGGER.isInfoEnabled()) {
 	        	LOGGER.info("Will repeat route when finished");

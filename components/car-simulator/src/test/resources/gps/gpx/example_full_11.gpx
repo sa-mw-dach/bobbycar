@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<p:gpx creator="" version="1.1" xmlns:p="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 gpx.xsd ">
+  <p:metadata>
+    <p:name>p:name</p:name>
+    <p:desc>p:desc</p:desc>
+    <p:author>
+      <p:name>p:name</p:name>
+      <p:email domain="" id=""/>
+      <p:link href="http://tempuri.org">
+        <p:text>p:text</p:text>
+        <p:type>p:type</p:type>
+      </p:link>
+    </p:author>
+    <p:copyright author="">
+      <p:year>2001</p:year>
+      <p:license>http://tempuri.org</p:license>
+    </p:copyright>
+    <p:link href="http://tempuri.org">
+      <p:text>p:text</p:text>
+      <p:type>p:type</p:type>
+    </p:link>
+    <p:time>2001-12-31T12:00:00</p:time>
+    <p:keywords>p:keywords</p:keywords>
+    <p:bounds maxlat="0.0" maxlon="0.0" minlat="0.0" minlon="0.0"/>
+    <p:extensions/>
+  </p:metadata>
+  <p:wpt lat="0.0" lon="0.0">
+    <p:ele>0.0</p:ele>
+    <p:time>2001-12-31T12:00:00</p:time>
+    <p:magvar>0.0</p:magvar>
+    <p:geoidheight>0.0</p:geoidheight>
+    <p:name>p:name</p:name>
+    <p:cmt>p:cmt</p:cmt>
+    <p:desc>p:desc</p:desc>
+    <p:src>p:src</p:src>
+    <p:link href="http://tempuri.org">
+      <p:text>p:text</p:text>
+      <p:type>p:type</p:type>
+    </p:link>
+    <p:sym>p:sym</p:sym>
+    <p:type>p:type</p:type>
+    <p:fix>none</p:fix>
+    <p:sat>0</p:sat>
+    <p:hdop>0.0</p:hdop>
+    <p:vdop>0.0</p:vdop>
+    <p:pdop>0.0</p:pdop>
+    <p:ageofdgpsdata>0.0</p:ageofdgpsdata>
+    <p:dgpsid>0</p:dgpsid>
+    <p:extensions/>
+  </p:wpt>
+  <p:rte>
+    <p:name>p:name</p:name>
+    <p:cmt>p:cmt</p:cmt>
+    <p:desc>p:desc</p:desc>
+    <p:src>p:src</p:src>
+    <p:link href="http://tempuri.org">
+      <p:text>p:text</p:text>
+      <p:type>p:type</p:type>
+    </p:link>
+    <p:number>0</p:number>
+    <p:type>p:type</p:type>
+    <p:extensions/>
+    <p:rtept lat="0.0" lon="0.0">
+      <p:ele>0.0</p:ele>
+      <p:time>2001-12-31T12:00:00</p:time>
+      <p:magvar>0.0</p:magvar>
+      <p:geoidheight>0.0</p:geoidheight>
+      <p:name>p:name</p:name>
+      <p:cmt>p:cmt</p:cmt>
+      <p:desc>p:desc</p:desc>
+      <p:src>p:src</p:src>
+      <p:link href="http://tempuri.org">
+        <p:text>p:text</p:text>
+        <p:type>p:type</p:type>
+      </p:link>
+      <p:sym>p:sym</p:sym>
+      <p:type>p:type</p:type>
+      <p:fix>none</p:fix>
+      <p:sat>0</p:sat>
+      <p:hdop>0.0</p:hdop>
+      <p:vdop>0.0</p:vdop>
+      <p:pdop>0.0</p:pdop>
+      <p:ageofdgpsdata>0.0</p:ageofdgpsdata>
+      <p:dgpsid>0</p:dgpsid>
+      <p:extensions/>
+    </p:rtept>
+  </p:rte>
+  <p:trk>
+    <p:name>p:name</p:name>
+    <p:cmt>p:cmt</p:cmt>
+    <p:desc>p:desc</p:desc>
+    <p:src>p:src</p:src>
+    <p:link href="http://tempuri.org">
+      <p:text>p:text</p:text>
+      <p:type>p:type</p:type>
+    </p:link>
+    <p:number>0</p:number>
+    <p:type>p:type</p:type>
+    <p:extensions/>
+    <p:trkseg>
+      <p:trkpt lat="0.0" lon="0.0">
+        <p:ele>0.0</p:ele>
+        <p:time>2001-12-31T12:00:00</p:time>
+        <p:magvar>0.0</p:magvar>
+        <p:geoidheight>0.0</p:geoidheight>
+        <p:name>p:name</p:name>
+        <p:cmt>p:cmt</p:cmt>
+        <p:desc>p:desc</p:desc>
+        <p:src>p:src</p:src>
+        <p:link href="http://tempuri.org">
+          <p:text>p:text</p:text>
+          <p:type>p:type</p:type>
+        </p:link>
+        <p:sym>p:sym</p:sym>
+        <p:type>p:type</p:type>
+        <p:fix>none</p:fix>
+        <p:sat>0</p:sat>
+        <p:hdop>0.0</p:hdop>
+        <p:vdop>0.0</p:vdop>
+        <p:pdop>0.0</p:pdop>
+        <p:ageofdgpsdata>0.0</p:ageofdgpsdata>
+        <p:dgpsid>0</p:dgpsid>
+        <p:extensions/>
+      </p:trkpt>
+      <p:extensions/>
+    </p:trkseg>
+  </p:trk>
+  <p:extensions/>
+</p:gpx>

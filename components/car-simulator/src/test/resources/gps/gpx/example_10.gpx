@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<gpx
+ version="1.0"
+creator="GPSBabel - http://www.gpsbabel.org"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xmlns="http://www.topografix.com/GPX/1/0"
+xsi:schemaLocation="http://www.topografix.com/GPX/1/0
+http://www.topografix.com/GPX/1/0/gpx.xsd">
+<time>2005-11-07T14:00:09Z</time>
+<trk>
+  <name>ACTIVE LOG</name>
+<trkseg>
+<trkpt lat="52.564001083" lon="-1.826841831">
+  <ele>115.976196</ele>
+<time>2005-11-07T12:03:31Z</time>
+</trkpt>
+</trkseg>
+</trk>
+</gpx>

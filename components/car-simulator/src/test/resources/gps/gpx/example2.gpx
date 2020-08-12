@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<gpx version="1.1"
+    creator="EMTAC BTGPS Trine II DataLog Dump 1.0 - http://www.ayeltd.biz"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns="http://www.topografix.com/GPX/1/1"
+    xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd">
+<metadata>
+<name>GPS Receiver track log</name>
+<desc>Tallinn (car)</desc>
+<author>
+<name>Michael Collinson</name>
+<email id="mikes" domain="ayeltd.biz" />
+<link href="http://www.ayeltd.biz"><text>AYE Ltd.</text></link>
+</author>
+<time>2007-10-02T09:22:06Z</time>
+<keywords>Estonia, Tallinn, A. Weizbergi</keywords>
+<bounds minlat="59.4367664166667" maxlat="59.4440920666666" minlon="24.74394385" maxlon="24.7971432"/>
+</metadata>
+<trk>
+<src>Logged by Michael Collinson using EMTAC BTGPS Trine II</src>
+<link href="http://www.ayeltd.biz"><text>AYE Ltd.</text></link>
+<trkseg>
+    <trkpt lat="59.4408327" lon="24.74516185">
+        <ele>44</ele>
+        <time>2007-10-02T07:54:30Z</time>
+        <fix>3d</fix>
+        <hdop>300</hdop><vdop>300</vdop><pdop>300</pdop>
+    </trkpt>
+</trkseg>
+</trk>
+</gpx>
