@@ -24,7 +24,7 @@ public class Driver implements Runnable{
 	private Optional<RoutePoint> lastPoint = Optional.empty();
 	private final DrivingStrategy drivingStrategy;
 	private final Optional<DriverMetrics> metrics;
-	private final UUID id = UUID.randomUUID();
+	private final UUID id;
 	private final String routeName;
 	private final boolean repeat;
 	private final long startDelay;
@@ -39,6 +39,7 @@ public class Driver implements Runnable{
 		this.repeat = builder.repeat;
 		this.startDelay = builder.startDelay;
 		this.metrics = Optional.ofNullable(builder.metrics);
+		this.id = builder.id;
 		if(!drivingStrategy.supports(builder.route)) {
 			throw new RouteNotSupportedException("Route not supported for driving strategy", builder.route);
 		}
@@ -117,6 +118,7 @@ public class Driver implements Runnable{
 		private DriverMetrics metrics;
 		private long startDelay = 0;
 		private boolean repeat;
+		private UUID id;
 
 		private Builder() {
 		}
@@ -143,6 +145,11 @@ public class Driver implements Runnable{
 		
 		public Builder withStartDelay(long startDelay) {
 			this.startDelay = startDelay;
+			return this;
+		}
+		
+		public Builder withId(UUID id) {
+			this.id = id;
 			return this;
 		}
 

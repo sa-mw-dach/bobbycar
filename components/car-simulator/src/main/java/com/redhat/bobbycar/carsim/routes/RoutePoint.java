@@ -56,9 +56,9 @@ public class RoutePoint implements Serializable{
 	
 	public double distanceInMetersTo(RoutePoint other) {
 		double lat1 = this.getLatitude().doubleValue();
-		double lon1 = this.getLatitude().doubleValue();
+		double lon1 = this.getLongitude().doubleValue();
 		double lat2 = other.getLatitude().doubleValue();
-		double lon2 = other.getLatitude().doubleValue();			
+		double lon2 = other.getLongitude().doubleValue();			
 		
 		int R = 6371000; // metres
 		double phi1 = lat1 * Math.PI/180; // φ, λ in radians

@@ -17,7 +17,7 @@ import com.redhat.bobbycar.carsim.cars.model.GearBehavior;
 import com.redhat.bobbycar.carsim.cars.model.SpeedPerRpm;
 
 
-public class JsonEngineConfiguration {
+public class JsonEngineConfiguration implements EngineConfiguration {
 	private static final Logger LOGGER = LoggerFactory.getLogger(JsonEngineConfiguration.class);
 	private Jsonb jsonb;
 	private EngineBehavior engineBehavior;
@@ -91,6 +91,7 @@ public class JsonEngineConfiguration {
 		return jsonb.fromJson(JsonEngineConfiguration.class.getResourceAsStream("/engines/bmw_m3_coupe.json"), EngineBehavior.class);
 	}
 	
+	@Override
 	public Optional<Double> maxSpeed() {
 		return engineBehavior.getGearBehaviors().stream()
 			.flatMap(b -> b.getSpeedPerRpms().stream())
@@ -99,16 +100,19 @@ public class JsonEngineConfiguration {
 	}
 	
 	
+	@Override
 	public Optional<Double> co2FromSpeed(double speed) {
-		return null;
+		//TODO
+		return Optional.of(120.0);
 	}
 	
+	@Override
 	public Optional<Double> fuelConsumptionPer100KmFromSpeed(double speed) {
 		
 		if (speed >= consumptionIncreaseSpeedKmH) {
 			return maxSpeed()
 					.flatMap(max -> {
-						LOGGER.info("Max speed is {}", max);
+						LOGGER.debug("Max speed is {}", max);
 						if (speed > max) {
 							return Optional.empty();
 						} else {
@@ -123,13 +127,15 @@ public class JsonEngineConfiguration {
 		}
 	}
 	
+	@Override
 	public Optional<Double> rpmFromSpeed(double speed) {
 		return gearEntryFromSpeed(speed)
 				.map(g -> g.rpmAtSpeed(speed));
 	}
 
+	@Override
 	public Optional<Integer> gearFromSpeed(double speed) {
-		LOGGER.info("Matching {} gear behaviors ", engineBehavior.getGearBehaviors().size());
+		LOGGER.debug("Matching {} gear behaviors ", engineBehavior.getGearBehaviors().size());
 		return gearEntryFromSpeed(speed)
 				.map(GearEntry::getGear);
 	}

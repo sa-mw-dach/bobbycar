@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
+import java.util.UUID;
 import java.util.stream.Stream;
 
 import javax.xml.bind.JAXBException;
@@ -17,6 +18,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.redhat.bobbycar.carsim.cars.Car;
 import com.redhat.bobbycar.carsim.drivers.Driver;
 import com.redhat.bobbycar.carsim.drivers.DrivingStrategy;
 import com.redhat.bobbycar.carsim.drivers.TimedDrivingStrategy;
@@ -24,12 +26,26 @@ import com.redhat.bobbycar.carsim.gpx.GpxReader;
 import com.redhat.bobbycar.carsim.routes.Route;
 import com.redhat.bobbycar.carsim.routes.RoutePoint;
 
-public class DriverTest {
+class DriverTest {
 	private static final Logger LOGGER = LoggerFactory.getLogger(DriverTest.class);
 
 	@ParameterizedTest
 	@MethodSource
-	public void driveRoute(Route route) throws InterruptedException {
+	void driveRoute(Route route) throws InterruptedException {
+		DrivingStrategy strategy = TimedDrivingStrategy.builder().withCar(new Car("M3 Coupe", "BMW", route.getPoints().findFirst().get(), UUID.randomUUID())).build();
+		Driver driver = Driver.builder().withRoute(route).withDrivingStrategy(strategy).build();
+		driver.registerCarEventListener(evt -> {
+			LOGGER.info("Event is {}", evt);
+			assertNotNull(evt);
+		});
+		Thread t = new Thread(driver);
+		t.start();
+		t.join();
+	}
+	
+	@ParameterizedTest
+	@MethodSource
+	void driveRouteWithoutCar(Route route) throws InterruptedException {
 		DrivingStrategy strategy = TimedDrivingStrategy.builder().build();
 		Driver driver = Driver.builder().withRoute(route).withDrivingStrategy(strategy).build();
 		driver.registerCarEventListener(evt -> {
@@ -42,6 +58,14 @@ public class DriverTest {
 	}
 
 	private static Stream<Route> driveRoute() {
+		return generateRoutes();
+	}
+	
+	private static Stream<Route> driveRouteWithoutCar() {
+		return generateRoutes();
+	}
+
+	private static Stream<Route> generateRoutes() {
 		ZonedDateTime now = ZonedDateTime.now();
 		ZonedDateTime nowPlus5 = now.plusSeconds(5);
 		return Stream.of(new Route("SinglePointTimed", new RoutePoint(new BigDecimal("8.89322222"), new BigDecimal("46.57652778"), new BigDecimal("100"), now)),
@@ -49,9 +73,12 @@ public class DriverTest {
 						new RoutePoint(new BigDecimal("8.89344444"), new BigDecimal("46.57661111"), new BigDecimal("100"), nowPlus5)));
 	}
 	
+	
+	
+	
 	@ParameterizedTest
 	@MethodSource
-	public void driveGpxRoute(Route route) throws InterruptedException {
+	void driveGpxRoute(Route route) throws InterruptedException {
 		TimedDrivingStrategy strategy = TimedDrivingStrategy.builder().withFactor(100).build();
 		Driver driver = Driver.builder().withRoute(route).withDrivingStrategy(strategy).build();
 		driver.registerCarEventListener(evt -> {
