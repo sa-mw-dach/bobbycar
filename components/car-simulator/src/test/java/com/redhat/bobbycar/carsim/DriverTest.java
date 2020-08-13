@@ -32,7 +32,10 @@ class DriverTest {
 	@ParameterizedTest
 	@MethodSource
 	void driveRoute(Route route) throws InterruptedException {
-		DrivingStrategy strategy = TimedDrivingStrategy.builder().withCar(new Car("M3 Coupe", "BMW", route.getPoints().findFirst().get(), UUID.randomUUID())).build();
+		
+		Car car = Car.builder().withModel("M3 Coupe").withManufacturer("BMW")
+				.withStartingPoint(route.getPoints().findFirst().get()).withDriverId(UUID.randomUUID()).build();
+		DrivingStrategy strategy = TimedDrivingStrategy.builder().withCar(car).build();
 		Driver driver = Driver.builder().withRoute(route).withDrivingStrategy(strategy).build();
 		driver.registerCarEventListener(evt -> {
 			LOGGER.info("Event is {}", evt);

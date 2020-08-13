@@ -7,10 +7,12 @@ import javax.ws.rs.QueryParam;
 
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 
+import com.redhat.bobbycar.carsim.clients.model.Zone;
+
 @Path("")
 @RegisterRestClient(configKey = "datagrid")
 public interface DataGridService {
 	@GET
 	@Path("/zones/{zoneid}")
-	public String getZoneData(@QueryParam("user_key") String apiKey, @PathParam("zoneid") String zoneid);
+	public Zone getZoneData(@QueryParam("user_key") String apiKey, @PathParam("zoneid") String zoneid);
 }

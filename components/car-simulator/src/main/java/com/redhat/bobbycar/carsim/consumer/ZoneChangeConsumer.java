@@ -1,19 +1,16 @@
 package com.redhat.bobbycar.carsim.consumer;
 
-import java.util.Optional;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
 
 import org.eclipse.microprofile.reactive.messaging.Incoming;
-import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.redhat.bobbycar.carsim.clients.DataGridService;
-import com.redhat.bobbycar.carsim.clients.model.Zone;
 import com.redhat.bobbycar.carsim.consumer.model.ZoneChangeEvent;
 
 @ApplicationScoped
@@ -21,18 +18,11 @@ public class ZoneChangeConsumer {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(ZoneChangeConsumer.class);
 	private Jsonb jsonb;
-    @RestClient
-    @Inject
-    DataGridService dataGridService;
-	
+	private Set<ZoneChangeListener> listeners = new HashSet<>();
    
 	public ZoneChangeConsumer() {
 		LOGGER.info("Listening for zonechange events");
 		jsonb = JsonbBuilder.create();
-	}
-	
-	private Optional<Zone> retrieveZoneData(String zoneId) {
-		return Optional.of(jsonb.fromJson(dataGridService.getZoneData("", zoneId), Zone.class));
 	}
 	
 	@Incoming("zonechange")
@@ -41,8 +31,15 @@ public class ZoneChangeConsumer {
 		String event = new String(raw);
 		ZoneChangeEvent zoneChangeEvent = jsonb.fromJson(event, ZoneChangeEvent.class);
 		LOGGER.info("Event: {}", zoneChangeEvent);
-		LOGGER.info("Zone: {}", retrieveZoneData(zoneChangeEvent.getNextZoneId()));
+		notifyZoneChangeListeners(zoneChangeEvent);
     }
+	
+	private void notifyZoneChangeListeners(ZoneChangeEvent event) {
+		listeners.stream().forEach(l -> l.onZoneChange(event));
+	}
 
+	public void registerZoneChangeListener(ZoneChangeListener listener) {
+		listeners.add(listener);
+	}
 	
 }

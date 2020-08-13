@@ -28,10 +28,12 @@ import org.slf4j.LoggerFactory;
 
 import com.redhat.bobbycar.carsim.cars.Car;
 import com.redhat.bobbycar.carsim.cars.EngineMetrics;
+import com.redhat.bobbycar.carsim.clients.DataGridService;
 import com.redhat.bobbycar.carsim.clients.KafkaService;
 import com.redhat.bobbycar.carsim.clients.model.KafkaCarEvent;
 import com.redhat.bobbycar.carsim.clients.model.KafkaCarPosition;
 import com.redhat.bobbycar.carsim.clients.model.KafkaCarRecord;
+import com.redhat.bobbycar.carsim.consumer.ZoneChangeConsumer;
 import com.redhat.bobbycar.carsim.data.DriverDao;
 import com.redhat.bobbycar.carsim.drivers.Driver;
 import com.redhat.bobbycar.carsim.drivers.DriverMetrics;
@@ -95,6 +97,13 @@ public class CarSimulatorApp {
 	@Inject
 	DriverMetrics driverMetrics;
 	
+	@Inject
+	ZoneChangeConsumer zoneChangeConsumer;
+	
+	@RestClient
+    @Inject
+    DataGridService dataGridService;
+	
     private RouteSelectionStrategy routeSelectionStrategy;
 	
 	private final Map<UUID, CompletableFuture<Void>> futures;
@@ -133,7 +142,12 @@ public class CarSimulatorApp {
         	UUID driverId = UUID.randomUUID();
 	    	Route route = getRouteSelectionStrategy().selectRoute();
 	    	EngineMetrics engineMetrics = new EngineMetrics(registry, driverId, route.getName());
-			Car car = new Car("M3 Coupe", "BMW", route.getPoints().findFirst().orElse(null), driverId, engineMetrics);
+			Car car = Car.builder().withModel("M3 Coupe").withManufacturer("BMW")
+					.withStartingPoint(route.getPoints().findFirst().orElse(null)).withDriverId(driverId)
+					.withMetrics(engineMetrics).build();
+			zoneChangeConsumer.registerZoneChangeListener(evt -> 
+				LOGGER.info("Retrieved zone data {}", dataGridService.getZoneData("", evt.getNextZoneId()))
+			);
 			TimedDrivingStrategy strategy = TimedDrivingStrategy.builder()
 	    			.withFactor(factor)
 	    			.withCar(car)

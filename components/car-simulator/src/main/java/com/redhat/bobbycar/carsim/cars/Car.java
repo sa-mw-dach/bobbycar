@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.redhat.bobbycar.carsim.routes.RoutePoint;
+import javax.annotation.Generated;
 
 public class Car {
 	private final String model;
@@ -16,21 +17,18 @@ public class Car {
 	private final Engine engine;
 	private final UUID driverId;
 	private static final Logger LOGGER = LoggerFactory.getLogger(Car.class);
-	
-	public Car(String model, String manufacturer, RoutePoint startingPoint, UUID driverId) {
-		this(model, manufacturer, startingPoint, driverId, null);
-	}
-	
-	public Car(String model, String manufacturer, RoutePoint startingPoint, UUID driverId, EngineMetrics metrics) {
-		super();
-		this.model = model;
-		this.manufacturer = manufacturer;
-		this.driverId = driverId;
+
+	@Generated("SparkTools")
+	private Car(Builder builder) {
+		this.model = builder.model;
+		this.manufacturer = builder.manufacturer;
+		this.driverId = builder.driverId;
 		try {
-			this.engine = new TimedEngine(5, startingPoint, new JsonEngineConfiguration(), metrics);
+			this.engine = new TimedEngine(5, builder.startingPoint, new JsonEngineConfiguration(), builder.metrics);
 		} catch (FileNotFoundException e) {
 			throw new EngineException("Engine configuration could not be loaded", e);
 		}
+		
 	}
 
 	public void start(Executor executor) {
@@ -54,6 +52,55 @@ public class Car {
 
 	public UUID getDriverId() {
 		return driverId;
+	}
+
+	/**
+	 * Creates builder to build {@link Car}.
+	 * @return created builder
+	 */
+	@Generated("SparkTools")
+	public static Builder builder() {
+		return new Builder();
+	}
+
+	public static final class Builder {
+		private String model;
+		private String manufacturer;
+		private UUID driverId;
+		private RoutePoint startingPoint;
+		private EngineMetrics metrics;
+
+		private Builder() {
+		}
+
+		public Builder withModel(String model) {
+			this.model = model;
+			return this;
+		}
+
+		public Builder withManufacturer(String manufacturer) {
+			this.manufacturer = manufacturer;
+			return this;
+		}
+
+		public Builder withDriverId(UUID driverId) {
+			this.driverId = driverId;
+			return this;
+		}
+		
+		public Builder withStartingPoint(RoutePoint startingPoint) {
+			this.startingPoint = startingPoint;
+			return this;
+		}
+		
+		public Builder withMetrics(EngineMetrics metrics) {
+			this.metrics = metrics;
+			return this;
+		}
+
+		public Car build() {
+			return new Car(this);
+		}
 	}
 	
 	

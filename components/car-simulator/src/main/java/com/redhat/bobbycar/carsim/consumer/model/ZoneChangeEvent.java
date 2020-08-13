@@ -16,6 +16,13 @@ public class ZoneChangeEvent implements Serializable{
 		super();
 	}
 
+	public ZoneChangeEvent(String previousZoneId, String nextZoneId, String carId) {
+		super();
+		this.previousZoneId = previousZoneId;
+		this.nextZoneId = nextZoneId;
+		this.carId = carId;
+	}
+
 	public String getPreviousZoneId() {
 		return previousZoneId;
 	}
