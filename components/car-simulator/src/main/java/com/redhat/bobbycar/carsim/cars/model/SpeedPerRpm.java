@@ -2,6 +2,9 @@ package com.redhat.bobbycar.carsim.cars.model;
 
 import java.util.Objects;
 
+import io.quarkus.runtime.annotations.RegisterForReflection;
+
+@RegisterForReflection
 public class SpeedPerRpm {
 	private double rpm;
 	private double speed;

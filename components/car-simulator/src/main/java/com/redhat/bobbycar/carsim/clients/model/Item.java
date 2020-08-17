@@ -2,6 +2,9 @@ package com.redhat.bobbycar.carsim.clients.model;
 
 import javax.xml.bind.annotation.XmlElement;
 
+import io.quarkus.runtime.annotations.RegisterForReflection;
+
+@RegisterForReflection
 public class Item {
 	private String link;
 	

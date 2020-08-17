@@ -3,6 +3,9 @@ package com.redhat.bobbycar.carsim.consumer.model;
 import java.io.Serializable;
 import java.util.Objects;
 
+import io.quarkus.runtime.annotations.RegisterForReflection;
+
+@RegisterForReflection
 public class ZoneChangeEvent implements Serializable{
 	/**
 	 * 
