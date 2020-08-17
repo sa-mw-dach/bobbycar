@@ -25,7 +25,7 @@ public class DatagridTestResource implements QuarkusTestResourceLifecycleManager
 	@Override
 	public Map<String, String> start() {
 
-		wireMockServer = new WireMockServer(options().port(8089));
+		wireMockServer = new WireMockServer(options().dynamicPort());
 		wireMockServer.start(); 
 		wireMockServer.stubFor(get(urlMatching("/zones/.*")).willReturn(
 				aResponse().withHeader("Content-Type", "application/json").withBody(jsonb.toJson(dummyZone()))));

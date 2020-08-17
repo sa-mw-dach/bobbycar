@@ -10,7 +10,9 @@ public class DefaultTestProfile implements QuarkusTestProfile {
 	@Override
 	public Map<String, String> getConfigOverrides() {
 		Map<String, String> configOverrides = new HashMap<>();
-		configOverrides.putAll(Map.of("com.redhat.bobbycar.carsim.route", "src/test/resources/gps/gpx/test"));
+		configOverrides.putAll(Map.of("com.redhat.bobbycar.carsim.route", "src/test/resources/gps/gpx/test",
+				"quarkus.http.test-port", "0"
+				));
 		configOverrides.putAll(Map.of(
 			"mp.messaging.incoming.zonechange.topic", "bobbycar/zonechange",
 			"mp.messaging.incoming.zonechange.type", "smallrye-mqtt",

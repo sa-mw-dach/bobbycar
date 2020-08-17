@@ -6,10 +6,10 @@ import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-import javax.inject.Inject;
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
 
+import org.eclipse.microprofile.reactive.messaging.Message;
 import org.eclipse.microprofile.reactive.messaging.Outgoing;
 import org.junit.jupiter.api.Test;
 
@@ -22,20 +22,26 @@ import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.TestProfile;
 import io.smallrye.mutiny.Multi;
+import io.vertx.core.json.JsonObject;
 
 @QuarkusTest
 @TestProfile(DefaultTestProfile.class)
 @QuarkusTestResource(DatagridTestResource.class)
 @QuarkusTestResource(KafkaTestResource.class)
-class TestZoneChangeConsumer {
+class ZoneChangeConsumerTest {
 
 	private static final int EVENT_FREQUENCY_SECONDS = 1;
 	private static final int EVENT_TIMEOUT = 3;
 	private static final String ID = "de9bcc2e-b623-4b19-a2f9-a1bc8e81b45e";
 	private Jsonb jsonb = JsonbBuilder.create();
 	
-	@Inject
+	
 	ZoneChangeConsumer consumer;
+
+	public ZoneChangeConsumerTest(ZoneChangeConsumer consumer) {
+		super();
+		this.consumer = consumer;
+	}
 
 	@Test
 	void test() throws InterruptedException {
@@ -46,9 +52,10 @@ class TestZoneChangeConsumer {
 	}
 
 	@Outgoing("zonechangepub")
-	public Multi<String> generate() {
+	public Multi<JsonObject> generate() {
+		
 		return Multi.createFrom().ticks().every(ofSeconds(EVENT_FREQUENCY_SECONDS))
-	            .map(x -> jsonb.toJson(createTestEvent()));
+	            .map(x -> new JsonObject(jsonb.toJson(createTestEvent())));
 	}
 
 	private ZoneChangeEvent createTestEvent() {

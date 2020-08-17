@@ -21,7 +21,7 @@ public class KafkaTestResource implements QuarkusTestResourceLifecycleManager {
 	@Override
 	public Map<String, String> start() {
 
-		wireMockServer = new WireMockServer(options().port(8090));
+		wireMockServer = new WireMockServer(options().dynamicPort());
 		wireMockServer.start(); 
 		wireMockServer.stubFor(post(urlMatching("/topics/bobbycar-gps")).willReturn(
 				aResponse().withHeader("Content-Type", "application/json").withBody("")));
