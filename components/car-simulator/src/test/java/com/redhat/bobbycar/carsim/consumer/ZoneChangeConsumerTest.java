@@ -9,7 +9,6 @@ import static org.mockito.Mockito.verify;
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
 
-import org.eclipse.microprofile.reactive.messaging.Message;
 import org.eclipse.microprofile.reactive.messaging.Outgoing;
 import org.junit.jupiter.api.Test;
 
@@ -42,9 +41,9 @@ class ZoneChangeConsumerTest {
 		super();
 		this.consumer = consumer;
 	}
-
+	
 	@Test
-	void test() throws InterruptedException {
+	void testOnZoneChange() throws InterruptedException {
 		ZoneChangeListener mock = mock(ZoneChangeListener.class);
 		consumer.registerZoneChangeListener(mock);
 		SECONDS.sleep(EVENT_TIMEOUT);
