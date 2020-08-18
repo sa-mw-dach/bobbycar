@@ -148,14 +148,16 @@ public class CarSimulatorApp {
 					.withMetrics(engineMetrics).build();
 			zoneChangeConsumer.registerZoneChangeListener(evt -> 
 				{
-					if (evt.getNextZoneId() != null) {
-						LOGGER.info("Retrieved zone data {}", dataGridService.getZoneData("", MediaType.APPLICATION_JSON, evt.getNextZoneId()));
-					} else {
-						LOGGER.info("Left zone");
+					if (driverId.toString().equals(evt.getCarId())) {
+						if (evt.getNextZoneId() != null) {
+							LOGGER.info("Retrieved zone data {}", dataGridService.getZoneData("", MediaType.APPLICATION_JSON, evt.getNextZoneId()));
+						} else {
+							LOGGER.info("Left zone");
+						}
 					}
+					
 				}
 			);
-			LOGGER.error("Zone is {}", dataGridService.getZoneData("", MediaType.APPLICATION_JSON, "bobbycar-ffm"));
 			TimedDrivingStrategy strategy = TimedDrivingStrategy.builder()
 	    			.withFactor(factor)
 	    			.withCar(car)
