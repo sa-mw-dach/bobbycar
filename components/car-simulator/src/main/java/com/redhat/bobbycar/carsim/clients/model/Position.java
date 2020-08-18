@@ -1,5 +1,8 @@
 package com.redhat.bobbycar.carsim.clients.model;
 
+import io.quarkus.runtime.annotations.RegisterForReflection;
+
+@RegisterForReflection
 public class Position {
 	double lat;
 	double lng;

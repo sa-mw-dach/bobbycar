@@ -18,6 +18,7 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 import javax.net.ssl.SSLException;
+import javax.ws.rs.core.MediaType;
 import javax.xml.bind.JAXBException;
 
 import org.eclipse.microprofile.config.inject.ConfigProperty;
@@ -146,8 +147,9 @@ public class CarSimulatorApp {
 					.withStartingPoint(route.getPoints().findFirst().orElse(null)).withDriverId(driverId)
 					.withMetrics(engineMetrics).build();
 			zoneChangeConsumer.registerZoneChangeListener(evt -> 
-				LOGGER.info("Retrieved zone data {}", dataGridService.getZoneData("", evt.getNextZoneId()))
+				LOGGER.info("Retrieved zone data {}", dataGridService.getZoneData("", MediaType.APPLICATION_JSON, evt.getNextZoneId()))
 			);
+			LOGGER.error("Zone is {}", dataGridService.getZoneData("", MediaType.APPLICATION_JSON, "bobbycar-ffm"));
 			TimedDrivingStrategy strategy = TimedDrivingStrategy.builder()
 	    			.withFactor(factor)
 	    			.withCar(car)

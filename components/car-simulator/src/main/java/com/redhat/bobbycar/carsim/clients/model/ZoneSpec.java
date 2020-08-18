@@ -2,6 +2,9 @@ package com.redhat.bobbycar.carsim.clients.model;
 
 import java.util.Objects;
 
+import io.quarkus.runtime.annotations.RegisterForReflection;
+
+@RegisterForReflection
 public class ZoneSpec {
 	String name;
 	Position position;

@@ -6,9 +6,6 @@ import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-import javax.json.bind.Jsonb;
-import javax.json.bind.JsonbBuilder;
-
 import org.eclipse.microprofile.reactive.messaging.Outgoing;
 import org.junit.jupiter.api.Test;
 
@@ -21,7 +18,6 @@ import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.TestProfile;
 import io.smallrye.mutiny.Multi;
-import io.vertx.core.json.JsonObject;
 
 @QuarkusTest
 @TestProfile(DefaultTestProfile.class)
@@ -32,7 +28,6 @@ class ZoneChangeConsumerTest {
 	private static final int EVENT_FREQUENCY_SECONDS = 1;
 	private static final int EVENT_TIMEOUT = 3;
 	private static final String ID = "de9bcc2e-b623-4b19-a2f9-a1bc8e81b45e";
-	private Jsonb jsonb = JsonbBuilder.create();
 	
 	
 	ZoneChangeConsumer consumer;
@@ -51,10 +46,9 @@ class ZoneChangeConsumerTest {
 	}
 
 	@Outgoing("zonechangepub")
-	public Multi<JsonObject> generate() {
-		
+	public Multi<ZoneChangeEvent> generate() {
 		return Multi.createFrom().ticks().every(ofSeconds(EVENT_FREQUENCY_SECONDS))
-	            .map(x -> new JsonObject(jsonb.toJson(createTestEvent())));
+	            .map(x -> createTestEvent());
 	}
 
 	private ZoneChangeEvent createTestEvent() {
