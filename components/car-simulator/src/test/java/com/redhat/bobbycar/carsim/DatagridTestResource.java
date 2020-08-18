@@ -14,6 +14,7 @@ import javax.json.bind.JsonbBuilder;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.redhat.bobbycar.carsim.clients.model.Zone;
+import com.redhat.bobbycar.carsim.clients.model.ZoneSpec;
 
 import io.quarkus.test.common.QuarkusTestResourceLifecycleManager;
 
@@ -34,7 +35,11 @@ public class DatagridTestResource implements QuarkusTestResourceLifecycleManager
 	}
 
 	private static Zone dummyZone() {
-		return new Zone();
+		Zone zone = new Zone();
+		ZoneSpec spec = new ZoneSpec();
+		spec.setName("Testzone");
+		zone.setSpec(spec);
+		return zone;
 	}
 
 	@Override
