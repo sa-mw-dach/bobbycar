@@ -22,12 +22,12 @@ public class EngineMetrics {
 		LOGGER.debug("Register metrics with tags driver='{}' and route='{}'", driverId, routeName);
 		register("com.redhat.bobbycar.carsim.car.speed", () -> engineData.map(EngineData::getSpeedInKmh).orElse(0.0),
 				"kmh", registry, driverId, routeNameOrUnknown);
-		register("com.redhat.bobbycar.carsim.car.rpm", () -> engineData.map(EngineData::getRpm).orElse(0.0), "rpm",
+		register("com.redhat.bobbycar.carsim.car.rpm", () -> engineData.map(EngineData::getRpm).orElse(0.0), "",
 				registry, driverId, routeNameOrUnknown);
 		register("com.redhat.bobbycar.carsim.car.co2", () -> engineData.map(EngineData::getCo2Emission).orElse(0.0),
 				"g/km", registry, driverId, routeNameOrUnknown);
 		register("com.redhat.bobbycar.carsim.car.fuel",
-				() -> engineData.map(EngineData::getFuelConsumptionPer100km).orElse(0.0), "l/100km", registry, driverId,
+				() -> engineData.map(EngineData::getFuelConsumptionPer100km).orElse(0.0), "lper100km", registry, driverId,
 				routeNameOrUnknown);
 		register("com.redhat.bobbycar.carsim.car.gear", () -> engineData.map(EngineData::getGear).orElse(0), "",
 				registry, driverId, routeNameOrUnknown);
