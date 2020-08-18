@@ -25,7 +25,7 @@ public class EngineMetrics {
 		register("com.redhat.bobbycar.carsim.car.rpm", () -> engineData.map(EngineData::getRpm).orElse(0.0), "",
 				registry, driverId, routeNameOrUnknown);
 		register("com.redhat.bobbycar.carsim.car.co2", () -> engineData.map(EngineData::getCo2Emission).orElse(0.0),
-				"g/km", registry, driverId, routeNameOrUnknown);
+				"gPerKm", registry, driverId, routeNameOrUnknown);
 		register("com.redhat.bobbycar.carsim.car.fuel",
 				() -> engineData.map(EngineData::getFuelConsumptionPer100km).orElse(0.0), "lper100km", registry, driverId,
 				routeNameOrUnknown);
