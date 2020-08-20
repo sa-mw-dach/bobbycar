@@ -18,6 +18,7 @@ import com.redhat.bobbycar.carsim.cars.model.SpeedPerRpm;
 
 
 public class JsonEngineConfiguration implements EngineConfiguration {
+	private static final String DEFAULT_ENGINE_CONFIG_JSON = "/engines/bmw_m3_coupe.json";
 	private static final Logger LOGGER = LoggerFactory.getLogger(JsonEngineConfiguration.class);
 	private Jsonb jsonb;
 	private EngineBehavior engineBehavior;
@@ -88,7 +89,8 @@ public class JsonEngineConfiguration implements EngineConfiguration {
 	}
 	
 	private EngineBehavior readConfiguration() {
-		return jsonb.fromJson(JsonEngineConfiguration.class.getResourceAsStream("/engines/bmw_m3_coupe.json"), EngineBehavior.class);
+		return jsonb.fromJson(JsonEngineConfiguration.class.getResourceAsStream(DEFAULT_ENGINE_CONFIG_JSON),
+				EngineBehavior.class);
 	}
 	
 	@Override
@@ -102,28 +104,29 @@ public class JsonEngineConfiguration implements EngineConfiguration {
 	
 	@Override
 	public Optional<Double> co2FromSpeed(double speed) {
-		//TODO
+		//TODO Implement this
 		return Optional.of(120.0);
 	}
 	
 	@Override
 	public Optional<Double> fuelConsumptionPer100KmFromSpeed(double speed) {
-		
 		if (speed >= consumptionIncreaseSpeedKmH) {
 			return maxSpeed()
-					.flatMap(max -> {
-						LOGGER.debug("Max speed is {}", max);
-						if (speed > max) {
-							return Optional.empty();
-						} else {
-							double speedRange = max - consumptionIncreaseSpeedKmH;
-							double consumptionRange = maxFuelConsumptionPer100km - minFuelConsumptionPer100km;
-							return Optional.of(consumptionRange / speedRange * (speed - consumptionIncreaseSpeedKmH) + minFuelConsumptionPer100km);
-						}
-					});
+					.flatMap(max -> calculateFuelConsumptionByKmH(speed, max));
 		} 
 		else {
 			return Optional.of(minFuelConsumptionPer100km);
+		}
+	}
+
+	private Optional<? extends Double> calculateFuelConsumptionByKmH(double speed, Double max) {
+		LOGGER.debug("Max speed is {}", max);
+		if (speed > max) {
+			return Optional.empty();
+		} else {
+			double speedRange = max - consumptionIncreaseSpeedKmH;
+			double consumptionRange = maxFuelConsumptionPer100km - minFuelConsumptionPer100km;
+			return Optional.of(consumptionRange / speedRange * (speed - consumptionIncreaseSpeedKmH) + minFuelConsumptionPer100km);
 		}
 	}
 	

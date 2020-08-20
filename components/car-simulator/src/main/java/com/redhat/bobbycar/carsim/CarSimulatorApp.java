@@ -35,6 +35,7 @@ import com.redhat.bobbycar.carsim.clients.model.KafkaCarEvent;
 import com.redhat.bobbycar.carsim.clients.model.KafkaCarPosition;
 import com.redhat.bobbycar.carsim.clients.model.KafkaCarRecord;
 import com.redhat.bobbycar.carsim.consumer.ZoneChangeConsumer;
+import com.redhat.bobbycar.carsim.consumer.ZoneChangeListener;
 import com.redhat.bobbycar.carsim.data.DriverDao;
 import com.redhat.bobbycar.carsim.drivers.Driver;
 import com.redhat.bobbycar.carsim.drivers.DriverMetrics;
@@ -54,64 +55,91 @@ import io.quarkus.runtime.StartupEvent;
 public class CarSimulatorApp {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(CarSimulatorApp.class);
-	
+	// Config Properties
 	@ConfigProperty(name = "com.redhat.bobbycar.carsim.cars", defaultValue = "1")
 	int cars;
-	
 	@ConfigProperty(name = "com.redhat.bobbycar.carsim.route")
 	String pathToRoutes;
-	
 	@ConfigProperty(name = "com.redhat.bobbycar.carsim.route.remote", defaultValue = "")
 	Optional<String[]> remoteRoutes;
-	
 	@ConfigProperty(name = "com.redhat.bobbycar.carsim.delay", defaultValue = "0")
 	int delay;
-	
 	@ConfigProperty(name = "com.redhat.bobbycar.carsim.factor", defaultValue = "1.0")
 	double factor;
-	
 	@ConfigProperty(name = "com.redhat.bobbycar.carsim.repeat", defaultValue = "false")
 	boolean repeat;
-	
 	@ConfigProperty(name = "com.redhat.bobbycar.carsim.kafka.apiKey")
 	Optional<String> apiKey;
-	
+	// CDI Beans
+	@Inject
+    DriverDao driverDao;
+	@Inject
+	GpxReader gpxReader;
+	@Inject
+	MetricRegistry registry;
+	@Inject
+	OsmRouteSelector osmRouteSelector;
+	@Inject
+	TimedDrivingStrategyMetrics timedDrivingStrategyMetrics;
+	@Inject
+	DriverMetrics driverMetrics;
+	@Inject
+	ZoneChangeConsumer zoneChangeConsumer;
+	// Rest Clients
 	@Inject
     @RestClient
     KafkaService kafkaService;
-	
-	@Inject
-    DriverDao driverDao;
-	
-	@Inject
-	GpxReader gpxReader;
-	
-	@Inject
-	MetricRegistry registry;
-	
-	@Inject
-	OsmRouteSelector osmRouteSelector;
-	
-	@Inject
-	TimedDrivingStrategyMetrics timedDrivingStrategyMetrics;
-	
-	@Inject
-	DriverMetrics driverMetrics;
-	
-	@Inject
-	ZoneChangeConsumer zoneChangeConsumer;
-	
 	@RestClient
     @Inject
     DataGridService dataGridService;
-	
+	// Attributes
     private RouteSelectionStrategy routeSelectionStrategy;
-	
 	private final Map<UUID, CompletableFuture<Void>> futures;
-	
+
 	public CarSimulatorApp() throws JAXBException {
 		futures = new HashMap<>();
 	}
+	
+	void onStart(@Observes StartupEvent ev) {  
+		ThreadPoolExecutor carPoolExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(cars);
+		ThreadPoolExecutor enginePoolExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(cars);
+        LOGGER.info("The application is starting... ");
+        LOGGER.info("Reading routes from {}", pathToRoutes);
+        LongStream.range(0, cars).forEach(c -> {
+        	UUID id = UUID.randomUUID();
+	    	Route route = getRouteSelectionStrategy().selectRoute();
+	    	EngineMetrics engineMetrics = new EngineMetrics(registry, id, route.getName());
+			Car car = Car.builder().withModel("M3 Coupe").withManufacturer("BMW")
+					.withStartingPoint(route.getPoints().findFirst().orElse(null)).withDriverId(id)
+					.withMetrics(engineMetrics).build();
+			zoneChangeConsumer.registerZoneChangeListener(onZoneChange(id));
+			TimedDrivingStrategy strategy = TimedDrivingStrategy.builder()
+	    			.withFactor(factor)
+	    			.withCar(car)
+	    			.withMetrics(timedDrivingStrategyMetrics)
+	    			.build();
+	        Driver driver = Driver.builder()
+	        		.withRoute(route)
+	        		.withDrivingStrategy(strategy)
+	        		.withRepeat(repeat)
+	        		.withMetrics(driverMetrics)
+	        		.withStartDelay(delay * (c + 1))
+	        		.withId(id)
+	        		.build();
+	        onCarEvent(driver);
+	        futures.put(id, CompletableFuture.runAsync(driver, carPoolExecutor));
+	        car.start(enginePoolExecutor);
+	        driverDao.create(driver.getId(), driver);
+	        if (repeat && LOGGER.isInfoEnabled()) {
+	        	LOGGER.info("Will repeat route when finished");
+	        }
+        	
+        });
+    }
+	
+	void onStop(@Observes ShutdownEvent ev) {               
+        LOGGER.info("The application is stopping...");
+    }
 	
 	synchronized RouteSelectionStrategy getRouteSelectionStrategy() {
 		if (routeSelectionStrategy == null) {
@@ -133,75 +161,43 @@ public class CarSimulatorApp {
 		});
 		
 	}
-	
-	void onStart(@Observes StartupEvent ev) {  
-		ThreadPoolExecutor carPoolExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(cars);
-		ThreadPoolExecutor enginePoolExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(cars);
-        LOGGER.info("The application is starting... ");
-        LOGGER.info("Reading routes from {}", pathToRoutes);
-        LongStream.range(0, cars).forEach(c -> {
-        	UUID driverId = UUID.randomUUID();
-	    	Route route = getRouteSelectionStrategy().selectRoute();
-	    	EngineMetrics engineMetrics = new EngineMetrics(registry, driverId, route.getName());
-			Car car = Car.builder().withModel("M3 Coupe").withManufacturer("BMW")
-					.withStartingPoint(route.getPoints().findFirst().orElse(null)).withDriverId(driverId)
-					.withMetrics(engineMetrics).build();
-			zoneChangeConsumer.registerZoneChangeListener(evt -> 
-				{
-					if (driverId.toString().equals(evt.getCarId())) {
-						if (evt.getNextZoneId() != null) {
-							LOGGER.info("Retrieved zone data {}", dataGridService.getZoneData("", MediaType.APPLICATION_JSON, evt.getNextZoneId()));
-						} else {
-							LOGGER.info("Left zone");
-						}
-					}
-					
-				}
-			);
-			TimedDrivingStrategy strategy = TimedDrivingStrategy.builder()
-	    			.withFactor(factor)
-	    			.withCar(car)
-	    			.withMetrics(timedDrivingStrategyMetrics)
-	    			.build();
-	        Driver driver = Driver.builder()
-	        		.withRoute(route)
-	        		.withDrivingStrategy(strategy)
-	        		.withRepeat(repeat)
-	        		.withMetrics(driverMetrics)
-	        		.withStartDelay(delay * (c + 1))
-	        		.withId(driverId)
-	        		.build();
-	        registerListenerForKafka(driver);
-	        futures.put(driverId, CompletableFuture.runAsync(driver, carPoolExecutor));
-	        car.start(enginePoolExecutor);
-	        driverDao.create(driver.getId(), driver);
-	        if (repeat && LOGGER.isInfoEnabled()) {
-	        	LOGGER.info("Will repeat route when finished");
-	        }
-        	
-        });
-    }
 
-	private void registerListenerForKafka(Driver driver) {
-		driver.registerCarEventListener(evt -> {
-			 List<KafkaCarRecord> records = new ArrayList<>();
-		     records.add(new KafkaCarRecord(driver.getId().toString(), new KafkaCarPosition(evt.getLatitude().doubleValue(), evt.getLongitude().doubleValue(), evt.getElevation().doubleValue(), driver.getId().toString(), evt.getTime().orElse(null))));
-		     KafkaCarEvent event = new KafkaCarEvent(records);
-		     try {
-		    	 kafkaService.publishCarEvent(apiKey.orElse(null), event);
-		     } catch(Exception e) {
-		    	 LOGGER.error("Error publishing car event to kafka", e);
-		    	 if (e.getCause() instanceof SSLException) {
-		    		 LOGGER.error("Cannot recover from SSL error. Shutting down.");
-		    		 throw e;
-		    	 }
-		     }
-		});
+	private ZoneChangeListener onZoneChange(UUID driverId) {
+		return evt -> {
+			if (driverId.toString().equals(evt.getCarId())) {
+				retrieveZoneData(evt.getNextZoneId());
+			}
+		};
+	}
+
+	private void retrieveZoneData(String zoneId) {
+		if (zoneId != null) {
+			LOGGER.info("Retrieved zone data {}",
+					dataGridService.getZoneData("", MediaType.APPLICATION_JSON, zoneId));
+		} else {
+			LOGGER.info("Left zone");
+		}
+	}
+
+	private void onCarEvent(Driver driver) {
+		driver.registerCarEventListener(evt -> publishToKafka(driver, evt));
+	}
+
+	private void publishToKafka(Driver driver, CarEvent evt) {
+		List<KafkaCarRecord> records = new ArrayList<>();
+		 records.add(new KafkaCarRecord(driver.getId().toString(), new KafkaCarPosition(evt.getLatitude().doubleValue(), evt.getLongitude().doubleValue(), evt.getElevation().doubleValue(), driver.getId().toString(), evt.getTime().orElse(null))));
+		 KafkaCarEvent event = new KafkaCarEvent(records);
+		 try {
+			 kafkaService.publishCarEvent(apiKey.orElse(null), event);
+		 } catch(Exception e) {
+			 LOGGER.error("Error publishing car event to kafka", e);
+			 if (e.getCause() instanceof SSLException) {
+				 LOGGER.error("Cannot recover from SSL error. Shutting down.");
+				 throw e;
+				 //TODO Shutdown Service or set health check to unhealthy state
+			 }
+		 }
 	}
 
 	
-
-	void onStop(@Observes ShutdownEvent ev) {               
-        LOGGER.info("The application is stopping...");
-    }
 }
