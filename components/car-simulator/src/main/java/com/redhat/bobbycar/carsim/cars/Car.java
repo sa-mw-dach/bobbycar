@@ -9,7 +9,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.redhat.bobbycar.carsim.routes.RoutePoint;
-import javax.annotation.Generated;
 
 public class Car {
 	private final String model;
@@ -18,7 +17,6 @@ public class Car {
 	private final UUID driverId;
 	private static final Logger LOGGER = LoggerFactory.getLogger(Car.class);
 
-	@Generated("SparkTools")
 	private Car(Builder builder) {
 		this.model = builder.model;
 		this.manufacturer = builder.manufacturer;
@@ -58,7 +56,6 @@ public class Car {
 	 * Creates builder to build {@link Car}.
 	 * @return created builder
 	 */
-	@Generated("SparkTools")
 	public static Builder builder() {
 		return new Builder();
 	}

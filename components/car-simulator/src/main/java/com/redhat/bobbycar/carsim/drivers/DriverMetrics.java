@@ -35,6 +35,4 @@ public class DriverMetrics {
 		this.carsDriving.decrementAndGet();
 	}
 
-	
-	
 }
