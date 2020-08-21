@@ -4,8 +4,6 @@ import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-import java.util.UUID;
-
 import javax.inject.Inject;
 
 import org.eclipse.microprofile.reactive.messaging.Incoming;
@@ -45,7 +43,7 @@ class CarMetricsEventPublisherTest {
 	@Test
 	void testPublish() {
 		CarMetricsEvent evt = new CarMetricsEvent();
-		evt.setDriverId(UUID.fromString(ID));
+		evt.setDriverId(ID);
 		evt.setManufacturer("BMW");
 		evt.setModel("M3 Coupe");
 		evt.setEngineData(EngineData.builder().withCo2Emission(120).withFuelConsumptionPer100km(5.8).withGear(4)

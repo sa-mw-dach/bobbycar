@@ -1,14 +1,22 @@
 package com.redhat.bobbycar.carsim.cars;
 
+import java.io.Serializable;
 import java.util.Objects;
 
-public class EngineData {
+import io.quarkus.runtime.annotations.RegisterForReflection;
+
+@RegisterForReflection
+public class EngineData implements Serializable{
+	private static final long serialVersionUID = 1L;
+	private double speedInKmh;
+	private double rpm;
+	private int gear;
+	private double fuelConsumptionPer100km;
+	private double co2Emission;
 	
-	private final double speedInKmh;
-	private final double rpm;
-	private final int gear;
-	private final double fuelConsumptionPer100km;
-	private final double co2Emission;
+	public EngineData() {
+		
+	}
 	
 	private EngineData(Builder builder) {
 		this.speedInKmh = builder.speedInKmh;
@@ -22,20 +30,40 @@ public class EngineData {
 		return speedInKmh;
 	}
 
+	public void setSpeedInKmh(double speedInKmh) {
+		this.speedInKmh = speedInKmh;
+	}
+
 	public double getRpm() {
 		return rpm;
+	}
+
+	public void setRpm(double rpm) {
+		this.rpm = rpm;
 	}
 
 	public int getGear() {
 		return gear;
 	}
 
+	public void setGear(int gear) {
+		this.gear = gear;
+	}
+
 	public double getFuelConsumptionPer100km() {
 		return fuelConsumptionPer100km;
 	}
 
+	public void setFuelConsumptionPer100km(double fuelConsumptionPer100km) {
+		this.fuelConsumptionPer100km = fuelConsumptionPer100km;
+	}
+
 	public double getCo2Emission() {
 		return co2Emission;
+	}
+
+	public void setCo2Emission(double co2Emission) {
+		this.co2Emission = co2Emission;
 	}
 
 	public static Builder builder() {
