@@ -1,6 +1,5 @@
 package com.redhat.bobbycar.carsim.cars;
 
-import java.io.FileNotFoundException;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
@@ -21,12 +20,7 @@ public class Car {
 		this.model = builder.model;
 		this.manufacturer = builder.manufacturer;
 		this.driverId = builder.driverId;
-		try {
-			this.engine = new TimedEngine(5, builder.startingPoint, new JsonEngineConfiguration(), builder.metrics);
-		} catch (FileNotFoundException e) {
-			throw new EngineException("Engine configuration could not be loaded", e);
-		}
-		
+		this.engine = builder.engine;
 	}
 
 	public void start(Executor executor) {
@@ -64,8 +58,7 @@ public class Car {
 		private String model;
 		private String manufacturer;
 		private UUID driverId;
-		private RoutePoint startingPoint;
-		private EngineMetrics metrics;
+		private Engine engine;
 
 		private Builder() {
 		}
@@ -85,13 +78,8 @@ public class Car {
 			return this;
 		}
 		
-		public Builder withStartingPoint(RoutePoint startingPoint) {
-			this.startingPoint = startingPoint;
-			return this;
-		}
-		
-		public Builder withMetrics(EngineMetrics metrics) {
-			this.metrics = metrics;
+		public Builder withEngine(Engine engine) {
+			this.engine = engine;
 			return this;
 		}
 

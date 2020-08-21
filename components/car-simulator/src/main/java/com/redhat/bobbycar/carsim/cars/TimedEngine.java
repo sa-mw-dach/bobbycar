@@ -10,10 +10,13 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
+import javax.annotation.Generated;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.redhat.bobbycar.carsim.cars.EngineData.Builder;
+import com.redhat.bobbycar.carsim.cars.events.EngineMetricsEvent;
+import com.redhat.bobbycar.carsim.cars.events.EngineMetricsEventListener;
 import com.redhat.bobbycar.carsim.drivers.RouteNotSupportedException;
 import com.redhat.bobbycar.carsim.routes.Route;
 import com.redhat.bobbycar.carsim.routes.RoutePoint;
@@ -33,25 +36,23 @@ public class TimedEngine implements Engine{
 	private final Random random = new Random();
 	private final Optional<EngineMetrics> metrics;
 	private boolean stopped = false;
-	
-	public TimedEngine(int speedVariationInKmH, RoutePoint startingPoint, EngineConfiguration config) {
-		this(speedVariationInKmH, startingPoint, config, null);
-	}
-	
-	public TimedEngine(int speedVariationInKmH, RoutePoint startingPoint, EngineConfiguration config, EngineMetrics metrics) {
-		super();
-		this.speedVariationInKmH = speedVariationInKmH;
-		this.previous = startingPoint;
-		this.next = startingPoint;
-		this.config = config;
-		this.metrics = Optional.ofNullable(metrics);
-		if(startingPoint == null || !startingPoint.getTime().isPresent()) {
+	private List<EngineMetricsEventListener> eventListeners = new ArrayList<>();
+
+
+	private TimedEngine(Builder builder) {
+		this.speedVariationInKmH = builder.speedVariationInKmH;
+		this.previous = builder.startingPoint;
+		this.next = builder.startingPoint;
+		this.config = builder.config;
+		this.metrics = builder.metrics;
+		if(builder.startingPoint == null || !builder.startingPoint.getTime().isPresent()) {
 			List<RoutePoint> points = new ArrayList<>();
-			if (startingPoint != null) {
-				points.add(startingPoint);
+			if (builder.startingPoint != null) {
+				points.add(builder.startingPoint);
 			}
 			throw new RouteNotSupportedException(ROUTE_NOT_SUPPORTED_MSG, new Route("", points));
 		}
+		metrics.ifPresent(m -> registerEventListener(evt -> m.updateEngineData(evt.getEngineData())));
 	}
 	
 	@Override
@@ -96,7 +97,7 @@ public class TimedEngine implements Engine{
 	public EngineData currentData() {
 		Optional<Double> currentSpeedInKmH = currentSpeedInKmH();
 		LOGGER.debug("Current speed {}", currentSpeedInKmH);
-		Builder builder = EngineData.builder();
+		com.redhat.bobbycar.carsim.cars.EngineData.Builder builder = EngineData.builder();
 		currentSpeedInKmH.ifPresent(speed -> {
 			config.co2FromSpeed(speed).ifPresent(builder::withCo2Emission);
 			config.fuelConsumptionPer100KmFromSpeed(speed).ifPresent(builder::withFuelConsumptionPer100km);
@@ -110,7 +111,8 @@ public class TimedEngine implements Engine{
 	@Override
 	public void run() {
 		while(!stopped) {
-			metrics.ifPresent(m -> m.updateEngineData(currentData()));
+			EngineData currentData = currentData();
+			eventListeners.stream().forEach(l -> l.update(new EngineMetricsEvent(currentData)));
 			try {
 				TimeUnit.MILLISECONDS.sleep(DATA_RESOULUTION_MS);
 			} catch (InterruptedException e) {
@@ -124,5 +126,57 @@ public class TimedEngine implements Engine{
 	public void stop() {
 		stopped = true;
 	}
+	
+	public void registerEventListener(EngineMetricsEventListener eventListener) {
+		this.eventListeners.add(eventListener);
+	}
+
+	/**
+	 * Creates builder to build {@link TimedEngine}.
+	 * @return created builder
+	 */
+	@Generated("SparkTools")
+	public static Builder builder() {
+		return new Builder();
+	}
+
+	/**
+	 * Builder to build {@link TimedEngine}.
+	 */
+	public static final class Builder {
+		private int speedVariationInKmH;
+		private RoutePoint startingPoint;
+		private EngineConfiguration config;
+		private Optional<EngineMetrics> metrics = Optional.empty();
+
+		private Builder() {
+		}
+
+		public Builder withSpeedVariationInKmH(int speedVariationInKmH) {
+			this.speedVariationInKmH = speedVariationInKmH;
+			return this;
+		}
+
+		public Builder withStartingPoint(RoutePoint startingPoint) {
+			this.startingPoint = startingPoint;
+			return this;
+		}
+
+
+		public Builder withConfig(EngineConfiguration config) {
+			this.config = config;
+			return this;
+		}
+
+		public Builder withMetrics(EngineMetrics metrics) {
+			this.metrics = Optional.ofNullable(metrics);
+			return this;
+		}
+
+		public TimedEngine build() {
+			return new TimedEngine(this);
+		}
+	}
+	
 	
 }

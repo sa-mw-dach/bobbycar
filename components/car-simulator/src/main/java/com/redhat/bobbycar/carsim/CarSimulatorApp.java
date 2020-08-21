@@ -1,5 +1,6 @@
 package com.redhat.bobbycar.carsim;
 
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -28,7 +29,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.redhat.bobbycar.carsim.cars.Car;
+import com.redhat.bobbycar.carsim.cars.EngineException;
 import com.redhat.bobbycar.carsim.cars.EngineMetrics;
+import com.redhat.bobbycar.carsim.cars.JsonEngineConfiguration;
+import com.redhat.bobbycar.carsim.cars.TimedEngine;
+import com.redhat.bobbycar.carsim.cars.events.CarMetricsEvent;
+import com.redhat.bobbycar.carsim.cars.events.CarMetricsEventPublisher;
 import com.redhat.bobbycar.carsim.clients.DataGridService;
 import com.redhat.bobbycar.carsim.clients.KafkaService;
 import com.redhat.bobbycar.carsim.clients.model.KafkaCarEvent;
@@ -85,6 +91,8 @@ public class CarSimulatorApp {
 	DriverMetrics driverMetrics;
 	@Inject
 	ZoneChangeConsumer zoneChangeConsumer;
+	@Inject
+	CarMetricsEventPublisher carMetricsPublisher;
 	// Rest Clients
 	@Inject
     @RestClient
@@ -92,6 +100,7 @@ public class CarSimulatorApp {
 	@RestClient
     @Inject
     DataGridService dataGridService;
+	
 	// Attributes
     private RouteSelectionStrategy routeSelectionStrategy;
 	private final Map<UUID, CompletableFuture<Void>> futures;
@@ -106,34 +115,40 @@ public class CarSimulatorApp {
         LOGGER.info("The application is starting... ");
         LOGGER.info("Reading routes from {}", pathToRoutes);
         LongStream.range(0, cars).forEach(c -> {
-        	UUID id = UUID.randomUUID();
-	    	Route route = getRouteSelectionStrategy().selectRoute();
-	    	EngineMetrics engineMetrics = new EngineMetrics(registry, id, route.getName());
-			Car car = Car.builder().withModel("M3 Coupe").withManufacturer("BMW")
-					.withStartingPoint(route.getPoints().findFirst().orElse(null)).withDriverId(id)
-					.withMetrics(engineMetrics).build();
-			zoneChangeConsumer.registerZoneChangeListener(onZoneChange(id));
-			TimedDrivingStrategy strategy = TimedDrivingStrategy.builder()
-	    			.withFactor(factor)
-	    			.withCar(car)
-	    			.withMetrics(timedDrivingStrategyMetrics)
-	    			.build();
-	        Driver driver = Driver.builder()
-	        		.withRoute(route)
-	        		.withDrivingStrategy(strategy)
-	        		.withRepeat(repeat)
-	        		.withMetrics(driverMetrics)
-	        		.withStartDelay(delay * (c + 1))
-	        		.withId(id)
-	        		.build();
-	        onCarEvent(driver);
-	        futures.put(id, CompletableFuture.runAsync(driver, carPoolExecutor));
-	        car.start(enginePoolExecutor);
-	        driverDao.create(driver.getId(), driver);
-	        if (repeat && LOGGER.isInfoEnabled()) {
-	        	LOGGER.info("Will repeat route when finished");
-	        }
-        	
+        	try {
+	        	UUID id = UUID.randomUUID();
+		    	Route route = getRouteSelectionStrategy().selectRoute();
+		    	EngineMetrics engineMetrics = new EngineMetrics(registry, id, route.getName());
+		    	TimedEngine engine = TimedEngine.builder().withSpeedVariationInKmH(5).withStartingPoint(route.getPoints().findFirst().orElse(null))
+							.withConfig(new JsonEngineConfiguration()).withMetrics(engineMetrics).build();
+		    	Car car = Car.builder().withModel("M3 Coupe").withManufacturer("BMW")
+						.withEngine(engine).withDriverId(id)
+						.build();
+		    	engine.registerEventListener(e -> carMetricsPublisher.publish(CarMetricsEvent.create(car, e.getEngineData())));
+				zoneChangeConsumer.registerZoneChangeListener(onZoneChange(id));
+				TimedDrivingStrategy strategy = TimedDrivingStrategy.builder()
+		    			.withFactor(factor)
+		    			.withCar(car)
+		    			.withMetrics(timedDrivingStrategyMetrics)
+		    			.build();
+		        Driver driver = Driver.builder()
+		        		.withRoute(route)
+		        		.withDrivingStrategy(strategy)
+		        		.withRepeat(repeat)
+		        		.withMetrics(driverMetrics)
+		        		.withStartDelay(delay * (c + 1))
+		        		.withId(id)
+		        		.build();
+		        onCarEvent(driver);
+		        futures.put(id, CompletableFuture.runAsync(driver, carPoolExecutor));
+		        car.start(enginePoolExecutor);
+		        driverDao.create(driver.getId(), driver);
+		        if (repeat && LOGGER.isInfoEnabled()) {
+		        	LOGGER.info("Will repeat route when finished");
+		        }
+			} catch (FileNotFoundException e) {
+				throw new EngineException("Engine configuration could not be loaded", e);
+			}
         });
     }
 	

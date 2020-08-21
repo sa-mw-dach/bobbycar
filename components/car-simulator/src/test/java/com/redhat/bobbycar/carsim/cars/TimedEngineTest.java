@@ -28,7 +28,7 @@ class TimedEngineTest {
 		
 		RoutePoint p1 = new RoutePoint(new BigDecimal(8.269912), new BigDecimal(50.22101), new BigDecimal(268.8));
 		assertThrows(RouteNotSupportedException.class, () -> {
-			new TimedEngine(0, p1, config);
+			TimedEngine.builder().withSpeedVariationInKmH(0).withStartingPoint(p1).withConfig(config).build();
 	    });
 	}
 	
@@ -36,7 +36,7 @@ class TimedEngineTest {
 	void testUnsupportedNextPoint() {
 		RoutePoint p1 = new RoutePoint(new BigDecimal(8.269912), new BigDecimal(50.22101), new BigDecimal(268.8), ZonedDateTime.parse("2020-05-14T07:37:42Z"));
 		RoutePoint p2 = new RoutePoint(new BigDecimal(8.270075), new BigDecimal(50.22086), new BigDecimal(269.6));
-		Engine engine = new TimedEngine(0, p1, config);
+		Engine engine = TimedEngine.builder().withSpeedVariationInKmH(0).withStartingPoint(p1).withConfig(config).build();
 		assertThrows(RouteNotSupportedException.class, () -> {
 			engine.nextRoutePoint(p2);
 	    });
@@ -45,7 +45,7 @@ class TimedEngineTest {
 	@Test
 	void testSpeedWithoutNextpoint() {
 		RoutePoint p1 = new RoutePoint(new BigDecimal(8.269912), new BigDecimal(50.22101), new BigDecimal(268.8), ZonedDateTime.parse("2020-05-14T07:37:42Z"));
-		Engine engine = new TimedEngine(0, p1, config);
+		Engine engine = TimedEngine.builder().withSpeedVariationInKmH(0).withStartingPoint(p1).withConfig(config).build();
 		assertEquals(0, engine.currentData().getSpeedInKmh());
 	}
 	
@@ -53,7 +53,7 @@ class TimedEngineTest {
 	void testSpeedWithoutVariation() {
 		RoutePoint p1 = new RoutePoint(new BigDecimal(8.269912), new BigDecimal(50.22101), new BigDecimal(268.8), ZonedDateTime.parse("2020-05-14T07:37:42Z"));
 		RoutePoint p2 = new RoutePoint(new BigDecimal(8.270075), new BigDecimal(50.22086), new BigDecimal(269.6), ZonedDateTime.parse("2020-05-14T07:37:59Z"));
-		Engine engine = new TimedEngine(0, p1, config);
+		Engine engine = TimedEngine.builder().withSpeedVariationInKmH(0).withStartingPoint(p1).withConfig(config).build();
 		assertEquals(5.19318504337, engine.nextRoutePoint(p2).currentData().getSpeedInKmh(), 5);
 	}
 	

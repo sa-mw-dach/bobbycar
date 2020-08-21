@@ -25,8 +25,8 @@ import io.smallrye.mutiny.Multi;
 @QuarkusTestResource(KafkaTestResource.class)
 class ZoneChangeConsumerTest {
 
-	private static final int EVENT_FREQUENCY_SECONDS = 1;
-	private static final int EVENT_TIMEOUT = 3;
+	static final int EVENT_FREQUENCY_SECONDS = 1;
+	private static final int EVENT_TIMEOUT = 10;
 	private static final String ID = "de9bcc2e-b623-4b19-a2f9-a1bc8e81b45e";
 	
 	
@@ -48,10 +48,13 @@ class ZoneChangeConsumerTest {
 	@Outgoing("zonechangepub")
 	public Multi<ZoneChangeEvent> generate() {
 		return Multi.createFrom().ticks().every(ofSeconds(EVENT_FREQUENCY_SECONDS))
-	            .map(x -> createTestEvent());
+	            .map(x -> {
+	            	System.out.println("Tick");
+	            	return createTestEvent();
+	            }).onOverflow().buffer();
 	}
 
-	private ZoneChangeEvent createTestEvent() {
+	ZoneChangeEvent createTestEvent() {
 		return new ZoneChangeEvent("A","B",ID);
 	}
 }

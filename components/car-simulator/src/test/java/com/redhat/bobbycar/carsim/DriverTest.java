@@ -3,6 +3,7 @@ package com.redhat.bobbycar.carsim;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
@@ -19,6 +20,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.redhat.bobbycar.carsim.cars.Car;
+import com.redhat.bobbycar.carsim.cars.JsonEngineConfiguration;
+import com.redhat.bobbycar.carsim.cars.TimedEngine;
 import com.redhat.bobbycar.carsim.drivers.Driver;
 import com.redhat.bobbycar.carsim.drivers.DrivingStrategy;
 import com.redhat.bobbycar.carsim.drivers.TimedDrivingStrategy;
@@ -31,10 +34,11 @@ class DriverTest {
 
 	@ParameterizedTest
 	@MethodSource
-	void driveRoute(Route route) throws InterruptedException {
-		
+	void driveRoute(Route route) throws InterruptedException, FileNotFoundException {
+		TimedEngine engine = TimedEngine.builder().withSpeedVariationInKmH(5).withStartingPoint(route.getPoints().findFirst().orElse(null))
+				.withConfig(new JsonEngineConfiguration()).build();
 		Car car = Car.builder().withModel("M3 Coupe").withManufacturer("BMW")
-				.withStartingPoint(route.getPoints().findFirst().get()).withDriverId(UUID.randomUUID()).build();
+				.withEngine(engine).withDriverId(UUID.randomUUID()).build();
 		DrivingStrategy strategy = TimedDrivingStrategy.builder().withCar(car).build();
 		Driver driver = Driver.builder().withRoute(route).withDrivingStrategy(strategy).build();
 		driver.registerCarEventListener(evt -> {
