@@ -1,7 +1,7 @@
 package com.redhat.bobbycar.carsim.cars.events;
 
+import java.io.Serializable;
 import java.util.Objects;
-import java.util.UUID;
 
 import com.redhat.bobbycar.carsim.cars.Car;
 import com.redhat.bobbycar.carsim.cars.EngineData;
@@ -9,17 +9,18 @@ import com.redhat.bobbycar.carsim.cars.EngineData;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 
 @RegisterForReflection
-public class CarMetricsEvent {
+public class CarMetricsEvent implements Serializable{
+	private static final long serialVersionUID = 1L;
 	private EngineData engineData;
 	private String model;
 	private String manufacturer;
-	private UUID driverId;
+	private String driverId;
 
 	public CarMetricsEvent() {
 
 	}
 
-	public CarMetricsEvent(EngineData engineData, String model, String manufacturer, UUID driverId) {
+	public CarMetricsEvent(EngineData engineData, String model, String manufacturer, String driverId) {
 		super();
 		this.engineData = engineData;
 		this.model = model;
@@ -28,7 +29,7 @@ public class CarMetricsEvent {
 	}
 
 	public static CarMetricsEvent create(Car car, EngineData currentData) {
-		return new CarMetricsEvent(currentData, car.getModel(), car.getManufacturer(), car.getDriverId());
+		return new CarMetricsEvent(currentData, car.getModel(), car.getManufacturer(), car.getDriverId().toString());
 	}
 
 	public EngineData getEngineData() {
@@ -55,11 +56,11 @@ public class CarMetricsEvent {
 		this.manufacturer = manufacturer;
 	}
 
-	public UUID getDriverId() {
+	public String getDriverId() {
 		return driverId;
 	}
 
-	public void setDriverId(UUID driverId) {
+	public void setDriverId(String driverId) {
 		this.driverId = driverId;
 	}
 
