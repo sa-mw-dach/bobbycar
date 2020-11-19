@@ -1,0 +1,19 @@
+{{- if .Values.components.enabled.datagrid -}}
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  name: datagrid
+  namespace: {{ .Values.namespace }}
+  labels:
+    clusterName: {{ .Values.datagrid.name }}
+    infinispan_cr: {{ .Values.datagrid.name }}
+spec:
+  host: {{ .Values.datagrid.name }}-{{ .Values.namespace }}.{{ .Values.ocpDomain }}
+  to:
+    kind: Service
+    name: {{ .Values.datagrid.name }}
+    weight: 100
+  port:
+    targetPort: 11222
+  wildcardPolicy: None
+{{- end }}   

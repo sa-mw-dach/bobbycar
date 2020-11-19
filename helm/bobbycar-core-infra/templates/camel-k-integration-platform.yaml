@@ -1,0 +1,13 @@
+{{- if .Values.components.enabled.camelK -}}
+apiVersion: camel.apache.org/v1
+kind: IntegrationPlatform
+metadata:
+  name: camel-k
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: "camel-k"
+spec:
+  configuration:
+  - type: repository
+    value: https://maven.repository.redhat.com/earlyaccess/all@id=redhat.ea
+{{- end }}

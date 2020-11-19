@@ -1,0 +1,18 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  labels:
+    app: {{ .Values.dashboard.name }}
+  name: {{ .Values.dashboard.name }}
+  namespace: {{ .Values.namespace }}
+spec:
+  host: {{ .Values.dashboard.name }}-{{ .Values.namespace }}.{{ .Values.ocpDomain }}
+  port:
+    targetPort: 8080-tcp
+  to:
+    kind: Service
+    name: {{ .Values.dashboard.name }}
+    weight: 100
+  wildcardPolicy: None
+status:
+  ingress: []

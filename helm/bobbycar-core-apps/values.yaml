@@ -1,0 +1,20 @@
+# Default values for bobbycar-core.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+namespace: bobbycar
+appName: Bobbycar
+ocpDomain: apps.ocp4.stormshift.coe.muc.redhat.com
+
+dashboard:
+  name: dashboard
+  config:
+    googleApiKey: AIzaSyCQSXa6ZZKvbDqs_D_Kg42NFCgOJNHwcXw
+    threeScaleApiKey: replaceme
+    cacheEndpoint: http://bobbycar-dg-oschneid-bc.apps.ocp4.stormshift.coe.muc.redhat.com
+
+streamingService:
+  name: kafka-streaming-service
+  topic: bobbycar-gps
+  service:
+    name: kafka-streaming-service

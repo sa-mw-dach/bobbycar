@@ -1,0 +1,27 @@
+{{- if .Values.components.enabled.datagrid -}}
+apiVersion: infinispan.org/v1
+kind: Infinispan
+metadata:
+  name: {{ .Values.datagrid.name }}
+  namespace: {{ .Values.namespace }}
+spec:
+  container:
+    cpu: ''
+    extraJvmOpts: ''
+    memory: ''
+  expose: {}
+  image: ''
+  logging:
+    categories: 
+      org.infinispan: info
+  replicas: {{ .Values.datagrid.replicas }}
+  service:
+    container:
+      storage: ''
+    sites:
+      local:
+        expose: {}
+        name: ''
+      locations: null
+    type: Cache
+{{- end }}    

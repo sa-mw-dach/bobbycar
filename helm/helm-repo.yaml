@@ -1,0 +1,8 @@
+apiVersion: helm.openshift.io/v1beta1
+kind: HelmChartRepository
+metadata:
+  name: bobbycar-repo
+spec:
+  name: bobbycar-repo
+  connectionConfig:
+    url: https://sa-mw-dach.github.io/bobbycar-charts/

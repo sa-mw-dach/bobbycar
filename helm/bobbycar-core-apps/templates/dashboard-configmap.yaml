@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dashboard-config
+  namespace: {{ .Values.namespace }}
+data:
+  config.json: |-
+    {
+        "GOOGLE_API_KEY": "{{ .Values.dashboard.config.googleApiKey }}",
+        "BOBBYCAR_API_KEY": "{{ .Values.dashboard.config.threeScaleApiKey }}",
+        "SSE_ENDPOINT": "",
+        "WS_ENDPOINT": "ws://{{ .Values.streamingService.name }}-{{ .Values.namespace }}.{{ .Values.ocpDomain }}/api/carevents?sendToAll=true",
+        "CACHE_ENDPOINT": "{{ .Values.dashboard.config.cacheEndpoint }}"
+    }
