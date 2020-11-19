@@ -1,0 +1,64 @@
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  labels:
+    app.kubernetes.io/part-of: {{ .Values.appName }}
+  name: {{ .Values.dashboard.name }}
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    component: {{ .Values.dashboard.name }}
+    deploymentconfig: {{ .Values.dashboard.name }}
+  strategy:
+    activeDeadlineSeconds: 21600
+    resources: {}
+    rollingParams:
+      intervalSeconds: 1
+      maxSurge: 25%
+      maxUnavailable: 25%
+      timeoutSeconds: 600
+      updatePeriodSeconds: 1
+    type: Rolling
+  template:
+    metadata:
+      labels:
+        component: {{ .Values.dashboard.name }}
+        deploymentconfig: {{ .Values.dashboard.name }}
+    spec:
+      containers:
+      - image: dashboard:latest
+        #imagePullPolicy: Always
+        name: {{ .Values.dashboard.name }}
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+            - mountPath: /opt/app-root/output/conf/config.json
+              name: dashboard-cfg-vol
+              subPath: config.json
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+        - configMap:
+            defaultMode: 438
+            name: dashboard-config
+          name: dashboard-cfg-vol
+  test: false
+  triggers:
+  - type: ConfigChange
+  - imageChangeParams:
+      automatic: true
+      containerNames:
+      - dashboard
+      from:
+        kind: ImageStreamTag
+        name: dashboard:latest
+    type: ImageChange

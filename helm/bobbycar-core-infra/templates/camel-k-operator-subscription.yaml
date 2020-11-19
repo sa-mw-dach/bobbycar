@@ -1,0 +1,14 @@
+{{- if .Values.components.enabled.camelK -}}
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  name: {{ .Values.camelKOperator.name }}
+  namespace: {{ .Values.namespace }}
+spec:
+  channel: techpreview
+  installPlanApproval: {{ .Values.camelKOperator.installPlanApproval }}
+  name: red-hat-camel-k
+  source: redhat-operators
+  sourceNamespace: openshift-marketplace
+  startingCSV: {{ .Values.camelKOperator.startingCSV }}
+  {{- end }}

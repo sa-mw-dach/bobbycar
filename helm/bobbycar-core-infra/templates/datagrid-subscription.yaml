@@ -1,0 +1,14 @@
+{{- if .Values.components.enabled.datagrid -}}
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  name: {{ .Values.datagridOperator.name }}
+  namespace: {{ .Values.namespace }}
+spec:
+  channel: 8.0.x
+  installPlanApproval: {{ .Values.datagridOperator.installPlanApproval }}
+  name: datagrid
+  source: redhat-operators
+  sourceNamespace: openshift-marketplace
+  startingCSV: {{ .Values.datagridOperator.startingCSV }}
+{{- end }}  

@@ -1,0 +1,29 @@
+{{- if .Values.components.enabled.kafka -}}
+apiVersion: kafka.strimzi.io/v1beta1
+kind: Kafka
+metadata:
+  name: {{ .Values.kafka.cluster.name }}
+  namespace: {{ .Values.namespace }}
+spec:
+  kafka:
+    version: 2.4.0
+    replicas: {{ .Values.kafka.cluster.brokerReplicas }}
+    listeners:
+      plain: {}
+      tls: {}
+      external:
+        type: route
+    config:
+      offsets.topic.replication.factor: 1
+      transaction.state.log.replication.factor: 1
+      log.message.format.version: '2.4'
+    storage:
+      type: ephemeral 
+  zookeeper:
+    replicas: {{ .Values.kafka.cluster.zookeeperReplicas }}
+    storage:
+      type: ephemeral
+  entityOperator:
+    topicOperator: {}
+    userOperator: {}
+{{- end }} 

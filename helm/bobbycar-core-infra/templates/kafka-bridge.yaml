@@ -1,0 +1,13 @@
+{{- if .Values.components.enabled.kafka -}}
+apiVersion: kafka.strimzi.io/v1alpha1
+kind: KafkaBridge
+metadata:
+  name: {{ .Values.kafka.bridge.name }}
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: {{ .Values.kafka.bridge.replicas }}
+  bootstrapServers: {{ .Values.kafka.bridge.bootstrapServers }}
+  http:
+    port: {{ .Values.kafka.bridge.port }}
+{{- end }}  
+

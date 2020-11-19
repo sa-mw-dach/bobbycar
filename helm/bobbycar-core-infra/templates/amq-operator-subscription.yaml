@@ -1,0 +1,14 @@
+{{- if .Values.components.enabled.amqBroker -}}
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  name: {{ .Values.amqOperator.name }}
+  namespace: {{ .Values.namespace }}
+spec:
+  channel: current
+  installPlanApproval: {{ .Values.amqOperator.installPlanApproval }}
+  name: amq-broker
+  source: redhat-operators
+  sourceNamespace: openshift-marketplace
+  startingCSV: {{ .Values.amqOperator.startingCSV }}
+{{- end }}  

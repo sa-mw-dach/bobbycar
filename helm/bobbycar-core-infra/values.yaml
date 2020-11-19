@@ -1,0 +1,65 @@
+# Default values for bobbycar-core.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+namespace: bobbycar
+appName: Bobbycar
+ocpDomain: apps.ocp4.stormshift.coe.muc.redhat.com
+
+# Enable the components that should be installed
+components:
+  enabled:
+    camelK: true
+    kafka: true
+    datagrid: true
+    amqBroker: true
+
+# AMQ Broker Operator Subscription
+amqOperator:
+  name: amq-broker
+  installPlanApproval: Automatic
+  startingCSV: amq-broker-operator.v0.17.0
+
+# Camel-K Operator Subscription
+camelKOperator:
+  name: red-hat-camel-k
+  installPlanApproval: Automatic
+  startingCSV: red-hat-camel-k-operator.v1.0.0
+
+# Datagrid Operator Subscription
+datagridOperator:
+  name: datagrid
+  installPlanApproval: Automatic
+  startingCSV: datagrid-operator.v8.0.3
+
+# AMQ Streams Operator Subscription
+strimziOperator:
+  name: amq-streams
+  installPlanApproval: Automatic
+  startingCSV: amqstreams.v1.5.4  
+
+datagrid:
+  name: bobbycar-dg
+  replicas: 1
+
+amqBroker:
+  name: bobbycar-amq-mqtt
+  instances: 1   
+  console:
+    expose: true  
+
+kafka: 
+  cluster:
+    name: bobbycar-cluster
+    brokerReplicas: 1
+    zookeeperReplicas: 3
+  bridge: 
+    name: bobbycar
+    replicas: 1
+    bootstrapServers: bobbycar-cluster-kafka-bootstrap:9092
+    port: 8080
+  topic:
+    gps:
+      name: bobbycar-gps
+      partitions: 1
+      replicas: 1    
