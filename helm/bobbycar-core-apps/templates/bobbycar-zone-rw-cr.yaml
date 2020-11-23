@@ -2,7 +2,6 @@ apiVersion: bobbycar.redhat.com/v1alpha1
 kind: BobbycarZone
 metadata:
   name: bobbycar-ffm-railway
-  namespace: bobbycar
 spec:
   name: "Frankfurt Railway Station Zone"
   type: "circle"

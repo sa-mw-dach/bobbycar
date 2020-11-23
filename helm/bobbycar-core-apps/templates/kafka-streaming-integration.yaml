@@ -2,7 +2,8 @@ apiVersion: camel.apache.org/v1
 kind: Integration
 metadata:
   name: {{ .Values.streamingService.name }}
-  app.kubernetes.io/part-of: {{ .Values.appName }}
+  labels:
+    app.kubernetes.io/part-of: {{ .Values.appName }}
 spec:
   configuration:
     - type: property

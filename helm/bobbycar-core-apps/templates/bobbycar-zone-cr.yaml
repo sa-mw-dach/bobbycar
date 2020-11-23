@@ -2,7 +2,6 @@ apiVersion: bobbycar.redhat.com/v1alpha1
 kind: BobbycarZone
 metadata:
   name: bobbycar-ffm
-  namespace: bobbycar
 spec:
   name: "Frankfurt Environmental Zone"
   type: "circle"
