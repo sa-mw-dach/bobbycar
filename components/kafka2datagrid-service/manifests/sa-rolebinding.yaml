@@ -8,5 +8,5 @@ subjects:
     namespace: bobbycar
 roleRef:
   apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
+  kind: Role
   name: view-zones

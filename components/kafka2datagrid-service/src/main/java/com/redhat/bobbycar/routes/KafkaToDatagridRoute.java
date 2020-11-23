@@ -73,7 +73,11 @@ public class KafkaToDatagridRoute extends RouteBuilder {
 	private String carsnapshotCacheName;
 	@PropertyInject(value = "com.redhat.bobbycar.camelk.dg.zone.cacheName")
 	private String zonesCacheName;
-	
+	@PropertyInject(value = "com.redhat.bobbycar.camelk.dg.ocp.api")
+	private String ocpAPIHost;
+	@PropertyInject(value = "com.redhat.bobbycar.camelk.dg.namespace")
+	private String namespace;
+
 	private RemoteCacheManager cacheManager;
 	private RemoteCache<String, String> zonesCache;
 	private RemoteCache<String, String> carsCache;
@@ -373,7 +377,7 @@ public class KafkaToDatagridRoute extends RouteBuilder {
 	}
 
 	private void storeAggregatedSnaphotOfCarEventsInCacheRouteJson() {
-		from("kafka:{{com.redhat.bobbycar.camelk.kafka.topic}}?clientId=kafkaToDatagridAggregatorCamelClient&brokers={{com.redhat.bobbycar.camelk.kafka.brokers}}:9092")
+		from("kafka:{{com.redhat.bobbycar.camelk.kafka.topic}}?clientId=kafkaToDatagridAggregatorCamelClient&brokers={{com.redhat.bobbycar.camelk.kafka.brokers}}")
 			.unmarshal().json(JsonLibrary.Jackson, CarEvent.class)
 			.aggregate(simple("true"), new GroupedBodyAggregationStrategy())
 			.completionInterval(aggregationInterval).id("myAggregator")
@@ -403,7 +407,7 @@ public class KafkaToDatagridRoute extends RouteBuilder {
 	}
 	
 	private void storeZonesInCacheRoute() throws IOException {
-		restConfiguration().component("undertow").host("https://api.ocp3.stormshift.coe.muc.redhat.com").port(6443).bindingMode(RestBindingMode.json);
+		restConfiguration().component("undertow").host("https://"+ocpAPIHost).port(6443).bindingMode(RestBindingMode.json);
 		bindToRegistry("sslConfiguration", configureSslForApiAccess());
 		String token = retrieveServiceAccountToken();
 		from("scheduler://foo?delay=60000")
@@ -413,7 +417,7 @@ public class KafkaToDatagridRoute extends RouteBuilder {
 			.setHeader("Authorization").constant("Bearer " + token)
 			.setHeader(Exchange.HTTP_METHOD, constant("GET"))
 			.setHeader("Connection", constant("Keep-Alive"))
-			.to("undertow:https://api.ocp3.stormshift.coe.muc.redhat.com:6443/apis/bobbycar.redhat.com/v1alpha1/namespaces/bobbycar/zones?sslContextParameters=#sslConfiguration&keepAlive=true")
+			.to("undertow:https://" + ocpAPIHost + ":6443/apis/bobbycar.redhat.com/v1alpha1/namespaces/" + namespace + "/zones?sslContextParameters=#sslConfiguration&keepAlive=true")
 			.log("Response was ${body}")
 			.split().jsonpathWriteAsString("$.items")
 			.log("Item is ${body} of type ${body.class}")
@@ -432,7 +436,7 @@ public class KafkaToDatagridRoute extends RouteBuilder {
 		// clear the cars cache before starting the route
 		carsCache.clear();
 
-		from("kafka:{{com.redhat.bobbycar.camelk.kafka.topic}}?clientId=kafkaToDatagridCamelClient&brokers={{com.redhat.bobbycar.camelk.kafka.brokers}}:9092")
+		from("kafka:{{com.redhat.bobbycar.camelk.kafka.topic}}?clientId=kafkaToDatagridCamelClient&brokers={{com.redhat.bobbycar.camelk.kafka.brokers}}")
 			.log("Received ${body} from Kafka")	
 			.setHeader(InfinispanConstants.OPERATION).constant(InfinispanOperation.PUT)
 			.setHeader(InfinispanConstants.KEY).expression(jsonpath("$.carid"))
@@ -528,9 +532,9 @@ public class KafkaToDatagridRoute extends RouteBuilder {
 	        		.saslQop(SaslQop.AUTH)
 	        		.saslMechanism("DIGEST-MD5")
 	        		
-			.ssl()
+			/*.ssl()
 	        	.sniHostName(datagridHost)
-	        	.trustStorePath(PATH_TO_SERVICE_CA)
+	        	.trustStorePath(PATH_TO_SERVICE_CA)*/
         .build();
 	}
 	
@@ -538,7 +542,7 @@ public class KafkaToDatagridRoute extends RouteBuilder {
 		SSLContextParameters params = new SSLContextParameters();
 		params.setCamelContext(getContext());
 		SSLContextClientParameters clientParameters = new SSLContextClientParameters();
-		clientParameters.setSniHostName("api.ocp3.stormshift.coe.muc.redhat.com");
+		clientParameters.setSniHostName(ocpAPIHost);
 		FilterParameters cipherSuitesFilter = new FilterParameters();
 		cipherSuitesFilter.getInclude().add(".*");
 		clientParameters.setCipherSuitesFilter(cipherSuitesFilter);
