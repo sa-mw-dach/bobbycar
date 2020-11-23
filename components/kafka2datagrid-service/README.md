@@ -1,8 +1,12 @@
-# kafka-streaming-service
+# kafka2datagrid service
 
-## Dev
+- Stores BobbycarZone CRs in Datagrid (every 60 seconds)
+- Stores car events from Kafka in Datagrid (GPS data)
+- Stores Zone change detection events in MQTT Broker
 
-`kamel run src/main/java/com/redhat/bobbycar/routes/KafkaToDatagridRoute.java --dev --secret=bobbycar-kafka2datagrid-secret --profile=openshift`
+## Start integration in dev mode
+
+`kamel run src/main/java/com/redhat/bobbycar/routes/KafkaToDatagridRoute.java --dev --name k2dgDEV --secret=bobbycar-kafka2datagrid-secret --profile=openshift`
 
 ## Properties
 
@@ -16,3 +20,5 @@
 - com.redhat.bobbycar.camelk.kafka.topic: bobbycar-gps
 - com.redhat.bobbycar.camelk.mqtt.brokerUrl: tcp://bobbycar-amq-mqtt-all-0-svc:61616
 - com.redhat.bobbycar.camelk.mqtt.topic: bobbycar/zonechange
+- com.redhat.bobbycar.camelk.dg.namespace: bobbycar
+- com.redhat.bobbycar.camelk.dg.ocp.api: api.ocp4.stormshift.coe.muc.redhat.com
