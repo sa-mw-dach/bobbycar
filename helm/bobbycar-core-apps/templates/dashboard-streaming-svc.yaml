@@ -1,10 +1,10 @@
 kind: Service
 apiVersion: v1
 metadata:
-  name: {{ .Values.streamingService.service.name }}
+  name: {{ .Values.dashboardService.service.name }}
   labels:
     camel.apache.org/generation: '1'
-    camel.apache.org/integration: kafka-streaming-service
+    camel.apache.org/integration: dashboard-streaming-service
     camel.apache.org/service.type: user
 spec:
   ports:
@@ -13,6 +13,6 @@ spec:
       port: 80
       targetPort: http
   selector:
-    camel.apache.org/integration: {{ .Values.streamingService.name }}
+    camel.apache.org/integration: {{ .Values.dashboardService.name }}
   type: ClusterIP
   sessionAffinity: None

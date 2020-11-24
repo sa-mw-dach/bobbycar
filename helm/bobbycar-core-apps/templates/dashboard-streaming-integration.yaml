@@ -1,13 +1,13 @@
 apiVersion: camel.apache.org/v1
 kind: Integration
 metadata:
-  name: {{ .Values.streamingService.name }}
+  name: {{ .Values.dashboardService.name }}
   labels:
     app.kubernetes.io/part-of: {{ .Values.appName }}
 spec:
   configuration:
     - type: property
-      value: com.redhat.bobbycar.camelk.kafka.topic={{ .Values.streamingService.topic }}
+      value: com.redhat.bobbycar.camelk.kafka.topic={{ .Values.dashboardService.topic }}
   dependencies:
     - 'camel:undertow'
   sources:
