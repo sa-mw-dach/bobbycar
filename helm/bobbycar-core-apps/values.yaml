@@ -11,10 +11,22 @@ dashboard:
   config:
     googleApiKey: replaceme
     threeScaleApiKey: replaceme
-    cacheEndpoint: http://bobbycar-dg-oschneid-bc.apps.ocp4.stormshift.coe.muc.redhat.com
+    datagridRestService: http://bobbycar-dg-oschneid-bc.apps.ocp4.stormshift.coe.muc.redhat.com
 
 carSimulator:
   name: car-simulator 
+  replicas: 1
+  config:
+    carsimCars: '20'
+    carsimFactor: '3'
+    carsimRepeat: 'true'
+    carsimDelay: '1000'
+    mqttZoneChangeTopic: bobbycar/zonechange
+    mqttMetricsTopic: bobbycar/enginemetrics
+    mqttHost: bobbycar-amq-mqtt-all-0-svc
+    mqttPort: '61616'
+    datagridURL: 'http://bobbycar-dg'
+    kafkaBridgeURL: 'http://bobbycar-bridge-service'
 
 streamingService:
   name: kafka-streaming-service

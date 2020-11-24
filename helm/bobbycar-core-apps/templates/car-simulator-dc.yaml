@@ -1,0 +1,122 @@
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  labels:
+    app: {{ .Values.carSimulator.name }}
+    app.kubernetes.io/part-of: {{ .Values.appName }}
+  name: {{ .Values.carSimulator.name }}
+spec:
+  replicas: {{ .Values.carSimulator.replicas }}
+  revisionHistoryLimit: 10
+  selector:
+    deploymentConfig: {{ .Values.carSimulator.name }}
+  strategy:
+    activeDeadlineSeconds: 21600
+    resources: {}
+    type: Rolling
+    rollingParams:
+      updatePeriodSeconds: 1
+      intervalSeconds: 1
+      timeoutSeconds: 600
+      maxUnavailable: 25%
+      maxSurge: 25%
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: {{ .Values.carSimulator.name }}
+        deploymentConfig: {{ .Values.carSimulator.name }}
+      name: {{ .Values.carSimulator.name }}
+    spec:
+      volumes:
+        - name: config
+          configMap:
+            name: {{ .Values.carSimulator.name }}-config
+            defaultMode: 420
+      containers:
+      - name: {{ .Values.carSimulator.name }}
+        image: {{ .Values.carSimulator.name }}:latest
+        imagePullPolicy: Always
+        volumeMounts:
+            - name: config
+              readOnly: true
+              mountPath: /opt/routes
+        env:
+            - name: com.redhat.bobbycar.carsim.route
+              value: /opt/routes
+            - name: com.redhat.bobbycar.carsim.cars
+              value: {{ .Values.carSimulator.config.carsimCars }}
+            - name: com.redhat.bobbycar.carsim.factor
+              value: {{ .Values.carSimulator.config.carsimFactor }}
+            - name: com.redhat.bobbycar.carsim.repeat
+              value: {{ .Values.carSimulator.config.carsimRepeat }}
+            - name: quarkus.log.level
+              value: INFO
+            - name: com.redhat.bobbycar.carsim.delay
+              value: {{ .Values.carSimulator.config.carsimDelay }}
+            - name: mp.messaging.incoming.zonechange.type
+              value: smallrye-mqtt
+            - name: mp.messaging.incoming.zonechange.topic
+              value: {{ .Values.carSimulator.config.mqttZoneChangeTopic }}
+            - name: mp.messaging.incoming.zonechange.host
+              value: {{ .Values.carSimulator.config.mqttHost }}
+            - name: mp.messaging.incoming.zonechange.port
+              value: {{ .Values.carSimulator.config.mqttPort }}
+            - name: com.redhat.bobbycar.carsim.datagrid.url
+              value: {{ .Values.carSimulator.config.datagridURL }}
+            - name: com.redhat.bobbycar.carsim.kafka.url
+              value: {{ .Values.carSimulator.config.kafkaBridgeURL }}
+            - name: mp.messaging.outgoing.enginemetrics.type
+              value: smallrye-mqtt
+            - name: mp.messaging.outgoing.enginemetrics.topic
+              value: {{ .Values.carSimulator.config.kafkaBridgeURL }}
+            - name: mp.messaging.outgoing.enginemetrics.host
+              value: {{ .Values.carSimulator.config.mqttMetricsTopic }}
+            - name: mp.messaging.outgoing.enginemetrics.port
+              value: {{ .Values.carSimulator.config.mqttPort }}
+        ports:
+          - containerPort: 8080
+            name: http
+            protocol: TCP
+        envFrom:
+          - configMapRef: 
+              name: {{ .Values.carSimulator.name }}-config
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        livenessProbe: 
+          httpGet:   
+            path: /health/live
+            port: 8080
+            scheme: HTTP
+          initialDelaySeconds: 15  
+          timeoutSeconds: 1
+          periodSeconds: 10
+          successThreshold: 1
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /health/ready
+            port: 8080
+            scheme: HTTP
+          initialDelaySeconds: 1
+          timeoutSeconds: 1
+          periodSeconds: 10
+          successThreshold: 1
+          failureThreshold: 3
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+  test: false
+  triggers:
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+          - {{ .Values.carSimulator.name }}
+        from:
+          kind: ImageStreamTag
+          name: '{{ .Values.carSimulator.name }}:latest'
+      type: ImageChange
+    - type: ConfigChange
