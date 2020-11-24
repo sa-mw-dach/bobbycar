@@ -10,5 +10,5 @@ data:
         "BOBBYCAR_API_KEY": "{{ .Values.dashboard.config.threeScaleApiKey }}",
         "SSE_ENDPOINT": "",
         "WS_ENDPOINT": "ws://{{ .Values.streamingService.name }}-{{ .Values.namespace }}.{{ .Values.ocpDomain }}/api/carevents?sendToAll=true",
-        "CACHE_ENDPOINT": "{{ .Values.dashboard.config.cacheEndpoint }}"
+        "CACHE_ENDPOINT": "{{ .Values.dashboard.config.datagridRestService }}"
     }
