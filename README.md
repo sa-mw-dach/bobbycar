@@ -43,7 +43,7 @@ The data is then being used in different data processing flows for visualization
 
 ## Quickstart
 
-If you want to setup Bobbycar in your own environment, please follow the [Quickstart Guide!](https://github.com/sa-mw-dach/bobbycar/tree/master/quickstart)
+If you want to setup Bobbycar in your own environment, please follow the [Helm installation instructions!](https://github.com/sa-mw-dach/bobbycar/tree/master/helm)
 
 ## Screenshots
 
