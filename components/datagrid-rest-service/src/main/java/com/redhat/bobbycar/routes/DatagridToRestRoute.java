@@ -16,7 +16,7 @@ import org.infinispan.client.hotrod.configuration.SaslQop;
 import org.infinispan.commons.marshall.StringMarshaller;
 
 public class DatagridToRestRoute extends RouteBuilder {
-	private static final String PATH_TO_SERVICE_CA = "/var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt";
+	// private static final String PATH_TO_SERVICE_CA = "/var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt";
 	@PropertyInject("com.redhat.bobbycar.camelk.dg.host")
     private String datagridHost;
 	@PropertyInject(value = "com.redhat.bobbycar.camelk.dg.user", defaultValue = "developer")
@@ -84,9 +84,6 @@ public class DatagridToRestRoute extends RouteBuilder {
 	        		.serverName("infinispan")
 	        		.saslQop(SaslQop.AUTH)
 	        		.saslMechanism("DIGEST-MD5")
-			.ssl()
-	        	.sniHostName(datagridHost)
-	        	.trustStorePath(PATH_TO_SERVICE_CA)
         .build();
 	}
 	

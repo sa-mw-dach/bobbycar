@@ -43,37 +43,37 @@ spec:
               mountPath: /opt/routes
         env:
             - name: com.redhat.bobbycar.carsim.route
-              value: /opt/routes
+              value: '/opt/routes'
             - name: com.redhat.bobbycar.carsim.cars
-              value: {{ .Values.carSimulator.config.carsimCars }}
+              value: {{ .Values.carSimulator.config.carsimCars | quote }}
             - name: com.redhat.bobbycar.carsim.factor
-              value: {{ .Values.carSimulator.config.carsimFactor }}
+              value: {{ .Values.carSimulator.config.carsimFactor | quote }}
             - name: com.redhat.bobbycar.carsim.repeat
-              value: {{ .Values.carSimulator.config.carsimRepeat }}
+              value: {{ .Values.carSimulator.config.carsimRepeat | quote }}
             - name: quarkus.log.level
-              value: INFO
+              value: 'INFO'
             - name: com.redhat.bobbycar.carsim.delay
-              value: {{ .Values.carSimulator.config.carsimDelay }}
+              value: {{ .Values.carSimulator.config.carsimDelay | quote }}
             - name: mp.messaging.incoming.zonechange.type
-              value: smallrye-mqtt
+              value: 'smallrye-mqtt'
             - name: mp.messaging.incoming.zonechange.topic
-              value: {{ .Values.carSimulator.config.mqttZoneChangeTopic }}
+              value: {{ .Values.carSimulator.config.mqttZoneChangeTopic | quote }}
             - name: mp.messaging.incoming.zonechange.host
-              value: {{ .Values.carSimulator.config.mqttHost }}
+              value: {{ .Values.carSimulator.config.mqttHost | quote }}
             - name: mp.messaging.incoming.zonechange.port
-              value: {{ .Values.carSimulator.config.mqttPort }}
+              value: {{ .Values.carSimulator.config.mqttPort | quote }}
             - name: com.redhat.bobbycar.carsim.datagrid.url
-              value: {{ .Values.carSimulator.config.datagridURL }}
+              value: 'http://{{ .Values.cacheService.name }}-{{ .Values.namespace }}.{{ .Values.ocpDomain }}'
             - name: com.redhat.bobbycar.carsim.kafka.url
-              value: {{ .Values.carSimulator.config.kafkaBridgeURL }}
+              value: 'http://{{ .Values.carSimulator.config.kafkaBridgeServiceUrl }}'
             - name: mp.messaging.outgoing.enginemetrics.type
-              value: smallrye-mqtt
+              value: 'smallrye-mqtt'
             - name: mp.messaging.outgoing.enginemetrics.topic
-              value: {{ .Values.carSimulator.config.kafkaBridgeURL }}
+              value: {{ .Values.carSimulator.config.mqttMetricsTopic | quote }}
             - name: mp.messaging.outgoing.enginemetrics.host
-              value: {{ .Values.carSimulator.config.mqttMetricsTopic }}
+              value: {{ .Values.carSimulator.config.mqttHost | quote }}
             - name: mp.messaging.outgoing.enginemetrics.port
-              value: {{ .Values.carSimulator.config.mqttPort }}
+              value: {{ .Values.carSimulator.config.mqttPort | quote }}
         ports:
           - containerPort: 8080
             name: http
