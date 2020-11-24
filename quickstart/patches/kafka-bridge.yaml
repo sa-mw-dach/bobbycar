@@ -1,8 +1,0 @@
-kind: Route
-apiVersion: route.openshift.io/v1
-metadata:
-  name: kafka-bridge
-  namespace: $(NS_BOBBYCAR)
-spec:
-  host: kafka-bridge-bobbycar.$(OCP_DOMAIN)
-   

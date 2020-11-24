@@ -1,7 +1,0 @@
-kind: Route
-apiVersion: route.openshift.io/v1
-metadata:
-  name: datagrid
-  namespace: $(NS_BOBBYCAR)
-spec:
-  host: datagrid-bobbycar.$(OCP_DOMAIN)
