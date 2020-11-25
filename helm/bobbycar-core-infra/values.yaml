@@ -62,4 +62,8 @@ kafka:
     gps:
       name: bobbycar-gps
       partitions: 1
-      replicas: 1    
+      replicas: 1
+    metrics:
+      name: bobbycar-metrics
+      partitions: 1
+      replicas: 1      
