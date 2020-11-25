@@ -65,8 +65,8 @@ public class DatagridToRestRoute extends RouteBuilder {
 	private void initRemoteCache(Configuration cacheConfig) {
 		cacheManager = new RemoteCacheManager(cacheConfig);
 		cacheManager.start();
-		zonesCache = cacheManager.administration().getOrCreateCache("zones", "default");
-		carsCache = cacheManager.administration().getOrCreateCache("cars", "default");
+		zonesCache = cacheManager.administration().getOrCreateCache("zones", "org.infinispan.DIST_ASYNC");
+		carsCache = cacheManager.administration().getOrCreateCache("cars", "org.infinispan.DIST_ASYNC");
 		cacheManager.start();
 	}
 	
@@ -75,12 +75,11 @@ public class DatagridToRestRoute extends RouteBuilder {
 		return hotRodBuilder.addServer()
 	        .host(datagridHost).port(11222)
 	        	.marshaller(new StringMarshaller(Charset.defaultCharset()))
-	        .clientIntelligence(ClientIntelligence.BASIC)
+	        .clientIntelligence(ClientIntelligence.HASH_DISTRIBUTION_AWARE)
 	        	.security()
 	        		.authentication().enable()
 	        		.username(datagridUsername)
 	        		.password(datagridPassword)
-	        		.realm("default")
 	        		.serverName("infinispan")
 	        		.saslQop(SaslQop.AUTH)
 	        		.saslMechanism("DIGEST-MD5")
