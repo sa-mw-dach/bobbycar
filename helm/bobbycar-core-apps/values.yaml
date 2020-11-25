@@ -35,6 +35,15 @@ dashboardService:
 cacheService:
   name: cache-service
 
+mqtt2kafka:
+  name: mqtt2kafka  
+  kafka:
+    host: bobbycar-cluster-kafka-brokers:9092
+    topic: bobbycar-metrics
+  mqtt:
+    host: tcp://bobbycar-amq-mqtt-all-0-svc:61616
+    topic: bobbycar/enginemetrics
+
 kafka2datagrid:
   name: kafka-to-datagrid    
   datagrid:
@@ -45,7 +54,7 @@ kafka2datagrid:
     account:   
       host: bobbycar-dg
       user: operator
-      password: JXVQST4G8zbiCtUN
+      password: gItmZ1fLXVIyrujB
   kafka:
     host: bobbycar-cluster-kafka-brokers:9092
     topic: bobbycar-gps
