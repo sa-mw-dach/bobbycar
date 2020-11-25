@@ -1,4 +1,5 @@
 package com.redhat.bobbycar.routes;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -45,6 +46,7 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -54,7 +56,7 @@ public class KafkaToDatagridRoute extends RouteBuilder {
 	private static final String ZONE_PREV_HEADER = "previousZone";
 	private static final String ZONE_NXT_HEADER = "nextZone";
 	private static final String CAR_ID_HEADER = "carid";
-	private static final String CACHE_TEMPLATE = "default";
+	private static final String CACHE_TEMPLATE = "org.infinispan.DIST_ASYNC";
 	private static final String PATH_TO_SERVICE_CA = "/var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt";
 	private static final Logger LOGGER = LoggerFactory.getLogger(KafkaToDatagridRoute.class);
 	@PropertyInject("com.redhat.bobbycar.camelk.dg.host")
@@ -304,6 +306,7 @@ public class KafkaToDatagridRoute extends RouteBuilder {
 		}
 	}
 	
+	@JsonIgnoreProperties(ignoreUnknown = true)
 	public static class ZoneSpec {
 		private String name;
 		private Position position;
@@ -369,8 +372,12 @@ public class KafkaToDatagridRoute extends RouteBuilder {
 		Configuration cacheConfig = createCacheConfig();
 		initRemoteCache(cacheConfig);
 		bindToRegistry("cacheContainerConfiguration", cacheConfig);
+
+		// mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
 		storeZonesInCacheRoute();
 		storeCarEventsInCacheRoute();
+
 		if (aggregationInterval > 0) {
 			storeAggregatedSnaphotOfCarEventsInCacheRouteJson();
 		}
@@ -522,12 +529,11 @@ public class KafkaToDatagridRoute extends RouteBuilder {
 		return hotRodBuilder.addServer()
 	        .host(datagridHost).port(11222)
 	        	.marshaller(new StringMarshaller(Charset.defaultCharset()))
-	        .clientIntelligence(ClientIntelligence.BASIC)
+	        .clientIntelligence(ClientIntelligence.HASH_DISTRIBUTION_AWARE)
 	        	.security()
 	        		.authentication().enable()
 	        		.username(datagridUsername)
 	        		.password(datagridPassword)
-	        		.realm(CACHE_TEMPLATE)
 	        		.serverName("infinispan")
 	        		.saslQop(SaslQop.AUTH)
 	        		.saslMechanism("DIGEST-MD5")
