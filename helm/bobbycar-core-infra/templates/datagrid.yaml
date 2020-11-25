@@ -5,23 +5,20 @@ metadata:
   name: {{ .Values.datagrid.name }}
   namespace: {{ .Values.namespace }}
 spec:
+  replicas: {{ .Values.datagrid.replicas }}
+  service:
+    type: DataGrid
+    container:
+      storage: 2Gi
   container:
-    cpu: ''
-    extraJvmOpts: ''
-    memory: ''
+    cpu: '500m'
+    extraJvmOpts: '-XX:NativeMemoryTracking=summary'
+    memory: 1Gi
   expose: {}
-  image: ''
   logging:
     categories: 
       org.infinispan: info
-  replicas: {{ .Values.datagrid.replicas }}
-  service:
-    container:
-      storage: ''
-    sites:
-      local:
-        expose: {}
-        name: ''
-      locations: null
-    type: Cache
+      org.jgroups: info
+      org.jgroups.protocols.TCP: error
+      org.jgroups.protocols.relay.RELAY2: fatal
 {{- end }}    
