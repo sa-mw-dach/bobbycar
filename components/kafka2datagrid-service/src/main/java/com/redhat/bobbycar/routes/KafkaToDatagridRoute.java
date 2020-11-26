@@ -25,7 +25,6 @@ import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.infinispan.InfinispanConstants;
 import org.apache.camel.component.infinispan.InfinispanOperation;
 import org.apache.camel.model.OnCompletionDefinition;
-import org.apache.camel.model.dataformat.JsonLibrary;
 import org.apache.camel.model.rest.RestBindingMode;
 import org.apache.camel.processor.aggregate.DefaultAggregateController;
 import org.apache.camel.processor.aggregate.GroupedBodyAggregationStrategy;
@@ -46,8 +45,6 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class KafkaToDatagridRoute extends RouteBuilder {
@@ -373,7 +370,7 @@ public class KafkaToDatagridRoute extends RouteBuilder {
 		initRemoteCache(cacheConfig);
 		bindToRegistry("cacheContainerConfiguration", cacheConfig);
 
-		// mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+		///mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
 		storeZonesInCacheRoute();
 		storeCarEventsInCacheRoute();
@@ -385,7 +382,10 @@ public class KafkaToDatagridRoute extends RouteBuilder {
 
 	private void storeAggregatedSnaphotOfCarEventsInCacheRouteJson() {
 		from("kafka:{{com.redhat.bobbycar.camelk.kafka.topic}}?clientId=kafkaToDatagridAggregatorCamelClient&brokers={{com.redhat.bobbycar.camelk.kafka.brokers}}")
-			.unmarshal().json(JsonLibrary.Jackson, CarEvent.class)
+			//.unmarshal().json(JsonLibrary.Jackson, CarEvent.class)
+			.process(ex -> 
+				ex.getIn().setBody(mapper.readValue(ex.getIn().getBody(String.class), CarEvent.class))
+			)
 			.aggregate(simple("true"), new GroupedBodyAggregationStrategy())
 			.completionInterval(aggregationInterval).id("myAggregator")
 			.aggregateController(new DefaultAggregateController())
@@ -444,13 +444,19 @@ public class KafkaToDatagridRoute extends RouteBuilder {
 		carsCache.clear();
 
 		from("kafka:{{com.redhat.bobbycar.camelk.kafka.topic}}?clientId=kafkaToDatagridCamelClient&brokers={{com.redhat.bobbycar.camelk.kafka.brokers}}")
-			.log("Received ${body} from Kafka")	
+			.log("Received ${body} from Kafka")
 			.setHeader(InfinispanConstants.OPERATION).constant(InfinispanOperation.PUT)
 			.setHeader(InfinispanConstants.KEY).expression(jsonpath("$.carid"))
-			.unmarshal().json(JsonLibrary.Jackson, CarEvent.class)
-			.log("Received ${body} from  ${body.class}")	
+			//.unmarshal().json(JsonLibrary.Jackson, CarEvent.class)
+			.process(ex -> 
+				ex.getIn().setBody(mapper.readValue(ex.getIn().getBody(String.class), CarEvent.class))
+			)
+			.log("Received ${body} from  ${body.class}")
 		    .process(this::processZoneData)
-		    .marshal().json(JsonLibrary.Jackson, String.class)
+		    //.marshal().json(JsonLibrary.Jackson, String.class)
+		    .process(ex -> 
+				ex.getIn().setBody(mapper.writeValueAsString(ex.getIn().getBody(CarEvent.class)))
+			)
 		    .setHeader(InfinispanConstants.VALUE).expression(simple("${body}"))
 		    .setHeader(InfinispanConstants.RESULT_HEADER).expression(simple("dummyAvoidOverwritingBody"))
 		    .log("Saving data to cache with key: ${headers[CamelInfinispanKey]} and value: ${body} of type  ${body.class}")
@@ -458,7 +464,10 @@ public class KafkaToDatagridRoute extends RouteBuilder {
 			.choice()
 				.when(header(ZONE_CHANGE_HEADER).isEqualTo(true))
 				.process(this::transformToZoneChangeEvent)
-				.marshal().json(JsonLibrary.Jackson, String.class)
+				//.marshal().json(JsonLibrary.Jackson, String.class)
+				.process(ex -> 
+					ex.getIn().setBody(mapper.writeValueAsString(ex.getIn().getBody(CarEvent.class)))
+				)
 				.log("Publishing ${body} to mqtt")
 				.to("paho:{{com.redhat.bobbycar.camelk.mqtt.topic}}?brokerUrl={{com.redhat.bobbycar.camelk.mqtt.brokerUrl}}")
 			;

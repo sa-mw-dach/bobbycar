@@ -6,7 +6,7 @@
 
 ## Start integration in dev mode
 
-`kamel run src/main/java/com/redhat/bobbycar/routes/KafkaToDatagridRoute.java --dev --name k2dgDEV --secret=bobbycar-kafka2datagrid-secret --profile=openshift`
+`kamel run src/main/java/com/redhat/bobbycar/routes/KafkaToDatagridRoute.java --dev --name k2dgDEV --secret=kafka2datagrid-secret --profile=openshift`
 
 ## Properties
 
