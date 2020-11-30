@@ -12,7 +12,7 @@ spec:
     listKind: BobbycarZoneList
     shortNames: 
     - bz
-  scope: Cluster
+  scope: Namespaced
   conversion:
     strategy: None
   preserveUnknownFields: true
