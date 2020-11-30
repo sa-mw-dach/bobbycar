@@ -1,16 +1,17 @@
+---
 apiVersion: build.openshift.io/v1
 kind: BuildConfig
 metadata:
   labels:
     app: {{ .Values.carSimulator.name }}
-  name: {{ .Values.carSimulator.name }}
+  name: {{ .Values.carSimulator.name }}-native
 spec:
   failedBuildsHistoryLimit: 5
   nodeSelector: {}
   output:
     to:
       kind: ImageStreamTag
-      name: {{ .Values.carSimulator.name }}:latest
+      name: {{ .Values.carSimulator.name }}:latest-native
   postCommit: {}
   runPolicy: Serial
   source:
@@ -32,3 +33,41 @@ spec:
   - type: ImageChange
 status: 
   lastVersion: 0
+---
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata:
+  labels:
+    app: {{ .Values.carSimulator.name }}
+  name: {{ .Values.carSimulator.name }}
+spec:
+  nodeSelector: {}
+  output:
+    to:
+      kind: ImageStreamTag
+      name: {{ .Values.carSimulator.name }}:latest
+  resources: {}
+  successfulBuildsHistoryLimit: 5
+  failedBuildsHistoryLimit: 5
+  strategy:
+    type: Source
+    sourceStrategy:
+      from:
+        kind: ImageStreamTag
+        namespace: openshift
+        name: 'java:11'
+      env:
+        - name: ARTIFACT_COPY_ARGS
+          value: '-p -r lib/ *-runner.jar'
+      forcePull: true
+  postCommit: {}
+  source:
+    type: Git
+    git:
+      uri: 'https://github.com/sa-mw-dach/bobbycar.git'
+      ref: master
+    contextDir: components/car-simulator
+  triggers:
+    - type: ConfigChange
+    - type: ImageChange
+  runPolicy: Serial
