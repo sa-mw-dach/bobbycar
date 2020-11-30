@@ -424,7 +424,7 @@ public class KafkaToDatagridRoute extends RouteBuilder {
 			.setHeader("Authorization").constant("Bearer " + token)
 			.setHeader(Exchange.HTTP_METHOD, constant("GET"))
 			.setHeader("Connection", constant("Keep-Alive"))
-			.to("undertow:https://" + ocpAPIHost + ":6443/apis/bobbycar.redhat.com/v1alpha1/namespaces/" + namespace + "/zones?sslContextParameters=#sslConfiguration&keepAlive=true")
+			.to("undertow:https://" + ocpAPIHost + ":6443/apis/bobbycar.redhat.com/v1alpha1/namespaces/" + namespace + "/bobbycarzones?sslContextParameters=#sslConfiguration&keepAlive=true")
 			.log("Response was ${body}")
 			.split().jsonpathWriteAsString("$.items")
 			.log("Item is ${body} of type ${body.class}")
