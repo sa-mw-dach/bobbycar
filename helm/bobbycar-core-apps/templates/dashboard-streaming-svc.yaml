@@ -4,7 +4,7 @@ metadata:
   name: {{ .Values.dashboardService.service.name }}
   labels:
     camel.apache.org/generation: '1'
-    camel.apache.org/integration: dashboard-streaming-service
+    camel.apache.org/integration: {{ .Values.dashboardService.name }}
     camel.apache.org/service.type: user
 spec:
   ports:

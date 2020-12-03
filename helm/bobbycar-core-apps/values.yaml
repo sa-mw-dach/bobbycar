@@ -28,7 +28,10 @@ carSimulator:
 
 dashboardService:
   name: dashboard-streaming-service
-  topic: bobbycar-gps
+  kafka:
+    host: bobbycar-cluster-kafka-brokers:9092
+    topicGps: bobbycar-gps
+    topicMetrics: bobbycar-metrics
   service:
     name: dashboard-streaming-service
 
