@@ -10,7 +10,8 @@ export class ConfigService {
     GOOGLE_API_KEY;
     BOBBYCAR_API_KEY;
     SSE_ENDPOINT;
-    WS_ENDPOINT;
+    CAR_EVENTS_ENDPOINT;
+    CAR_METRICS_ENDPOINT;
     CACHE_ENDPOINT;
 
     constructor(public http: HttpClient) {}
@@ -25,7 +26,8 @@ export class ConfigService {
         this.GOOGLE_API_KEY = data.GOOGLE_API_KEY;
         this.BOBBYCAR_API_KEY = data.BOBBYCAR_API_KEY;
         this.SSE_ENDPOINT = data.SSE_ENDPOINT;
-        this.WS_ENDPOINT = data.WS_ENDPOINT;
+        this.CAR_EVENTS_ENDPOINT = data.CAR_EVENTS_ENDPOINT;
+        this.CAR_METRICS_ENDPOINT = data.CAR_METRICS_ENDPOINT;
         this.CACHE_ENDPOINT = data.CACHE_ENDPOINT;
     }
 

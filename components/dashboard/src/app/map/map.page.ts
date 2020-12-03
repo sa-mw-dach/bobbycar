@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Platform } from '@ionic/angular';
 import { Router } from '@angular/router';
 import { ConfigService } from '../providers/config.service';
-import { WSService } from '../providers/ws.service';
+import { CarEventsService } from '../providers/ws.service';
 import { CacheService } from '../providers/cache.service';
 
 @Component({
@@ -23,7 +23,7 @@ export class MapPage implements OnInit {
 
     constructor(
         private platform: Platform,
-        private socketService: WSService,
+        private carEventsService: CarEventsService,
         private cacheService: CacheService,
         private router: Router
         ) {}
@@ -198,13 +198,13 @@ export class MapPage implements OnInit {
 
     ionViewWillLeave(){
         console.debug('ionViewWillLeave()');
-        this.socketService.close();
+        this.carEventsService.close();
     }
 
     async ngOnInit() {
 
         this.initializeMap();
-        this.socketService.connect();
+        this.carEventsService.connect();
 
         this.cacheService.getZones()
         .subscribe((data) => {
@@ -234,13 +234,36 @@ export class MapPage implements OnInit {
             });
         });
 
-        this.socketService.getMessages().subscribe(
+        this.carEventsService.getMessages().subscribe(
             msg => {
                 this.createOrUpdateMarker(msg);
             }, // Called whenever there is a message from the server.
             err => console.error(err), // Called if at any point WebSocket API signals some kind of error.
             () => console.log('complete') // Called when connection is closed (for whatever reason).
         );
+
+        if(!navigator.geolocation) {
+            console.log('Geolocation is not supported by your browser');
+          } else {
+              const options = {
+                enableHighAccuracy: true,
+                maximumAge: 30000,
+                timeout: 27000
+              };
+
+            navigator.geolocation.getCurrentPosition(position => {
+                const pos = {
+                lat: position.coords.latitude,
+                lng: position.coords.longitude,
+                }
+                console.log(pos);
+                const marker = new google.maps.Marker({
+                    position: new google.maps.LatLng({ lat: pos.lat, lng: pos.lng }),
+                    label: 'THATs ME',
+                    map: this.map
+                });
+            }, null, options);
+        }
 
     }
 

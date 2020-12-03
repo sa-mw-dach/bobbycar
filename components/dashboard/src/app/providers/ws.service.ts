@@ -7,14 +7,14 @@ import { Observable } from 'rxjs';
 @Injectable({
   providedIn: 'root'
 })
-export class WSService {
+export class CarEventsService {
 
   private socket$: WebSocketSubject<any>;
-  private WS_ENDPOINT: string;
+  private CAR_EVENTS_ENDPOINT: string;
 
   constructor(private configService: ConfigService) {
     console.debug('new WSService()');
-    this.WS_ENDPOINT = configService.WS_ENDPOINT;
+    this.CAR_EVENTS_ENDPOINT = configService.CAR_EVENTS_ENDPOINT;
   }
 
   public connect(): void {
@@ -24,7 +24,7 @@ export class WSService {
   }
 
   private getNewWebSocket(): WebSocketSubject<any> {
-    return webSocket(this.WS_ENDPOINT+'?user_key='+this.configService.BOBBYCAR_API_KEY);
+    return webSocket(this.CAR_EVENTS_ENDPOINT+'?user_key='+this.configService.BOBBYCAR_API_KEY);
   }
 
   getMessages(): Observable<any> {
