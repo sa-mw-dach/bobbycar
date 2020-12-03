@@ -2,9 +2,7 @@
   <ion-toolbar>
     <ion-title>Bobbycar - Car Detail</ion-title>
   </ion-toolbar>
-  <ion-toolbar>
-    
-  </ion-toolbar>
+  <ion-toolbar></ion-toolbar>
 </ion-header>
 
 <ion-content padding color="light">
@@ -17,12 +15,22 @@
       <div id="pano"></div>
     </div>
     <div class="instruments" *ngIf="showHUD">
-      <img src="./assets/rh-logo.png" alt="" width="150px"/><br/>
-      {{streetName}}
+      <ion-list>
+        <ion-item>Car ID: <span class="metricDisplayGrey"> {{ carMetric.driverId }} </span></ion-item>
+        <ion-item>Manufacturer: <span class="metricDisplayGrey"> {{ carMetric.manufacturer }} </span></ion-item>
+        <ion-item> Model: <span class="metricDisplayGrey"> {{ carMetric.model }} </span></ion-item>
+        <ion-item> Speed: <span class="metricDisplayGreen"> {{ carMetric.speed }} </span></ion-item>
+        <ion-item> RPM: <span class="metricDisplayGreen"> {{ carMetric.rpm }} </span></ion-item>
+        <ion-item> l/100km: <span class="metricDisplayGreen"> {{ carMetric.fuel }} </span></ion-item>
+        <ion-item> CO2: <span class="metricDisplayGreen"> {{ carMetric.co2 }} </span></ion-item>
+        <ion-item> Gear: <span class="metricDisplayGreen"> {{ carMetric.gear }} </span></ion-item>
+        <ion-item> Street: <span class="metricDisplayGrey"> {{streetName}} </span></ion-item>
+      </ion-list>      
     </div>
     <ion-button class="menu" (click)="toggleHUD()">
       HUD
     </ion-button>
+    <!--<div id="chartdiv" style="width: 20%; height: 200px; top: 17%; left: 32%; position: absolute;"></div>-->
  </div>
 
   
