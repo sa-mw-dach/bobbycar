@@ -8,6 +8,7 @@ import javax.inject.Inject;
 
 import org.eclipse.microprofile.reactive.messaging.Incoming;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import com.redhat.bobbycar.carsim.DatagridTestResource;
@@ -23,6 +24,7 @@ import io.quarkus.test.junit.TestProfile;
 @TestProfile(DefaultTestProfile.class)
 @QuarkusTestResource(DatagridTestResource.class)
 @QuarkusTestResource(KafkaTestResource.class)
+@Disabled
 class CarMetricsEventPublisherTest {
 	private static final String ID = "de9bcc2e-b623-4b19-a2f9-a1bc8e81b45e";
 	@Inject
