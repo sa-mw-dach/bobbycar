@@ -7,6 +7,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 import org.eclipse.microprofile.reactive.messaging.Outgoing;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import com.redhat.bobbycar.carsim.DatagridTestResource;
@@ -23,6 +24,7 @@ import io.smallrye.mutiny.Multi;
 @TestProfile(DefaultTestProfile.class)
 @QuarkusTestResource(DatagridTestResource.class)
 @QuarkusTestResource(KafkaTestResource.class)
+@Disabled
 class ZoneChangeConsumerTest {
 
 	static final int EVENT_FREQUENCY_SECONDS = 1;
