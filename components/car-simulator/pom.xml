@@ -166,7 +166,7 @@
       <url>${repos.release.url}</url> 
     </repository> 
     <snapshotRepository>
-      <id>repo-release</id> 
+      <id>repo-snapshot</id> 
       <url>${repos.snapshot.url}</url> 
     </snapshotRepository>
   </distributionManagement> 
