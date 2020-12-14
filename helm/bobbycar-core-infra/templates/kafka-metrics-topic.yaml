@@ -5,7 +5,7 @@ metadata:
   name: {{ .Values.kafka.topic.metrics.name }}
   namespace: {{ .Values.namespace }}
   labels:
-    strimzi.io/cluster: bobbycar-cluster
+    strimzi.io/cluster: {{ .Values.kafka.cluster.name }}
 spec:
   partitions: {{ .Values.kafka.topic.metrics.partitions }}
   replicas: {{ .Values.kafka.topic.metrics.replicas }}
