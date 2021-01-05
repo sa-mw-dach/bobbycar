@@ -2,7 +2,9 @@ import { Component, OnInit, NgZone } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { CarEventsService } from '../providers/ws.service';
 import { CarMetricsService } from '../providers/carmetrics.service';
+import { ZoneChangeService } from '../providers/zonechange.service';
 import { CacheService } from '../providers/cache.service';
+import { ToastController } from '@ionic/angular';
 
 import * as am4core from "@amcharts/amcharts4/core";
 import * as am4charts from "@amcharts/amcharts4/charts";
@@ -32,7 +34,9 @@ export class CarDetailPage implements OnInit {
     private carEventsService: CarEventsService,
     private carMetricsService: CarMetricsService,
     private cacheService: CacheService,
+    private zoneChangeService: ZoneChangeService,
     private route: ActivatedRoute,
+    public toastController: ToastController,
     private zone: NgZone
     ) {}
 
@@ -75,10 +79,21 @@ export class CarDetailPage implements OnInit {
     }
   }
 
+  async presentToast() {
+    const toast = await this.toastController.create({
+      message: 'ZONE CHANGE EVENT: Applying new zone configuration.',
+      duration: 4000,
+      color: 'danger',
+      position: 'top'
+    });
+    toast.present();
+  }
 
   ionViewWillLeave(){
     console.debug('ionViewWillLeave()');
     this.carEventsService.close();
+    this.carMetricsService.close();
+    this.zoneChangeService.close();
   }
 
   createOrUpdateMarker(data){
@@ -111,6 +126,7 @@ export class CarDetailPage implements OnInit {
     this.initializeMap();
     this.carEventsService.connect();
     this.carMetricsService.connect();
+    this.zoneChangeService.connect();
 
     this.cacheService.getZones()
         .subscribe((data) => {
@@ -152,6 +168,15 @@ export class CarDetailPage implements OnInit {
             this.carMetric.rpm = msg.engineData.rpm;
             this.carMetric.speed = msg.engineData.speedInKmh;
           }
+      }, // Called whenever there is a message from the server.
+      err => console.error(err), // Called if at any point WebSocket API signals some kind of error.
+      () => console.log('complete') // Called when connection is closed (for whatever reason).
+    );
+
+    this.zoneChangeService.getMessages().subscribe(
+      msg => {
+          console.log('ZONE CHANGE EVENT' + msg);
+          this.presentToast();
       }, // Called whenever there is a message from the server.
       err => console.error(err), // Called if at any point WebSocket API signals some kind of error.
       () => console.log('complete') // Called when connection is closed (for whatever reason).
