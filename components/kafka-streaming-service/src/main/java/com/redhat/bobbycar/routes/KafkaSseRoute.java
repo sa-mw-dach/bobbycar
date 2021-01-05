@@ -19,6 +19,13 @@ public class KafkaSseRoute extends RouteBuilder {
 			.to("undertow:ws://0.0.0.0:8080/api/carmetrics?sendToAll=true");
 		from("undertow:ws://0.0.0.0:8080/api/carmetrics?sendToAll=true")
 			.log("Message received from Websocket : ${body}");
+
+		// expose Bobbycar zone change events from Kafka as Websocket
+		from("kafka:{{com.redhat.bobbycar.camelk.kafka.topic.zonechange}}?clientId=kafkaSseZoneChangeClient&brokers={{com.redhat.bobbycar.camelk.kafka.brokers}}")
+				.log("Zone change event received from Kafka : ${body}")
+				.to("undertow:ws://0.0.0.0:8080/api/zonechange?sendToAll=true");
+		from("undertow:ws://0.0.0.0:8080/api/zonechange?sendToAll=true&")
+				.log("Message received from Websocket : ${body}");
 		
 	}
 	
