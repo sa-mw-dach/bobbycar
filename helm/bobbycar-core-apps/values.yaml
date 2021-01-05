@@ -4,7 +4,7 @@
 
 namespace: bobbycar
 appName: Bobbycar
-ocpDomain: apps.ocp4.stormshift.coe.muc.redhat.com
+ocpDomain: apps.ocp3.stormshift.coe.muc.redhat.com
 
 dashboard:
   name: dashboard
@@ -24,7 +24,7 @@ carSimulator:
     mqttMetricsTopic: bobbycar/enginemetrics
     mqttHost: bobbycar-amq-mqtt-all-0-svc
     mqttPort: 61616
-    kafkaBridgeServiceUrl: bobbycar-oschneid-bc.apps.ocp4.stormshift.coe.muc.redhat.com
+    kafkaBridgeServiceUrl: bobbycar-oschneid-bc.apps.ocp3.stormshift.coe.muc.redhat.com
 
 dashboardService:
   name: dashboard-streaming-service
@@ -32,6 +32,7 @@ dashboardService:
     host: bobbycar-cluster-kafka-brokers:9092
     topicGps: bobbycar-gps
     topicMetrics: bobbycar-metrics
+    topicZoneChange: bobbycar-zonechange
   service:
     name: dashboard-streaming-service
 
@@ -43,9 +44,11 @@ mqtt2kafka:
   kafka:
     host: bobbycar-cluster-kafka-brokers:9092
     topic: bobbycar-metrics
+    topicZoneChange: bobbycar-zonechange
   mqtt:
     host: tcp://bobbycar-amq-mqtt-all-0-svc:61616
     topic: bobbycar/enginemetrics
+    topicZoneChange: bobbycar/zonechange
 
 kafka2datagrid:
   name: kafka-to-datagrid    
@@ -57,7 +60,7 @@ kafka2datagrid:
     account:   
       host: bobbycar-dg
       user: operator
-      password: gItmZ1fLXVIyrujB
+      password: cRpOMlpv6iyqlaFm
   kafka:
     host: bobbycar-cluster-kafka-brokers:9092
     topic: bobbycar-gps
@@ -65,4 +68,4 @@ kafka2datagrid:
     host: tcp://bobbycar-amq-mqtt-all-0-svc:61616
     topic: bobbycar/zonechange
   ocp:
-    api: api.ocp4.stormshift.coe.muc.redhat.com     
+    api: api.ocp3.stormshift.coe.muc.redhat.com
