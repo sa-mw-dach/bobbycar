@@ -5,6 +5,7 @@ import { CarMetricsService } from '../providers/carmetrics.service';
 import { ZoneChangeService } from '../providers/zonechange.service';
 import { CacheService } from '../providers/cache.service';
 import { ToastController } from '@ionic/angular';
+import { map, tap, delay, retryWhen, delayWhen } from 'rxjs/operators';
 
 import * as am4core from "@amcharts/amcharts4/core";
 import * as am4charts from "@amcharts/amcharts4/charts";
@@ -23,7 +24,7 @@ export class CarDetailPage implements OnInit {
   map: google.maps.Map;
   initialPosition = { lat: 50.1146997, lng: 8.6185411 };
   carId = '';
-  carMetric = { driverId: '', manufacturer: '', model: '', co2: '', fuel: '', gear: '', rpm: '', speed: '' };
+  carMetric = { driverId: '', manufacturer: '', model: '', co2: '', fuel: '', gear: '', rpm: '', speed: '', zone: 'Default Zone' };
   marker: google.maps.Marker;
   panorama: google.maps.StreetViewPanorama;
   sv = new google.maps.StreetViewService();
@@ -48,7 +49,7 @@ export class CarDetailPage implements OnInit {
             center: this.initialPosition,
             zoom: 13,
             disableDefaultUI: true,
-            mapTypeControl: true,
+            mapTypeControl: false,
         });
 
         this.marker = new google.maps.Marker({
@@ -148,7 +149,7 @@ export class CarDetailPage implements OnInit {
             }
         });
 
-    this.carEventsService.getMessages().subscribe(
+    this.carEventsService.getMessages().pipe(retryWhen((errors) => errors.pipe(delay(1_000)))).subscribe(
       msg => {
           this.createOrUpdateMarker(msg);
       }, // Called whenever there is a message from the server.
@@ -156,7 +157,7 @@ export class CarDetailPage implements OnInit {
       () => console.log('complete') // Called when connection is closed (for whatever reason).
     );
 
-    this.carMetricsService.getMessages().subscribe(
+    this.carMetricsService.getMessages().pipe(retryWhen((errors) => errors.pipe(delay(1_000)))).subscribe(
       msg => {
           if(msg.driverId === this.carId){
             this.carMetric.driverId = msg.driverId;
@@ -173,11 +174,15 @@ export class CarDetailPage implements OnInit {
       () => console.log('complete') // Called when connection is closed (for whatever reason).
     );
 
-    this.zoneChangeService.getMessages().subscribe(
+    this.zoneChangeService.getMessages().pipe(retryWhen((errors) => errors.pipe(delay(1_000)))).subscribe(
       msg => {
-          console.log('ZONE CHANGE EVENT' + msg);
           if(msg.carId === this.carId){
             this.presentToast();
+            if(msg.nextZoneId !== null){
+                this.carMetric.zone = msg.nextZoneId;
+            } else {
+                this.carMetric.zone = 'Default Zone';
+            }
           }
       }, // Called whenever there is a message from the server.
       err => console.error(err), // Called if at any point WebSocket API signals some kind of error.

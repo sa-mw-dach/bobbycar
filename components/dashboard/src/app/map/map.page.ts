@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { ConfigService } from '../providers/config.service';
 import { CarEventsService } from '../providers/ws.service';
 import { CacheService } from '../providers/cache.service';
+import { map, tap, delay, retryWhen, delayWhen } from 'rxjs/operators';
 
 @Component({
     selector: 'app-map',
@@ -206,8 +207,7 @@ export class MapPage implements OnInit {
         this.initializeMap();
         this.carEventsService.connect();
 
-        this.cacheService.getZones()
-        .subscribe((data) => {
+        this.cacheService.getZones().subscribe((data) => {
             if(this.map){
                 data.forEach(element => {
                     const zone = new google.maps.Circle({
@@ -226,15 +226,14 @@ export class MapPage implements OnInit {
             }
         });
 
-        this.cacheService.getCars()
-        .subscribe((data) => {
+        this.cacheService.getCars().subscribe((data) => {
             console.log(data);
             data.forEach(element => {
                 this.createOrUpdateMarker(element);
             });
         });
 
-        this.carEventsService.getMessages().subscribe(
+        this.carEventsService.getMessages().pipe(retryWhen((errors) => errors.pipe(delay(1_000)))).subscribe(
             msg => {
                 this.createOrUpdateMarker(msg);
             }, // Called whenever there is a message from the server.
