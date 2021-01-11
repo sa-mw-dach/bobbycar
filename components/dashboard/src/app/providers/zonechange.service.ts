@@ -13,7 +13,7 @@ export class ZoneChangeService {
   private CAR_ZONECHANGE_ENDPOINT: string;
 
   constructor(private configService: ConfigService) {
-    console.debug('new WSService()');
+    console.debug('new ZoneChangeService()');
     this.CAR_ZONECHANGE_ENDPOINT = configService.CAR_ZONECHANGE_ENDPOINT;
   }
 
