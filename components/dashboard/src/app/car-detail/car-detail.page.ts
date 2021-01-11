@@ -71,7 +71,7 @@ export class CarDetailPage implements OnInit {
     }, 10);
   }
 
-  toggleHUD() {
+  toggleHUD(){
     if(this.showHUD) {
       this.showHUD = false;
     } else {
@@ -176,7 +176,9 @@ export class CarDetailPage implements OnInit {
     this.zoneChangeService.getMessages().subscribe(
       msg => {
           console.log('ZONE CHANGE EVENT' + msg);
-          this.presentToast();
+          if(msg.carId === this.carId){
+            this.presentToast();
+          }
       }, // Called whenever there is a message from the server.
       err => console.error(err), // Called if at any point WebSocket API signals some kind of error.
       () => console.log('complete') // Called when connection is closed (for whatever reason).
