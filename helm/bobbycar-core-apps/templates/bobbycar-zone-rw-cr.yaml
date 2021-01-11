@@ -1,12 +1,12 @@
 apiVersion: bobbycar.redhat.com/v1alpha1
 kind: BobbycarZone
 metadata:
-  name: bobbycar-ffm-railway
+  name: de-ffm-airport
 spec:
-  name: "Frankfurt Railway Station Zone"
+  name: "Frankfurt Airport"
   type: "circle"
-  priority: 20
+  priority: 500
   position:
-    lat: 50.1054641
-    lng: 8.6620329
-  radius: 500  
+    lat: 50.02698418863608
+    lng: 8.49455049723824
+  radius: 1000
