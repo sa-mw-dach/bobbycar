@@ -2,10 +2,10 @@
 apiVersion: operators.coreos.com/v1alpha1
 kind: Subscription
 metadata:
-  name: {{ .Values.strimziOperator.name }}
+  name: amq-streams
   namespace: {{ .Values.namespace }}
 spec:
-  channel: stable
+  channel: {{ .Values.strimziOperator.channel }}
   installPlanApproval: {{ .Values.strimziOperator.installPlanApproval }}
   name: amq-streams
   source: redhat-operators

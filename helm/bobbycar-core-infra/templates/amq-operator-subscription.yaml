@@ -2,10 +2,10 @@
 apiVersion: operators.coreos.com/v1alpha1
 kind: Subscription
 metadata:
-  name: {{ .Values.amqOperator.name }}
+  name: amq-broker
   namespace: {{ .Values.namespace }}
 spec:
-  channel: current
+  channel: {{ .Values.amqOperator.channel }}
   installPlanApproval: {{ .Values.amqOperator.installPlanApproval }}
   name: amq-broker
   source: redhat-operators
