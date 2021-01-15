@@ -2,11 +2,11 @@
 apiVersion: kafka.strimzi.io/v1alpha1
 kind: KafkaBridge
 metadata:
-  name: {{ .Values.kafka.bridge.name }}
+  name: bobbycar
   namespace: {{ .Values.namespace }}
 spec:
   replicas: {{ .Values.kafka.bridge.replicas }}
-  bootstrapServers: {{ .Values.kafka.bridge.bootstrapServers }}
+  bootstrapServers: bobbycar-cluster-kafka-bootstrap:9092
   http:
     port: {{ .Values.kafka.bridge.port }}
 {{- end }}  

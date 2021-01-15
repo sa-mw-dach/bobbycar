@@ -2,19 +2,20 @@
 apiVersion: infinispan.org/v1
 kind: Infinispan
 metadata:
-  name: {{ .Values.datagrid.name }}
+  name: bobbycar-dg
   namespace: {{ .Values.namespace }}
 spec:
   replicas: {{ .Values.datagrid.replicas }}
   service:
-    type: DataGrid
+    type: {{ .Values.datagrid.type }}
     container:
       storage: 2Gi
   container:
-    cpu: '500m'
+    cpu: {{ .Values.datagrid.cpu }}
     extraJvmOpts: '-XX:NativeMemoryTracking=summary'
-    memory: 1Gi
-  expose: {}
+    memory: {{ .Values.datagrid.memory }}
+  expose:
+    type: Route
   logging:
     categories: 
       org.infinispan: info

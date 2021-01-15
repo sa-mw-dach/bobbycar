@@ -2,10 +2,10 @@
 apiVersion: operators.coreos.com/v1alpha1
 kind: Subscription
 metadata:
-  name: {{ .Values.datagridOperator.name }}
+  name: datagrid
   namespace: {{ .Values.namespace }}
 spec:
-  channel: 8.0.x
+  channel: {{ .Values.datagridOperator.channel }}
   installPlanApproval: {{ .Values.datagridOperator.installPlanApproval }}
   name: datagrid
   source: redhat-operators
