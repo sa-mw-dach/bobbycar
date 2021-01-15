@@ -2,8 +2,8 @@ apiVersion: build.openshift.io/v1
 kind: BuildConfig
 metadata:
   labels:
-    app: {{ .Values.dashboard.name }}
-  name: {{ .Values.dashboard.name }}
+    app: dashboard
+  name: dashboard
   namespace: {{ .Values.namespace }}
 spec:
   failedBuildsHistoryLimit: 5

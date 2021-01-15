@@ -1,11 +1,11 @@
 apiVersion: camel.apache.org/v1
 kind: Integration
 metadata:
-  name: {{ .Values.mqtt2kafka.name }}
+  name: mqtt2kafka
 spec:
   configuration:
     - type: secret
-      value: {{ .Values.mqtt2kafka.name }}-secret
+      value: mqtt2kafka-secret
   profile: OpenShift
   sources:
     - content: {{`"package com.redhat.bobbycar.routes;\n\nimport java.nio.charset.Charset;\nimport java.util.stream.Collectors;\n\nimport org.apache.camel.PropertyInject;\nimport org.apache.camel.builder.RouteBuilder;\n\npublic class MqttToKafka extends RouteBuilder {\n\t\n\t@Override\n\tpublic void configure() throws Exception {\n\n\t\tfrom(\"paho:{{com.redhat.bobbycar.camelk.mqtt.topic}}?brokerUrl={{com.redhat.bobbycar.camelk.mqtt.brokerUrl}}\")\n\t\t\t.log(\"Publishing engine metric ${body} to Kafka\")\n\t\t.to(\"kafka:{{com.redhat.bobbycar.camelk.kafka.topic}}?clientId=mqtt2kafkaClientEM&brokers={{com.redhat.bobbycar.camelk.kafka.brokers}}\");\n\n\t\tfrom(\"paho:{{com.redhat.bobbycar.camelk.mqtt.topicZoneChange}}?brokerUrl={{com.redhat.bobbycar.camelk.mqtt.brokerUrl}}\")\n\t\t\t.log(\"Publishing zone change ${body} to Kafka\")\n\t\t.to(\"kafka:{{com.redhat.bobbycar.camelk.kafka.topicZoneChange}}?clientId=mqtt2kafkaClientZC&brokers={{com.redhat.bobbycar.camelk.kafka.brokers}}\");\n\t\n\t}\t\n\t\n}\n"`}}

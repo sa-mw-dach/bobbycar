@@ -2,8 +2,8 @@ apiVersion: image.openshift.io/v1
 kind: ImageStream
 metadata:
   labels:
-    app: {{ .Values.dashboard.name }}
-  name: {{ .Values.dashboard.name }}
+    app: dashboard
+  name: dashboard
   namespace: {{ .Values.namespace }}
 spec:
   lookupPolicy:

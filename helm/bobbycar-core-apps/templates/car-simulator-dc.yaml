@@ -57,23 +57,23 @@ spec:
             - name: mp.messaging.incoming.zonechange.type
               value: 'smallrye-mqtt'
             - name: mp.messaging.incoming.zonechange.topic
-              value: {{ .Values.carSimulator.config.mqttZoneChangeTopic | quote }}
+              value: {{ .Values.mqtt.topic.mqttZoneChangeTopic | quote }}
             - name: mp.messaging.incoming.zonechange.host
-              value: {{ .Values.carSimulator.config.mqttHost | quote }}
+              value: 'bobbycar-amq-mqtt-all-0-svc'
             - name: mp.messaging.incoming.zonechange.port
-              value: {{ .Values.carSimulator.config.mqttPort | quote }}
+              value: '61616'
             - name: com.redhat.bobbycar.carsim.datagrid.url
-              value: 'http://{{ .Values.cacheService.name }}-{{ .Values.namespace }}.{{ .Values.ocpDomain }}'
+              value: 'http://cache-service-{{ .Values.namespace }}.{{ .Values.ocpDomain }}'
             - name: com.redhat.bobbycar.carsim.kafka.url
-              value: 'http://{{ .Values.carSimulator.config.kafkaBridgeServiceUrl }}'
+              value: 'http://bobbycar-{{ .Values.namespace }}.{{ .Values.ocpDomain }}'
             - name: mp.messaging.outgoing.enginemetrics.type
               value: 'smallrye-mqtt'
             - name: mp.messaging.outgoing.enginemetrics.topic
-              value: {{ .Values.carSimulator.config.mqttMetricsTopic | quote }}
+              value: {{ .Values.mqtt.topic.mqttMetricsTopic | quote }}
             - name: mp.messaging.outgoing.enginemetrics.host
-              value: {{ .Values.carSimulator.config.mqttHost | quote }}
+              value: 'bobbycar-amq-mqtt-all-0-svc'
             - name: mp.messaging.outgoing.enginemetrics.port
-              value: {{ .Values.carSimulator.config.mqttPort | quote }}
+              value: '61616'
         ports:
           - containerPort: 8080
             name: http

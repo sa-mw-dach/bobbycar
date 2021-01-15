@@ -2,14 +2,34 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-namespace: bobbycar
+namespace: bc
 appName: Bobbycar
-ocpDomain: apps.ocp3.stormshift.coe.muc.redhat.com
+ocpDomain: apps.ocp4.stormshift.coe.muc.redhat.com
+ocpApi: api.ocp4.stormshift.coe.muc.redhat.com
+
+mqtt:
+  topic:
+    mqttZoneChangeTopic: bobbycar/zonechange
+    mqttMetricsTopic: bobbycar/enginemetrics
+
+kafka:
+  topic:
+    gps: bobbycar-gps
+    metrics: bobbycar-metrics
+    zonechange: bobbycar-zonechange
+
+datagrid:
+  cache:
+    snapshot: carsnapshots
+    car: cars
+    zone: zones
+  account:
+    user: operator
+    password: EohPRcN95Bjc8Rr7
 
 dashboard:
-  name: dashboard
   config:
-    googleApiKey: replaceme
+    googleApiKey: AIzaSyCH6fNIRY-3VeZ7eR3X1fu5UBCs5Ip-mbE
     threeScaleApiKey: replaceme
 
 carSimulator:
@@ -20,52 +40,3 @@ carSimulator:
     carsimFactor: 3
     carsimRepeat: true
     carsimDelay: 1000
-    mqttZoneChangeTopic: bobbycar/zonechange
-    mqttMetricsTopic: bobbycar/enginemetrics
-    mqttHost: bobbycar-amq-mqtt-all-0-svc
-    mqttPort: 61616
-    kafkaBridgeServiceUrl: bobbycar-oschneid-bc.apps.ocp3.stormshift.coe.muc.redhat.com
-
-dashboardService:
-  name: dashboard-streaming-service
-  kafka:
-    host: bobbycar-cluster-kafka-brokers:9092
-    topicGps: bobbycar-gps
-    topicMetrics: bobbycar-metrics
-    topicZoneChange: bobbycar-zonechange
-  service:
-    name: dashboard-streaming-service
-
-cacheService:
-  name: cache-service
-
-mqtt2kafka:
-  name: mqtt2kafka  
-  kafka:
-    host: bobbycar-cluster-kafka-brokers:9092
-    topic: bobbycar-metrics
-    topicZoneChange: bobbycar-zonechange
-  mqtt:
-    host: tcp://bobbycar-amq-mqtt-all-0-svc:61616
-    topic: bobbycar/enginemetrics
-    topicZoneChange: bobbycar/zonechange
-
-kafka2datagrid:
-  name: kafka-to-datagrid    
-  datagrid:
-    cache:
-      snapshot: carsnapshots
-      car: cars
-      zone: zones
-    account:   
-      host: bobbycar-dg
-      user: operator
-      password: cRpOMlpv6iyqlaFm
-  kafka:
-    host: bobbycar-cluster-kafka-brokers:9092
-    topic: bobbycar-gps
-  mqtt:
-    host: tcp://bobbycar-amq-mqtt-all-0-svc:61616
-    topic: bobbycar/zonechange
-  ocp:
-    api: api.ocp3.stormshift.coe.muc.redhat.com

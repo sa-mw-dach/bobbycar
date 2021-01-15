@@ -1,7 +1,7 @@
 apiVersion: camel.apache.org/v1
 kind: Integration
 metadata:
-  name: {{ .Values.kafka2datagrid.name }}
+  name: kafka2datagrid
   labels:
     app.kubernetes.io/part-of: {{ .Values.appName }}
 spec:
