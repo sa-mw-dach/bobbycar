@@ -13,7 +13,7 @@ All other Helm charts are optional.
 
 ## Set up Bobbycar from the Git repo
 
-1. Clone the Bobbycar repo and navigate to helm subfolder
+### 1. Clone the Bobbycar repo and navigate to helm subfolder
 
 ```sh
 git clone https://github.com/sa-mw-dach/bobbycar.git
@@ -21,40 +21,53 @@ git clone https://github.com/sa-mw-dach/bobbycar.git
 cd bobbycar/helm/
 ```
 
-2. Create a namespace
+### 2. Create the namespace where you want to install the Bobbycar demo
 
 ```sh
 oc new-project bobbycar
 ```
 
-3. Edit the operator-group.yaml to match the correct namespace and apply.
+### 3. Edit the operator-group.yaml to match the correct namespace and apply the file.
 
 ```sh
 oc apply -f operator-group.yaml
 ```
 
-4. Install *bobbycar-core-infra* chart
+### 4. Install the *bobbycar-core-infra* Helm chart
 
-Edit the bobbycar-core-infra Helm chart values.yaml, optionally validate the templates and install the chart
+Edit the chart values.yaml and install the chart
+
+**Adjusting these fields to your environement is mandatory:**
+- ocpDomain
+- namespace
+
+You can leave the others as default values if you like.
+
 
 ``` sh
 vi bobbycar-core-infra/values.yaml
-
-helm template bobbycar-core-infra/
 
 helm install bobbycar-core-infra/ -g
 ```
 
 Wait for around 2 minutes and verify that all components have been successfully installed.
 
-5. Install *bobbycar-core-apps* chart
+### 5. Install *bobbycar-core-apps* chart
 
-Edit the bobbycar-core-apps Helm chart values.yaml, optionally validate the templates and install the chart.
+Edit the chart values.yaml and install the chart.
 
+**Adjusting these fields to your environement is mandatory:**
+- ocpDomain
+- ocpApi  
+- namespace
+- datagrid.account.password
+- dashboard.config.googleApiKey
+
+Get the datagrid password from the **bobbycar-dg-generated-secret** secret.
+
+You can leave the others as default values if you like.
 ```sh
 vi bobbycar-core-apps/values.yaml
-
-helm template bobbycar-core-apps/
 
 helm install bobbycar-core-apps/ -g
 ```

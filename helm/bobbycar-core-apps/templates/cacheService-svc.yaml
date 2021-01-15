@@ -1,10 +1,10 @@
 kind: Service
 apiVersion: v1
 metadata:
-  name: {{ .Values.cacheService.name }}
+  name: cache-service
   labels:
     camel.apache.org/generation: '1'
-    camel.apache.org/integration: {{ .Values.cacheService.name }}
+    camel.apache.org/integration: cache-service
     camel.apache.org/service.type: user
 spec:
   ports:
@@ -13,6 +13,6 @@ spec:
       port: 80
       targetPort: http
   selector:
-    camel.apache.org/integration: {{ .Values.cacheService.name }}
+    camel.apache.org/integration: cache-service
   type: ClusterIP
   sessionAffinity: None

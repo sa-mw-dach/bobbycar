@@ -1,13 +1,13 @@
 apiVersion: camel.apache.org/v1
 kind: Integration
 metadata:
-  name: {{ .Values.cacheService.name }}
+  name: cache-service
   labels:
     app.kubernetes.io/part-of: {{ .Values.appName }}
 spec:
   configuration:
     - type: secret
-      value: {{ .Values.cacheService.name }}-secret
+      value: cache-service-secret
   dependencies:
     - 'camel:undertow'
     - 'camel:infinispan'
