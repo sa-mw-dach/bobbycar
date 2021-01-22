@@ -1,0 +1,4 @@
+
+namespace: bobbycar
+broker:
+  name: bobbycar
