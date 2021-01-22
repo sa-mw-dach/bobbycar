@@ -1,0 +1,7 @@
+Bobbycar Serverless components:
+
+- Knative Broker
+- Service Account, Cluster Role and Role Binding to access API Sources
+- Knative APIServerSource listening for BobbycarZone Lifecycle changes
+- 2 Mock Knative Services (audit and approval) displaying Cloud Events
+- 2 Knative Triggers filtering Cloud Events

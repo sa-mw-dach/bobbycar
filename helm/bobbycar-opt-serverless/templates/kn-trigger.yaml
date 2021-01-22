@@ -1,0 +1,28 @@
+apiVersion: eventing.knative.dev/v1
+kind: Trigger
+metadata:
+  name: bobbycar-zone-audit
+  namespace: {{ .Values.namespace }}
+spec:
+  broker: {{ .Values.broker.name }}
+  subscriber:
+    ref:
+      apiVersion: serving.knative.dev/v1
+      kind: Service
+      name: bobbycar-zone-audit
+---
+apiVersion: eventing.knative.dev/v1
+kind: Trigger
+metadata:
+  name: bobbycar-zone-approval
+  namespace: {{ .Values.namespace }}
+spec:
+  filter:
+    attributes:
+      type: dev.knative.apiserver.resource.add
+  broker: {{ .Values.broker.name }}
+  subscriber:
+    ref:
+      apiVersion: serving.knative.dev/v1
+      kind: Service
+      name: bobbycar-zone-approval
