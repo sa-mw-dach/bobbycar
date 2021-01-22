@@ -35,41 +35,58 @@ oc apply -f operator-group.yaml
 
 ### 4. Install the *bobbycar-core-infra* Helm chart
 
-Edit the chart values.yaml and install the chart
 
-**Adjusting these fields to your environement is mandatory:**
+Either edit the chart values.yaml or override the values with the commandline flags to install the chart.
+
+**Adjusting these values to your environment is mandatory:**
 - ocpDomain
 - namespace
 
 You can leave the others as default values if you like.
 
-
-``` sh
+Option 1:
+```sh
+helm install bobbycar-core-infra bobbycar-core-infra/ --set-string ocpDomain=apps.ocp4.stormshift.coe.muc.redhat.com --set-string namespace=bobbycar
+```
+Option 2:
+```sh
 vi bobbycar-core-infra/values.yaml
 
-helm install bobbycar-core-infra/ -g
+helm install bobbycar-core-infra bobbycar-core-infra/
 ```
 
 Wait for around 2 minutes and verify that all components have been successfully installed.
 
 ### 5. Install *bobbycar-core-apps* chart
 
-Edit the chart values.yaml and install the chart.
+Either edit the chart values.yaml or override the values with the commandline flags to install the chart.
 
-**Adjusting these fields to your environement is mandatory:**
+**Adjusting these values to your environment is mandatory:**
 - ocpDomain
 - ocpApi  
 - namespace
 - datagrid.account.password
 - dashboard.config.googleApiKey
 
-Get the datagrid password from the **bobbycar-dg-generated-secret** secret.
+**Get the datagrid operator password from the bobbycar-dg-generated-secret secret.**
 
 You can leave the others as default values if you like.
+
+Option 1:
+```sh
+helm install bobbycar-core-apps bobbycar-core-apps/ \
+--set-string ocpDomain=apps.ocp4.stormshift.coe.muc.redhat.com \
+--set-string ocpApi=api.ocp4.stormshift.coe.muc.redhat.com \
+--set-string namespace=bobbycar \
+--set-string datagrid.account.password=YourPassword \
+--set-string dashboard.config.googleApiKey=YourGoogleApiKey
+```
+
+Option 2:
 ```sh
 vi bobbycar-core-apps/values.yaml
 
-helm install bobbycar-core-apps/ -g
+helm install bobbycar-core-apps bobbycar-core-apps/
 ```
 Verify that all components have been successfully installed.
 
