@@ -8,3 +8,6 @@ Bobbycar core application components:
 - Dashboard Streaming Service: Camel-K app
 - Kafka2Datagrid Service: Camel-K app
 - MQTT2Kafka Service: Camel-K app
+
+1.0.1
+- Disabled Quarkus Runtime for Camel-K integrations.
