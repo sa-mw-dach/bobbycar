@@ -4,6 +4,9 @@ kind: Subscription
 metadata:
   name: datagrid
   namespace: {{ .Values.namespace }}
+  annotations:
+    "helm.sh/hook": pre-install
+    "helm.sh/hook-weight": "-80"
 spec:
   channel: {{ .Values.datagridOperator.channel }}
   installPlanApproval: {{ .Values.datagridOperator.installPlanApproval }}
