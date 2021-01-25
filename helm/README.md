@@ -27,13 +27,7 @@ cd bobbycar/helm/
 oc new-project bobbycar
 ```
 
-### 3. Edit the operator-group.yaml to match the correct namespace and apply the file.
-
-```sh
-oc apply -f operator-group.yaml
-```
-
-### 4. Install the *bobbycar-core-infra* Helm chart
+### 3. Install the *bobbycar-core-infra* Helm chart
 
 
 Either edit the chart values.yaml or override the values with the commandline flags to install the chart.
@@ -57,7 +51,7 @@ helm install bobbycar-core-infra bobbycar-core-infra/
 
 Wait for around 2 minutes and verify that all components have been successfully installed.
 
-### 5. Install *bobbycar-core-apps* chart
+### 4. Install *bobbycar-core-apps* chart
 
 Either edit the chart values.yaml or override the values with the commandline flags to install the chart.
 
@@ -91,5 +85,3 @@ helm install bobbycar-core-apps bobbycar-core-apps/
 Verify that all components have been successfully installed.
 
 Open the route URL of the dashboard component and get started.
-
-## Set up Bobbycar from the Helm Chart repo
