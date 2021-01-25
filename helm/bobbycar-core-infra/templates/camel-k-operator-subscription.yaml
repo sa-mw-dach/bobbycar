@@ -4,6 +4,9 @@ kind: Subscription
 metadata:
   name: red-hat-camel-k
   namespace: {{ .Values.namespace }}
+  annotations:
+    "helm.sh/hook": pre-install
+    "helm.sh/hook-weight": "-20"
 spec:
   channel: {{ .Values.camelKOperator.channel }}
   installPlanApproval: {{ .Values.camelKOperator.installPlanApproval }}
