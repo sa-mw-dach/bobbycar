@@ -1,0 +1,274 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "http://example.com/example.json",
+  "type": "object",
+  "title": "bobbycar-core-operators",
+  "description": "Installs the required operators into the cluster",
+  "default": {},
+  "examples": [
+    {
+      "namespace": "bobbycar",
+      "amqOperator": {
+        "installPlanApproval": "Automatic",
+        "startingCSV": "amq-broker-operator.v0.18.0",
+        "channel": "current"
+      },
+      "camelKOperator": {
+        "installPlanApproval": "Automatic",
+        "startingCSV": "red-hat-camel-k-operator.v1.2.1",
+        "channel": "techpreview"
+      },
+      "datagridOperator": {
+        "installPlanApproval": "Automatic",
+        "startingCSV": "datagrid-operator.v8.0.3",
+        "channel": "8.0.x"
+      },
+      "strimziOperator": {
+        "installPlanApproval": "Automatic",
+        "startingCSV": "amqstreams.v1.6.1",
+        "channel": "stable"
+      }
+    }
+  ],
+  "required": [
+    "namespace",
+    "amqOperator",
+    "camelKOperator",
+    "datagridOperator",
+    "strimziOperator"
+  ],
+  "properties": {
+    "namespace": {
+      "$id": "#/properties/namespace",
+      "type": "string",
+      "title": "The namespace schema",
+      "description": "The namespace where to install Bobbycar.",
+      "default": "",
+      "pattern": "^[A-Za-z0-9_-]+$",
+      "examples": [
+        "bobbycar"
+      ]
+    },
+    "amqOperator": {
+      "$id": "#/properties/amqOperator",
+      "type": "object",
+      "title": "The amqOperator schema",
+      "description": "An explanation about the purpose of this instance.",
+      "default": {},
+      "examples": [
+        {
+          "installPlanApproval": "Automatic",
+          "startingCSV": "amq-broker-operator.v0.18.0",
+          "channel": "current"
+        }
+      ],
+      "required": [
+        "installPlanApproval",
+        "startingCSV",
+        "channel"
+      ],
+      "properties": {
+        "installPlanApproval": {
+          "$id": "#/properties/amqOperator/properties/installPlanApproval",
+          "type": "string",
+          "title": "The installPlanApproval schema",
+          "description": "An explanation about the purpose of this instance.",
+          "pattern": "^(Automatic|Manual)$",
+          "default": "",
+          "examples": [
+            "Automatic"
+          ]
+        },
+        "startingCSV": {
+          "$id": "#/properties/amqOperator/properties/startingCSV",
+          "type": "string",
+          "title": "The startingCSV schema",
+          "description": "An explanation about the purpose of this instance.",
+          "pattern": "^.+$",
+          "default": "",
+          "examples": [
+            "amq-broker-operator.v0.18.0"
+          ]
+        },
+        "channel": {
+          "$id": "#/properties/amqOperator/properties/channel",
+          "type": "string",
+          "title": "The channel schema",
+          "description": "An explanation about the purpose of this instance.",
+          "pattern": "^.+$",
+          "default": "",
+          "examples": [
+            "current"
+          ]
+        }
+      },
+      "additionalProperties": true
+    },
+    "camelKOperator": {
+      "$id": "#/properties/camelKOperator",
+      "type": "object",
+      "title": "The camelKOperator schema",
+      "description": "An explanation about the purpose of this instance.",
+      "default": {},
+      "examples": [
+        {
+          "installPlanApproval": "Automatic",
+          "startingCSV": "red-hat-camel-k-operator.v1.2.1",
+          "channel": "techpreview"
+        }
+      ],
+      "required": [
+        "installPlanApproval",
+        "startingCSV",
+        "channel"
+      ],
+      "properties": {
+        "installPlanApproval": {
+          "$id": "#/properties/camelKOperator/properties/installPlanApproval",
+          "type": "string",
+          "title": "The installPlanApproval schema",
+          "description": "An explanation about the purpose of this instance.",
+          "pattern": "^(Automatic|Manual)$",
+          "default": "",
+          "examples": [
+            "Automatic"
+          ]
+        },
+        "startingCSV": {
+          "$id": "#/properties/camelKOperator/properties/startingCSV",
+          "type": "string",
+          "title": "The startingCSV schema",
+          "description": "An explanation about the purpose of this instance.",
+          "pattern": "^.+$",
+          "default": "",
+          "examples": [
+            "red-hat-camel-k-operator.v1.2.1"
+          ]
+        },
+        "channel": {
+          "$id": "#/properties/camelKOperator/properties/channel",
+          "type": "string",
+          "title": "The channel schema",
+          "description": "An explanation about the purpose of this instance.",
+          "pattern": "^.+$",
+          "default": "",
+          "examples": [
+            "techpreview"
+          ]
+        }
+      },
+      "additionalProperties": true
+    },
+    "datagridOperator": {
+      "$id": "#/properties/datagridOperator",
+      "type": "object",
+      "title": "The datagridOperator schema",
+      "description": "An explanation about the purpose of this instance.",
+      "default": {},
+      "examples": [
+        {
+          "installPlanApproval": "Automatic",
+          "startingCSV": "datagrid-operator.v8.0.3",
+          "channel": "8.0.x"
+        }
+      ],
+      "required": [
+        "installPlanApproval",
+        "startingCSV",
+        "channel"
+      ],
+      "properties": {
+        "installPlanApproval": {
+          "$id": "#/properties/datagridOperator/properties/installPlanApproval",
+          "type": "string",
+          "title": "The installPlanApproval schema",
+          "description": "An explanation about the purpose of this instance.",
+          "pattern": "^(Automatic|Manual)$",
+          "default": "",
+          "examples": [
+            "Automatic"
+          ]
+        },
+        "startingCSV": {
+          "$id": "#/properties/datagridOperator/properties/startingCSV",
+          "type": "string",
+          "title": "The startingCSV schema",
+          "description": "An explanation about the purpose of this instance.",
+          "pattern": "^.+$",
+          "default": "",
+          "examples": [
+            "datagrid-operator.v8.0.3"
+          ]
+        },
+        "channel": {
+          "$id": "#/properties/datagridOperator/properties/channel",
+          "type": "string",
+          "title": "The channel schema",
+          "description": "An explanation about the purpose of this instance.",
+          "pattern": "^.+$",
+          "default": "",
+          "examples": [
+            "8.0.x"
+          ]
+        }
+      },
+      "additionalProperties": true
+    },
+    "strimziOperator": {
+      "$id": "#/properties/strimziOperator",
+      "type": "object",
+      "title": "The strimziOperator schema",
+      "description": "An explanation about the purpose of this instance.",
+      "default": {},
+      "examples": [
+        {
+          "installPlanApproval": "Automatic",
+          "startingCSV": "amqstreams.v1.6.1",
+          "channel": "stable"
+        }
+      ],
+      "required": [
+        "installPlanApproval",
+        "startingCSV",
+        "channel"
+      ],
+      "properties": {
+        "installPlanApproval": {
+          "$id": "#/properties/strimziOperator/properties/installPlanApproval",
+          "type": "string",
+          "title": "The installPlanApproval schema",
+          "description": "An explanation about the purpose of this instance.",
+          "pattern": "^(Automatic|Manual)$",
+          "default": "",
+          "examples": [
+            "Automatic"
+          ]
+        },
+        "startingCSV": {
+          "$id": "#/properties/strimziOperator/properties/startingCSV",
+          "type": "string",
+          "title": "The startingCSV schema",
+          "description": "An explanation about the purpose of this instance.",
+          "pattern": "^.+$",
+          "default": "",
+          "examples": [
+            "amqstreams.v1.6.1"
+          ]
+        },
+        "channel": {
+          "$id": "#/properties/strimziOperator/properties/channel",
+          "type": "string",
+          "title": "The channel schema",
+          "description": "An explanation about the purpose of this instance.",
+          "pattern": "^.+$",
+          "default": "",
+          "examples": [
+            "stable"
+          ]
+        }
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}
