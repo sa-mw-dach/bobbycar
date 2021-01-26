@@ -1,0 +1,13 @@
+apiVersion: operators.coreos.com/v1
+kind: OperatorGroup
+metadata:
+  annotations:
+    olm.providedAPIs: ""
+    "helm.sh/hook": pre-install
+    "helm.sh/hook-weight": "-100"
+  generateName: bobbycar-og-
+  name: bobbycar-og
+  namespace: {{ .Values.namespace }}
+spec:
+  targetNamespaces:
+  - {{ .Values.namespace }}
