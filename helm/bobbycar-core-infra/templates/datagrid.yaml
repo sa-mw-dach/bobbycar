@@ -1,4 +1,3 @@
-{{- if .Values.components.enabled.datagrid -}}
 apiVersion: infinispan.org/v1
 kind: Infinispan
 metadata:
@@ -22,4 +21,3 @@ spec:
       org.jgroups: info
       org.jgroups.protocols.TCP: error
       org.jgroups.protocols.relay.RELAY2: fatal
-{{- end }}    

@@ -1,11 +1,8 @@
 Bobbycar core infrastructure components:
 
-- AMQ Broker Operator Subscription
 - AMQ Broker CR
-- Camel-K Operator Subscription
-- Datagrid Operator Subscription
 - Datagrid CR and Route
-- AMQ Streams Operator Subscription
 - AMQ Streams Kafka Cluster
 - AMQ Streams Kafka HTTP Bridge Cluster and Route
+- Camel-K Integration Platform
 - 3 Kafka Topics

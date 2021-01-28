@@ -1,4 +1,3 @@
-{{- if .Values.components.enabled.datagrid -}}
 kind: Route
 apiVersion: route.openshift.io/v1
 metadata:
@@ -16,4 +15,3 @@ spec:
   port:
     targetPort: 11222
   wildcardPolicy: None
-{{- end }}   
