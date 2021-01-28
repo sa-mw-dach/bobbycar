@@ -1,4 +1,3 @@
-{{- if .Values.components.enabled.kafka -}}
 apiVersion: kafka.strimzi.io/v1alpha1
 kind: KafkaBridge
 metadata:
@@ -9,5 +8,3 @@ spec:
   bootstrapServers: bobbycar-cluster-kafka-bootstrap:9092
   http:
     port: {{ .Values.kafka.bridge.port }}
-{{- end }}  
-
