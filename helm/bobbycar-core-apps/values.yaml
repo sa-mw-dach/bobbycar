@@ -1,11 +1,8 @@
-# Default values for bobbycar-core.
-# This is a YAML-formatted file.
-# Declare variables to be passed into your templates.
 
-namespace: bc
+namespace:
 appName: Bobbycar
-ocpDomain: apps.ocp4.stormshift.coe.muc.redhat.com
-ocpApi: api.ocp4.stormshift.coe.muc.redhat.com
+ocpDomain:
+ocpApi:
 
 mqtt:
   topic:
@@ -25,11 +22,11 @@ datagrid:
     zone: zones
   account:
     user: operator
-    password: EohPRcN95Bjc8Rr7
+    password:
 
 dashboard:
   config:
-    googleApiKey: AIzaSyCH6fNIRY-3VeZ7eR3X1fu5UBCs5Ip-mbE
+    googleApiKey:
     threeScaleApiKey: replaceme
 
 carSimulator:

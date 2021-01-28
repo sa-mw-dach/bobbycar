@@ -1,0 +1,542 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "http://example.com/example.json",
+  "type": "object",
+  "title": "bobbycar-core-apps",
+  "description": "This Helm Chart installs the Bobbycar application components",
+  "default": {},
+  "examples": [
+    {
+      "namespace": "bobbycar",
+      "appName": "Bobbycar",
+      "ocpDomain": "apps.ocp3.stormshift.coe.muc.redhat.com",
+      "ocpApi": "api.ocp3.stormshift.coe.muc.redhat.com",
+      "mqtt": {
+        "topic": {
+          "mqttZoneChangeTopic": "bobbycar/zonechange",
+          "mqttMetricsTopic": "bobbycar/enginemetrics"
+        }
+      },
+      "kafka": {
+        "topic": {
+          "gps": "bobbycar-gps",
+          "metrics": "bobbycar-metrics",
+          "zonechange": "bobbycar-zonechange"
+        }
+      },
+      "datagrid": {
+        "cache": {
+          "snapshot": "carsnapshots",
+          "car": "cars",
+          "zone": "zones"
+        },
+        "account": {
+          "user": "operator",
+          "password": "password"
+        }
+      },
+      "dashboard": {
+        "config": {
+          "googleApiKey": "replaceme",
+          "threeScaleApiKey": "replaceme"
+        }
+      },
+      "carSimulator": {
+        "name": "car-simulator",
+        "replicas": 1,
+        "config": {
+          "carsimCars": 20,
+          "carsimFactor": 3,
+          "carsimRepeat": true,
+          "carsimDelay": 1000
+        }
+      }
+    }
+  ],
+  "required": [
+    "namespace",
+    "appName",
+    "ocpDomain",
+    "ocpApi",
+    "mqtt",
+    "kafka",
+    "datagrid",
+    "dashboard",
+    "carSimulator"
+  ],
+  "properties": {
+    "namespace": {
+      "$id": "#/properties/namespace",
+      "type": "string",
+      "title": "The namespace / project",
+      "description": "The namespace where to install Bobbycar.",
+      "pattern": "^[A-Za-z0-9_-]+$",
+      "default": "",
+      "examples": [
+        "bobbycar"
+      ]
+    },
+    "appName": {
+      "$id": "#/properties/appName",
+      "type": "string",
+      "title": "appName",
+      "description": "The application name.",
+      "default": "",
+      "pattern": "^[A-Za-z0-9_-]+$",
+      "examples": [
+        "Bobbycar"
+      ]
+    },
+    "ocpDomain": {
+      "$id": "#/properties/ocpDomain",
+      "type": "string",
+      "title": "ocpDomain",
+      "description": "The wildcard Openshift app domain name.",
+      "default": "",
+      "pattern": "^.+$",
+      "examples": [
+        "apps.ocp3.stormshift.coe.muc.redhat.com"
+      ]
+    },
+    "ocpApi": {
+      "$id": "#/properties/ocpApi",
+      "type": "string",
+      "title": "ocpApi",
+      "description": "The OpenShift API domain name.",
+      "default": "",
+      "pattern": "^.+$",
+      "examples": [
+        "api.ocp3.stormshift.coe.muc.redhat.com"
+      ]
+    },
+    "mqtt": {
+      "$id": "#/properties/mqtt",
+      "type": "object",
+      "title": "The mqtt configuration",
+      "description": "The MQTT Topic config.",
+      "default": {},
+      "examples": [
+        {
+          "topic": {
+            "mqttZoneChangeTopic": "bobbycar/zonechange",
+            "mqttMetricsTopic": "bobbycar/enginemetrics"
+          }
+        }
+      ],
+      "required": [
+        "topic"
+      ],
+      "properties": {
+        "topic": {
+          "$id": "#/properties/mqtt/properties/topic",
+          "type": "object",
+          "title": "topic",
+          "description": "The MQTT Topic section.",
+          "default": {},
+          "examples": [
+            {
+              "mqttZoneChangeTopic": "bobbycar/zonechange",
+              "mqttMetricsTopic": "bobbycar/enginemetrics"
+            }
+          ],
+          "required": [
+            "mqttZoneChangeTopic",
+            "mqttMetricsTopic"
+          ],
+          "properties": {
+            "mqttZoneChangeTopic": {
+              "$id": "#/properties/mqtt/properties/topic/properties/mqttZoneChangeTopic",
+              "type": "string",
+              "title": "mqttZoneChangeTopic",
+              "description": "The MQTT Zonechange topic name.",
+              "default": "",
+              "examples": [
+                "bobbycar/zonechange"
+              ]
+            },
+            "mqttMetricsTopic": {
+              "$id": "#/properties/mqtt/properties/topic/properties/mqttMetricsTopic",
+              "type": "string",
+              "title": "mqttMetricsTopic",
+              "description": "The MQTT Metrics topic name.",
+              "default": "",
+              "examples": [
+                "bobbycar/enginemetrics"
+              ]
+            }
+          },
+          "additionalProperties": true
+        }
+      },
+      "additionalProperties": true
+    },
+    "kafka": {
+      "$id": "#/properties/kafka",
+      "type": "object",
+      "title": "The kafka Configuration",
+      "description": "The Kafka related Configuration.",
+      "default": {},
+      "examples": [
+        {
+          "topic": {
+            "gps": "bobbycar-gps",
+            "metrics": "bobbycar-metrics",
+            "zonechange": "bobbycar-zonechange"
+          }
+        }
+      ],
+      "required": [
+        "topic"
+      ],
+      "properties": {
+        "topic": {
+          "$id": "#/properties/kafka/properties/topic",
+          "type": "object",
+          "title": "topic",
+          "description": "The Kafka topic configuration.",
+          "default": {},
+          "examples": [
+            {
+              "gps": "bobbycar-gps",
+              "metrics": "bobbycar-metrics",
+              "zonechange": "bobbycar-zonechange"
+            }
+          ],
+          "required": [
+            "gps",
+            "metrics",
+            "zonechange"
+          ],
+          "properties": {
+            "gps": {
+              "$id": "#/properties/kafka/properties/topic/properties/gps",
+              "type": "string",
+              "title": "gps",
+              "description": "The Kafka topic name.",
+              "default": "",
+              "examples": [
+                "bobbycar-gps"
+              ]
+            },
+            "metrics": {
+              "$id": "#/properties/kafka/properties/topic/properties/metrics",
+              "type": "string",
+              "title": "metrics",
+              "description": "The Kafka topic name.",
+              "default": "",
+              "examples": [
+                "bobbycar-metrics"
+              ]
+            },
+            "zonechange": {
+              "$id": "#/properties/kafka/properties/topic/properties/zonechange",
+              "type": "string",
+              "title": "zonechange",
+              "description": "The Kafka topic name.",
+              "default": "",
+              "examples": [
+                "bobbycar-zonechange"
+              ]
+            }
+          },
+          "additionalProperties": true
+        }
+      },
+      "additionalProperties": true
+    },
+    "datagrid": {
+      "$id": "#/properties/datagrid",
+      "type": "object",
+      "title": "Datagrid configuration",
+      "description": "Datagrid configuration",
+      "default": {},
+      "examples": [
+        {
+          "cache": {
+            "snapshot": "carsnapshots",
+            "car": "cars",
+            "zone": "zones"
+          },
+          "account": {
+            "user": "operator",
+            "password": "mypassword"
+          }
+        }
+      ],
+      "required": [
+        "cache",
+        "account"
+      ],
+      "properties": {
+        "cache": {
+          "$id": "#/properties/datagrid/properties/cache",
+          "type": "object",
+          "title": "cache",
+          "description": "Datagrid Cache names configuration",
+          "default": {},
+          "examples": [
+            {
+              "snapshot": "carsnapshots",
+              "car": "cars",
+              "zone": "zones"
+            }
+          ],
+          "required": [
+            "snapshot",
+            "car",
+            "zone"
+          ],
+          "properties": {
+            "snapshot": {
+              "$id": "#/properties/datagrid/properties/cache/properties/snapshot",
+              "type": "string",
+              "title": "snapshot",
+              "description": "The cache name",
+              "default": "",
+              "examples": [
+                "carsnapshots"
+              ]
+            },
+            "car": {
+              "$id": "#/properties/datagrid/properties/cache/properties/car",
+              "type": "string",
+              "title": "car",
+              "description": "The cache name.",
+              "default": "",
+              "examples": [
+                "cars"
+              ]
+            },
+            "zone": {
+              "$id": "#/properties/datagrid/properties/cache/properties/zone",
+              "type": "string",
+              "title": "zone",
+              "description": "The cache name.",
+              "default": "",
+              "examples": [
+                "zones"
+              ]
+            }
+          },
+          "additionalProperties": true
+        },
+        "account": {
+          "$id": "#/properties/datagrid/properties/account",
+          "type": "object",
+          "title": "Datagrid account settings",
+          "description": "The Datagrid account settings.",
+          "default": {},
+          "examples": [
+            {
+              "user": "operator",
+              "password": "mypassword"
+            }
+          ],
+          "required": [
+            "user",
+            "password"
+          ],
+          "properties": {
+            "user": {
+              "$id": "#/properties/datagrid/properties/account/properties/user",
+              "type": "string",
+              "title": "user",
+              "description": "The operator username.",
+              "default": "",
+              "examples": [
+                "operator"
+              ]
+            },
+            "password": {
+              "$id": "#/properties/datagrid/properties/account/properties/password",
+              "type": "string",
+              "title": "password",
+              "description": "The operator password. Look in secret: bobbycar-dg-generated-secret",
+              "default": "",
+              "pattern": "^.+$",
+              "examples": [
+                "mypassword"
+              ]
+            }
+          },
+          "additionalProperties": true
+        }
+      },
+      "additionalProperties": true
+    },
+    "dashboard": {
+      "$id": "#/properties/dashboard",
+      "type": "object",
+      "title": "The dashboard configuration",
+      "description": "The dashboard configuration.",
+      "default": {},
+      "examples": [
+        {
+          "config": {
+            "googleApiKey": "replaceme",
+            "threeScaleApiKey": "replaceme"
+          }
+        }
+      ],
+      "required": [
+        "config"
+      ],
+      "properties": {
+        "config": {
+          "$id": "#/properties/dashboard/properties/config",
+          "type": "object",
+          "title": "config",
+          "description": "The dashboard configuration",
+          "default": {},
+          "examples": [
+            {
+              "googleApiKey": "replaceme",
+              "threeScaleApiKey": "replaceme"
+            }
+          ],
+          "required": [
+            "googleApiKey",
+            "threeScaleApiKey"
+          ],
+          "properties": {
+            "googleApiKey": {
+              "$id": "#/properties/dashboard/properties/config/properties/googleApiKey",
+              "type": "string",
+              "title": "googleApiKey",
+              "description": "Your valid Google Maps API key.",
+              "default": "",
+              "pattern": "^.+$",
+              "examples": [
+                "myGoogleMapsApiKey"
+              ]
+            },
+            "threeScaleApiKey": {
+              "$id": "#/properties/dashboard/properties/config/properties/threeScaleApiKey",
+              "type": "string",
+              "title": "threeScaleApiKey",
+              "description": "3scale API key for Bobbycar APIs.",
+              "default": "",
+              "examples": [
+                "replaceme"
+              ]
+            }
+          },
+          "additionalProperties": true
+        }
+      },
+      "additionalProperties": true
+    },
+    "carSimulator": {
+      "$id": "#/properties/carSimulator",
+      "type": "object",
+      "title": "The carSimulator config",
+      "description": "Configuration of the Bobbycar vehicle simulation pods.",
+      "default": {},
+      "examples": [
+        {
+          "name": "car-simulator",
+          "replicas": 1,
+          "config": {
+            "carsimCars": 20,
+            "carsimFactor": 3,
+            "carsimRepeat": true,
+            "carsimDelay": 1000
+          }
+        }
+      ],
+      "required": [
+        "name",
+        "replicas",
+        "config"
+      ],
+      "properties": {
+        "name": {
+          "$id": "#/properties/carSimulator/properties/name",
+          "type": "string",
+          "title": "name",
+          "description": "The deployment name of teh car-simulator / Bobbycar.",
+          "default": "",
+          "examples": [
+            "car-simulator"
+          ]
+        },
+        "replicas": {
+          "$id": "#/properties/carSimulator/properties/replicas",
+          "type": "integer",
+          "title": "replicas",
+          "description": "How many pods to start.",
+          "default": 0,
+          "examples": [
+            1
+          ]
+        },
+        "config": {
+          "$id": "#/properties/carSimulator/properties/config",
+          "type": "object",
+          "title": "config",
+          "description": "Car-simulator / Bobbycar configuration",
+          "default": {},
+          "examples": [
+            {
+              "carsimCars": 20,
+              "carsimFactor": 3,
+              "carsimRepeat": true,
+              "carsimDelay": 1000
+            }
+          ],
+          "required": [
+            "carsimCars",
+            "carsimFactor",
+            "carsimRepeat",
+            "carsimDelay"
+          ],
+          "properties": {
+            "carsimCars": {
+              "$id": "#/properties/carSimulator/properties/config/properties/carsimCars",
+              "type": "integer",
+              "title": "carsimCars",
+              "description": "Amount of cars (Threads) to simulate per pod.",
+              "default": 0,
+              "examples": [
+                20
+              ]
+            },
+            "carsimFactor": {
+              "$id": "#/properties/carSimulator/properties/config/properties/carsimFactor",
+              "type": "integer",
+              "title": "carsimFactor",
+              "description": "The speed factor of the simulation.",
+              "default": 0,
+              "examples": [
+                3
+              ]
+            },
+            "carsimRepeat": {
+              "$id": "#/properties/carSimulator/properties/config/properties/carsimRepeat",
+              "type": "boolean",
+              "title": "carsimRepeat",
+              "description": "Should the simulated cars start over again after finishing a route.",
+              "default": false,
+              "examples": [
+                true
+              ]
+            },
+            "carsimDelay": {
+              "$id": "#/properties/carSimulator/properties/config/properties/carsimDelay",
+              "type": "integer",
+              "title": "carsimDelay",
+              "description": "The delay in milliseconds when starting new car simulation threads.",
+              "default": 0,
+              "examples": [
+                1000
+              ]
+            }
+          },
+          "additionalProperties": true
+        }
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}
