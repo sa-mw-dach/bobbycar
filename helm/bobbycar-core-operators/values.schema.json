@@ -3,7 +3,7 @@
   "$id": "http://example.com/example.json",
   "type": "object",
   "title": "bobbycar-core-operators",
-  "description": "Installs the required operators into the cluster",
+  "description": "This Helm Chart installs the required Bobbycar operators in the cluster",
   "default": {},
   "examples": [
     {
@@ -41,7 +41,7 @@
     "namespace": {
       "$id": "#/properties/namespace",
       "type": "string",
-      "title": "The namespace schema",
+      "title": "The namespace / project",
       "description": "The namespace where to install Bobbycar.",
       "default": "",
       "pattern": "^[A-Za-z0-9_-]+$",
@@ -52,8 +52,8 @@
     "amqOperator": {
       "$id": "#/properties/amqOperator",
       "type": "object",
-      "title": "The amqOperator schema",
-      "description": "An explanation about the purpose of this instance.",
+      "title": "The amqOperator",
+      "description": "The AMQ Broker operator for the required MQTT broker.",
       "default": {},
       "examples": [
         {
@@ -71,8 +71,8 @@
         "installPlanApproval": {
           "$id": "#/properties/amqOperator/properties/installPlanApproval",
           "type": "string",
-          "title": "The installPlanApproval schema",
-          "description": "An explanation about the purpose of this instance.",
+          "title": "The installPlanApproval",
+          "description": "How operator updates are performed. Automatic or Manual",
           "pattern": "^(Automatic|Manual)$",
           "default": "",
           "examples": [
@@ -82,8 +82,8 @@
         "startingCSV": {
           "$id": "#/properties/amqOperator/properties/startingCSV",
           "type": "string",
-          "title": "The startingCSV schema",
-          "description": "An explanation about the purpose of this instance.",
+          "title": "The startingCSV",
+          "description": "The initial cluster service version of this operator.",
           "pattern": "^.+$",
           "default": "",
           "examples": [
@@ -93,8 +93,8 @@
         "channel": {
           "$id": "#/properties/amqOperator/properties/channel",
           "type": "string",
-          "title": "The channel schema",
-          "description": "An explanation about the purpose of this instance.",
+          "title": "The channel",
+          "description": "The update channel for this operator.",
           "pattern": "^.+$",
           "default": "",
           "examples": [
@@ -107,8 +107,8 @@
     "camelKOperator": {
       "$id": "#/properties/camelKOperator",
       "type": "object",
-      "title": "The camelKOperator schema",
-      "description": "An explanation about the purpose of this instance.",
+      "title": "The camelKOperator",
+      "description": "The Red Hat Camel-K operator managing the required cloud-native integrations.",
       "default": {},
       "examples": [
         {
@@ -126,8 +126,8 @@
         "installPlanApproval": {
           "$id": "#/properties/camelKOperator/properties/installPlanApproval",
           "type": "string",
-          "title": "The installPlanApproval schema",
-          "description": "An explanation about the purpose of this instance.",
+          "title": "The installPlanApproval",
+          "description": "How operator updates are performed. Automatic or Manual.",
           "pattern": "^(Automatic|Manual)$",
           "default": "",
           "examples": [
@@ -137,8 +137,8 @@
         "startingCSV": {
           "$id": "#/properties/camelKOperator/properties/startingCSV",
           "type": "string",
-          "title": "The startingCSV schema",
-          "description": "An explanation about the purpose of this instance.",
+          "title": "The startingCSV",
+          "description": "The initial cluster service version of this operator.",
           "pattern": "^.+$",
           "default": "",
           "examples": [
@@ -148,8 +148,8 @@
         "channel": {
           "$id": "#/properties/camelKOperator/properties/channel",
           "type": "string",
-          "title": "The channel schema",
-          "description": "An explanation about the purpose of this instance.",
+          "title": "The channel",
+          "description": "The update channel for this operator.",
           "pattern": "^.+$",
           "default": "",
           "examples": [
@@ -162,8 +162,8 @@
     "datagridOperator": {
       "$id": "#/properties/datagridOperator",
       "type": "object",
-      "title": "The datagridOperator schema",
-      "description": "An explanation about the purpose of this instance.",
+      "title": "The datagridOperator",
+      "description": "The Red Hat Datagrid operator managing the required distributed cashes.",
       "default": {},
       "examples": [
         {
@@ -181,8 +181,8 @@
         "installPlanApproval": {
           "$id": "#/properties/datagridOperator/properties/installPlanApproval",
           "type": "string",
-          "title": "The installPlanApproval schema",
-          "description": "An explanation about the purpose of this instance.",
+          "title": "The installPlanApproval",
+          "description": "How operator updates are performed. Automatic or Manual.",
           "pattern": "^(Automatic|Manual)$",
           "default": "",
           "examples": [
@@ -192,8 +192,8 @@
         "startingCSV": {
           "$id": "#/properties/datagridOperator/properties/startingCSV",
           "type": "string",
-          "title": "The startingCSV schema",
-          "description": "An explanation about the purpose of this instance.",
+          "title": "The startingCSV",
+          "description": "The initial cluster service version of this operator.",
           "pattern": "^.+$",
           "default": "",
           "examples": [
@@ -203,8 +203,8 @@
         "channel": {
           "$id": "#/properties/datagridOperator/properties/channel",
           "type": "string",
-          "title": "The channel schema",
-          "description": "An explanation about the purpose of this instance.",
+          "title": "The channel",
+          "description": "The update channel for this operator.",
           "pattern": "^.+$",
           "default": "",
           "examples": [
@@ -217,8 +217,8 @@
     "strimziOperator": {
       "$id": "#/properties/strimziOperator",
       "type": "object",
-      "title": "The strimziOperator schema",
-      "description": "An explanation about the purpose of this instance.",
+      "title": "The strimziOperator",
+      "description": "The AMQ Streams operator for managing the required Kafka resources.",
       "default": {},
       "examples": [
         {
@@ -236,8 +236,8 @@
         "installPlanApproval": {
           "$id": "#/properties/strimziOperator/properties/installPlanApproval",
           "type": "string",
-          "title": "The installPlanApproval schema",
-          "description": "An explanation about the purpose of this instance.",
+          "title": "The installPlanApproval",
+          "description": "How operator updates are performed. Automatic or Manual.",
           "pattern": "^(Automatic|Manual)$",
           "default": "",
           "examples": [
@@ -247,8 +247,8 @@
         "startingCSV": {
           "$id": "#/properties/strimziOperator/properties/startingCSV",
           "type": "string",
-          "title": "The startingCSV schema",
-          "description": "An explanation about the purpose of this instance.",
+          "title": "The startingCSV",
+          "description": "The initial cluster service version of this operator.",
           "pattern": "^.+$",
           "default": "",
           "examples": [
@@ -258,8 +258,8 @@
         "channel": {
           "$id": "#/properties/strimziOperator/properties/channel",
           "type": "string",
-          "title": "The channel schema",
-          "description": "An explanation about the purpose of this instance.",
+          "title": "The channel",
+          "description": "The update channel for this operator.",
           "pattern": "^.+$",
           "default": "",
           "examples": [
