@@ -1,4 +1,5 @@
-
 namespace: bobbycar
 broker:
   name: bobbycar
+# The Kafka zone change topic
+kafkaTopic: bobbycar-zonechange
