@@ -1,0 +1,26 @@
+apiVersion: sources.knative.dev/v1beta1
+kind: KafkaSource
+metadata:
+  name: zone-change-kafka-source
+  namespace: {{ .Values.namespace }}
+spec:
+  bootstrapServers:
+    - 'bobbycar-cluster-kafka-bootstrap.bobbycar.svc:9092'
+    - 'bobbycar-cluster-kafka-bootstrap.bobbycar.svc:9093'
+  consumerGroup: KnativeZoneChangeSource
+  net:
+    sasl:
+      password: { }
+      type: { }
+      user: { }
+    tls:
+      caCert: { }
+      cert: { }
+      key: { }
+  sink:
+    ref:
+      apiVersion: eventing.knative.dev/v1
+      kind: Broker
+      name: {{ .Values.broker.name }}
+  topics:
+    - {{ .Values.kafkaTopic }}

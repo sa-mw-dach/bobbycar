@@ -1,0 +1,18 @@
+apiVersion: eventing.knative.dev/v1
+kind: Trigger
+metadata:
+  name: zone-change
+  namespace: {{ .Values.namespace }}
+spec:
+  broker: {{ .Values.broker.name }}
+  filter:
+    attributes:
+      source: >-
+        /apis/v1/namespaces/bobbycar/kafkasources/zone-change-kafka-source#{{ .Values.kafkaTopic }}
+      type: dev.knative.kafka.event
+  subscriber:
+    ref:
+      apiVersion: serving.knative.dev/v1
+      kind: Service
+      name: zone-change-faas
+      namespace: {{ .Values.namespace }}
