@@ -466,7 +466,7 @@ public class KafkaToDatagridRoute extends RouteBuilder {
 				.process(this::transformToZoneChangeEvent)
 				//.marshal().json(JsonLibrary.Jackson, String.class)
 				.process(ex -> 
-					ex.getIn().setBody(mapper.writeValueAsString(ex.getIn().getBody(CarEvent.class)))
+					ex.getIn().setBody(mapper.writeValueAsString(ex.getIn().getBody(ZoneChangeEvent.class)))
 				)
 				.log("Publishing ${body} to mqtt")
 				.to("paho:{{com.redhat.bobbycar.camelk.mqtt.topic}}?brokerUrl={{com.redhat.bobbycar.camelk.mqtt.brokerUrl}}")

@@ -13,7 +13,7 @@ export class CarEventsService {
   private CAR_EVENTS_ENDPOINT: string;
 
   constructor(private configService: ConfigService) {
-    console.debug('new WSService()');
+    console.debug('new CarEventsService()');
     this.CAR_EVENTS_ENDPOINT = configService.CAR_EVENTS_ENDPOINT;
   }
 
@@ -34,5 +34,6 @@ export class CarEventsService {
     this.socket$.next(msg);
   }
   close(): void {
-    this.socket$.complete(); }
+    this.socket$.complete();
+  }
 }

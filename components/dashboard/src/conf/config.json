@@ -2,7 +2,8 @@
     "GOOGLE_API_KEY": "",
     "BOBBYCAR_API_KEY": "",
     "SSE_ENDPOINT": "http://localhost:8080",
-    "CAR_EVENTS_ENDPOINT": "ws://dashboard-streaming-service-oschneid-bc.apps.ocp4.stormshift.coe.muc.redhat.com/api/carevents?sendToAll=true",
-    "CAR_METRICS_ENDPOINT": "ws://dashboard-streaming-service-oschneid-bc.apps.ocp4.stormshift.coe.muc.redhat.com/api/carmetrics?sendToAll=true",
-    "CACHE_ENDPOINT": "http://cache-service-oschneid-bc.apps.ocp4.stormshift.coe.muc.redhat.com"
+    "CAR_EVENTS_ENDPOINT": "ws://dashboard-streaming-service-bobbycar.apps.ocp4.stormshift.coe.muc.redhat.com/api/carevents?sendToAll=true",
+    "CAR_METRICS_ENDPOINT": "ws://dashboard-streaming-service-bobbycar.apps.ocp4.stormshift.coe.muc.redhat.com/api/carmetrics?sendToAll=true",
+    "CAR_ZONECHANGE_ENDPOINT": "ws://dashboard-streaming-service-bobbycar.apps.ocp4.stormshift.coe.muc.redhat.com/api/zonechange?sendToAll=true",
+    "CACHE_ENDPOINT": "http://cache-service-bobbycar.apps.ocp4.stormshift.coe.muc.redhat.com"
 }

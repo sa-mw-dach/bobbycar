@@ -1,14 +1,14 @@
 kind: Route
 apiVersion: route.openshift.io/v1
 metadata:
-  name: {{ .Values.dashboardService.name }}
+  name: dashboard-streaming-service
   labels:
-    camel.apache.org/integration: {{ .Values.dashboardService.name }}
+    camel.apache.org/integration: dashboard-streaming-service
 spec:
-  host: {{ .Values.dashboardService.name }}-{{ .Values.namespace }}.{{ .Values.ocpDomain }}
+  host: dashboard-streaming-service-{{ .Values.namespace }}.{{ .Values.ocpDomain }}
   to:
     kind: Service
-    name: {{ .Values.dashboardService.service.name }}
+    name: dashboard-streaming-service
     weight: 100
   port:
     targetPort: http

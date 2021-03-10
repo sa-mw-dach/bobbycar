@@ -1,4 +1,3 @@
-{{- if .Values.components.enabled.camelK -}}
 apiVersion: camel.apache.org/v1
 kind: IntegrationPlatform
 metadata:
@@ -10,4 +9,3 @@ spec:
   configuration:
   - type: repository
     value: https://maven.repository.redhat.com/earlyaccess/all@id=redhat.ea
-{{- end }}
