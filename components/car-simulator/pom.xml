@@ -90,7 +90,7 @@
 	<dependency>
 	    <groupId>com.github.tomakehurst</groupId>
 	    <artifactId>wiremock</artifactId>
-	    <scope>test</scope>
+	    <scope>compile</scope>
 	    <version>2.27.1</version> 
 	</dependency>
   </dependencies>
