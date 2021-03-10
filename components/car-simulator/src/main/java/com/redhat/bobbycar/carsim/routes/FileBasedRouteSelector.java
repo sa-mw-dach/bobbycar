@@ -28,6 +28,7 @@ public class FileBasedRouteSelector implements RouteSelectionStrategy{
 	private File[] readRoutes(String pathToRoutes) {
 		LOGGER.info("Collecting routes from {}", pathToRoutes);
 		File file = new File(pathToRoutes);
+		LOGGER.debug("Absolute path is {}", file.getAbsolutePath());
 		File[] gpx;
         
 		if (file.exists() && file.isDirectory()) {

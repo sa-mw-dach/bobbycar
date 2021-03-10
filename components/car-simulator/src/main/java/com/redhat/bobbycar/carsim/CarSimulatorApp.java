@@ -1,5 +1,9 @@
 package com.redhat.bobbycar.carsim;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.post;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
+
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -28,6 +32,7 @@ import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.github.tomakehurst.wiremock.WireMockServer;
 import com.redhat.bobbycar.carsim.cars.Car;
 import com.redhat.bobbycar.carsim.cars.EngineException;
 import com.redhat.bobbycar.carsim.cars.EngineMetrics;
@@ -76,6 +81,9 @@ public class CarSimulatorApp {
 	boolean repeat;
 	@ConfigProperty(name = "com.redhat.bobbycar.carsim.kafka.apiKey")
 	Optional<String> apiKey;
+	@ConfigProperty(name = "com.redhat.bobbycar.carsim.mockHttp", defaultValue = "false")
+	boolean mockHttp;
+	
 	// CDI Beans
 	@Inject
     DriverDao driverDao;
@@ -104,12 +112,14 @@ public class CarSimulatorApp {
 	// Attributes
     private RouteSelectionStrategy routeSelectionStrategy;
 	private final Map<UUID, CompletableFuture<Void>> futures;
+	private WireMockServer wireMockServer;
 
 	public CarSimulatorApp() throws JAXBException {
 		futures = new HashMap<>();
 	}
 	
 	void onStart(@Observes StartupEvent ev) {  
+		mockHttp();
 		ThreadPoolExecutor carPoolExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(cars);
 		ThreadPoolExecutor enginePoolExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(cars);
         LOGGER.info("The application is starting... ");
@@ -151,9 +161,22 @@ public class CarSimulatorApp {
 			}
         });
     }
+
+	private void mockHttp() {
+		if (mockHttp) {
+			wireMockServer = new WireMockServer(8081);
+			wireMockServer.start(); 
+			wireMockServer.stubFor(post(urlMatching("/topics/bobbycar-gps")).willReturn(
+					aResponse().withHeader("Content-Type", "application/json").withBody("")));
+			
+		}
+	}
 	
 	void onStop(@Observes ShutdownEvent ev) {               
         LOGGER.info("The application is stopping...");
+        if (mockHttp) {
+			wireMockServer.stop(); 
+		}
     }
 	
 	synchronized RouteSelectionStrategy getRouteSelectionStrategy() {
