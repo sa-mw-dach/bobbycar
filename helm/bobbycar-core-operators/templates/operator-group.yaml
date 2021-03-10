@@ -3,9 +3,11 @@ kind: OperatorGroup
 metadata:
   annotations:
     olm.providedAPIs: ""
+    "helm.sh/hook": pre-install
+    "helm.sh/hook-weight": "-100"
   generateName: bobbycar-og-
   name: bobbycar-og
-  namespace: bobbycar
+  namespace: {{ .Values.namespace }}
 spec:
   targetNamespaces:
-  - bobbycar
+  - {{ .Values.namespace }}

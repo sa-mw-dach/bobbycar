@@ -13,7 +13,7 @@ export class CarMetricsService {
   private CAR_METRICS_ENDPOINT: string;
 
   constructor(private configService: ConfigService) {
-    console.debug('new WSService()');
+    console.debug('new CarMetricsService()');
     this.CAR_METRICS_ENDPOINT = configService.CAR_METRICS_ENDPOINT;
   }
 

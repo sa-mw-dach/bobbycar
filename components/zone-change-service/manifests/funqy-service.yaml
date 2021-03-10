@@ -1,0 +1,13 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: zone-change
+spec:
+  template:
+    metadata:
+      name: zone-change-v1
+      annotations:
+        autoscaling.knative.dev/target: "1"
+    spec:
+      containers:
+        - image: docker.io/yourAccountName/funqy-knative-events-codestart

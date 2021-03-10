@@ -1,19 +1,17 @@
-{{- if .Values.components.enabled.datagrid -}}
 kind: Route
 apiVersion: route.openshift.io/v1
 metadata:
   name: datagrid
   namespace: {{ .Values.namespace }}
   labels:
-    clusterName: {{ .Values.datagrid.name }}
-    infinispan_cr: {{ .Values.datagrid.name }}
+    clusterName: bobbycar-dg
+    infinispan_cr: bobbycar-dg
 spec:
-  host: {{ .Values.datagrid.name }}-{{ .Values.namespace }}.{{ .Values.ocpDomain }}
+  host: bobbycar-dg-{{ .Values.namespace }}.{{ .Values.ocpDomain }}
   to:
     kind: Service
-    name: {{ .Values.datagrid.name }}
+    name: bobbycar-dg
     weight: 100
   port:
     targetPort: 11222
   wildcardPolicy: None
-{{- end }}   

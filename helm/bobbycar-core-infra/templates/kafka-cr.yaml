@@ -1,8 +1,7 @@
-{{- if .Values.components.enabled.kafka -}}
 apiVersion: kafka.strimzi.io/v1beta1
 kind: Kafka
 metadata:
-  name: {{ .Values.kafka.cluster.name }}
+  name: bobbycar-cluster
   namespace: {{ .Values.namespace }}
 spec:
   kafka:
@@ -25,4 +24,3 @@ spec:
   entityOperator:
     topicOperator: {}
     userOperator: {}
-{{- end }} 

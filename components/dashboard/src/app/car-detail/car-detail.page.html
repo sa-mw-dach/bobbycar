@@ -9,23 +9,36 @@
 
   <div class="image-box" style="--image-url: url(assets/cockpit.jpg)">
     <div class="navi">
-      <div id="map"></div>
+      <div id="map" style="border-radius:10px;"></div>
     </div>
     <div class="window" [style.visibility]="streetName ==''? 'hidden': 'visible'">
       <div id="pano"></div>
     </div>
     <div class="instruments" *ngIf="showHUD">
-      <ion-list>
-        <ion-item>Car ID: <span class="metricDisplayGrey"> {{ carMetric.driverId }} </span></ion-item>
-        <ion-item>Manufacturer: <span class="metricDisplayGrey"> {{ carMetric.manufacturer }} </span></ion-item>
-        <ion-item> Model: <span class="metricDisplayGrey"> {{ carMetric.model }} </span></ion-item>
-        <ion-item> Speed: <span class="metricDisplayGreen"> {{ carMetric.speed }} </span></ion-item>
-        <ion-item> RPM: <span class="metricDisplayGreen"> {{ carMetric.rpm }} </span></ion-item>
-        <ion-item> l/100km: <span class="metricDisplayGreen"> {{ carMetric.fuel }} </span></ion-item>
-        <ion-item> CO2: <span class="metricDisplayGreen"> {{ carMetric.co2 }} </span></ion-item>
-        <ion-item> Gear: <span class="metricDisplayGreen"> {{ carMetric.gear }} </span></ion-item>
-        <ion-item> Street: <span class="metricDisplayGrey"> {{streetName}} </span></ion-item>
-      </ion-list>      
+    <ion-grid>
+      <ion-row>
+        <ion-col>
+          <ion-list style="border: 3px solid #fff; border-radius: 10px;">
+            <ion-item>Car ID: <span class="metricDisplayGrey"> {{ carMetric.driverId }} </span></ion-item>
+            <ion-item>Manufacturer: <span class="metricDisplayGrey"> {{ carMetric.manufacturer }} </span></ion-item>
+            <ion-item> Model: <span class="metricDisplayGrey"> {{ carMetric.model }} </span></ion-item>
+            <ion-item> Street: <span class="metricDisplayGrey"> {{streetName}} </span></ion-item>
+            <ion-item> BobbycarZone: <span class="metricDisplayGrey"> {{carMetric.zone}} </span></ion-item>
+          </ion-list>
+        </ion-col>
+        <ion-col>
+          <ion-list style="border: 3px solid #fff; border-radius: 10px;">
+          <ion-item> Speed: <span class="metricDisplayGreen"> {{ carMetric.speed }} </span></ion-item>
+          <ion-item> RPM: <span class="metricDisplayGreen"> {{ carMetric.rpm }} </span></ion-item>
+          <ion-item> l/100km: <span class="metricDisplayGreen"> {{ carMetric.fuel }} </span></ion-item>
+          <ion-item> CO2: <span class="metricDisplayGreen"> {{ carMetric.co2 }} </span></ion-item>
+          <ion-item> Gear: <span class="metricDisplayGreen"> {{ carMetric.gear }} </span></ion-item>
+        </ion-list>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+
+
     </div>
     <ion-button class="menu" (click)="toggleHUD()">
       HUD

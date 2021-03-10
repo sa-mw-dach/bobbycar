@@ -12,8 +12,12 @@ public class MqttToKafka extends RouteBuilder {
 	public void configure() throws Exception {
 
 		from("paho:{{com.redhat.bobbycar.camelk.mqtt.topic}}?brokerUrl={{com.redhat.bobbycar.camelk.mqtt.brokerUrl}}")
-			.log("Publishing ${body} to kafka")
-		.to("kafka:{{com.redhat.bobbycar.camelk.kafka.topic}}?clientId=mqtt2kafkaClient&brokers={{com.redhat.bobbycar.camelk.kafka.brokers}}");
+			.log("Publishing engine metric ${body} to Kafka")
+		.to("kafka:{{com.redhat.bobbycar.camelk.kafka.topic}}?clientId=mqtt2kafkaClientEM&brokers={{com.redhat.bobbycar.camelk.kafka.brokers}}");
+
+		from("paho:{{com.redhat.bobbycar.camelk.mqtt.topicZoneChange}}?brokerUrl={{com.redhat.bobbycar.camelk.mqtt.brokerUrl}}")
+			.log("Publishing zone change ${body} to Kafka")
+		.to("kafka:{{com.redhat.bobbycar.camelk.kafka.topicZoneChange}}?clientId=mqtt2kafkaClientZC&brokers={{com.redhat.bobbycar.camelk.kafka.brokers}}");
 	
 	}	
 	

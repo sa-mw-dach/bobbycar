@@ -1,0 +1,16 @@
+apiVersion: sources.knative.dev/v1beta1
+kind: ApiServerSource
+metadata:
+  name: zone-events-source
+  namespace: {{ .Values.namespace }}
+spec:
+  serviceAccountName: bobbycar-sa
+  mode: Resource
+  resources:
+    - apiVersion: bobbycar.redhat.com/v1alpha1
+      kind: BobbycarZone
+  sink:
+    ref:
+      apiVersion: eventing.knative.dev/v1
+      kind: Broker
+      name: {{ .Values.broker.name }}
