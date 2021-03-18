@@ -1,26 +1,31 @@
 # The namespace where to install the operators (required)
 namespace:
+installOperatorGroup: true
 
 # AMQ Broker Operator Subscription
+installAmq: true
 amqOperator:
-  installPlanApproval: Automatic
+  installPlanApproval: Manual
   startingCSV: amq-broker-operator.v0.18.0
   channel: current
 
 # Camel-K Operator Subscription
+installCamelK: true
 camelKOperator:
-  installPlanApproval: Automatic
+  installPlanApproval: Manual
   startingCSV: red-hat-camel-k-operator.v1.2.1
   channel: techpreview
 
 # Datagrid Operator Subscription
+installDatagrid: true
 datagridOperator:
-  installPlanApproval: Automatic
+  installPlanApproval: Manual
   startingCSV: datagrid-operator.v8.0.3
   channel: 8.0.x
 
 # AMQ Streams Operator Subscription
+installStrimzi: true
 strimziOperator:
-  installPlanApproval: Automatic
-  startingCSV: amqstreams.v1.6.1
+  installPlanApproval: Manual
+  startingCSV: amqstreams.v1.6.2
   channel: stable
