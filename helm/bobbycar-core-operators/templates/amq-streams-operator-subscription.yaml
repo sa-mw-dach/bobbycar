@@ -1,4 +1,4 @@
-{{ if .Values.installStrimzi }}
+{{- if .Values.installStrimzi }}
 apiVersion: operators.coreos.com/v1alpha1
 kind: Subscription
 metadata:
@@ -11,4 +11,4 @@ spec:
   source: redhat-operators
   sourceNamespace: openshift-marketplace
   startingCSV: {{ .Values.strimziOperator.startingCSV }}
-{{ end }}
+{{- end }}

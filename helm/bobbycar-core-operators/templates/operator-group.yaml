@@ -1,4 +1,4 @@
-{{ if .Values.installOperatorGroup }}
+{{- if .Values.installOperatorGroup }}
 apiVersion: operators.coreos.com/v1
 kind: OperatorGroup
 metadata:
@@ -13,4 +13,4 @@ metadata:
 spec:
   targetNamespaces:
   - {{ .Values.namespace }}
-{{ end }}
+{{- end }}
