@@ -1,0 +1,12 @@
+apiVersion: 1.0.0
+metadata:
+  name: IntelliJ-dev
+projects:
+  - name: bobbycar
+    source:
+      location: 'https://github.com/sa-mw-dach/bobbycar'
+      type: git
+components:
+  - type: cheEditor
+    reference: 'https://raw.githubusercontent.com/redhat-developer/codeready-workspaces/crw-2.7-rhel-8/dependencies/che-editor-intellij-community/devfiles/meta.yaml'
+    alias: ideaic-editor

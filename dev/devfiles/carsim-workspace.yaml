@@ -1,0 +1,116 @@
+apiVersion: 1.0.0
+metadata:
+  name: car-simulator-dev
+projects:
+  - name: bobbycar
+    source:
+      location: 'http://gogs-bobbycar-dev.apps.ocp4.rhlab.de/gogs/bobbycar.git'
+      type: git
+      sparseCheckoutDir: components/car-simulator
+components:
+  - id: redhat/quarkus-java11/latest
+    type: chePlugin
+  - mountSources: true
+    memoryLimit: 512Mi
+    type: dockerimage
+    alias: rsync
+    image: 'quay.io/fbenoit/rsync-simple:latest'
+  - mountSources: false
+    endpoints:
+      - attributes:
+          path: /console
+        name: amq-console
+        port: 8161
+      - name: 61616/tcp
+        port: 61616
+    memoryLimit: 2048Mi
+    type: dockerimage
+    alias: amq
+    image: 'registry.redhat.io/amq7/amq-broker:7.8'
+    env:
+      - value: bobbycar
+        name: AMQ_USER
+      - value: bobbycar
+        name: AMQ_PASSWORD
+  - mountSources: true
+    endpoints:
+      - attributes:
+          path: /hello/greeting/che-user
+        name: hello-greeting-endpoint
+        port: 8080
+      - attributes:
+          public: 'false'
+        name: debug
+        port: 5005
+    memoryLimit: 8G
+    type: dockerimage
+    volumes:
+      - name: m2
+        containerPath: /home/user/.m2
+    alias: centos-quarkus-maven
+    image: 'quay.io/eclipse/che-quarkus:nightly'
+    env:
+      - value: '-XX:MaxRAMPercentage=50.0 -XX:+UseParallelGC -XX:MinHeapFreeRatio=10 -XX:MaxHeapFreeRatio=20 -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -Dsun.zip.disableMemoryMapping=true -Xms20m -Djava.security.egd=file:/dev/./urandom -Duser.home=/home/user'
+        name: JAVA_OPTS
+      - value: $(JAVA_OPTS)
+        name: MAVEN_OPTS
+      - value: 0.0.0.0
+        name: QUARKUS_HTTP_HOST
+  - mountSources: true
+    endpoints:
+      - attributes:
+          path: /hello/greeting/che-user
+        name: hello-greeting-endpoint
+        port: 8080
+    command:
+      - tail
+    args:
+      - '-f'
+      - /dev/null
+    memoryLimit: 32M
+    type: dockerimage
+    alias: ubi-minimal
+    image: registry.access.redhat.com/ubi8/ubi-minimal
+  - id: redhat/vscode-openshift-connector/latest
+    type: chePlugin
+commands:
+  - name: Attach remote debugger
+    actions:
+      - referenceContent: |
+          {
+            "version": "0.2.0",
+            "configurations": [
+              {
+                "type": "java",
+                "request": "attach",
+                "name": "Attach to Remote Quarkus App",
+                "hostName": "localhost",
+                "port": 5005
+              }
+            ]
+          }
+        type: vscode-launch
+  - name: Bobbycar - Dev mode
+    actions:
+      - workdir: '${CHE_PROJECTS_ROOT}/bobbycar/components/car-simulator'
+        type: exec
+        command: './mvnw compile quarkus:dev'
+        component: centos-quarkus-maven
+  - name: Bobbycar - Package
+    actions:
+      - workdir: '${CHE_PROJECTS_ROOT}/bobbycar/components/car-simulator'
+        type: exec
+        command: ./mvnw clean package -Dmaven.test.skip
+        component: centos-quarkus-maven
+  - name: Bobbycar- Package Native
+    actions:
+      - workdir: '${CHE_PROJECTS_ROOT}/bobbycar/components/car-simulator'
+        type: exec
+        command: ./mvnw package -Dnative -Dmaven.test.skip -Dquarkus.native.native-image-xmx=8G
+        component: centos-quarkus-maven
+  - name: Bobbycar- Run Native
+    actions:
+      - workdir: '${CHE_PROJECTS_ROOT}/bobbycar/components/car-simulator/target'
+        type: exec
+        command: ./car-simulator-1.0.0-SNAPSHOT-runner
+        component: ubi-minimal
