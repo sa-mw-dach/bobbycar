@@ -1,0 +1,18 @@
+apiVersion: 1.0.0
+metadata:
+  name: camel-k-dev
+projects:
+  - name: bobbycar
+    source:
+      location: 'http://gogs-bobbycar-dev.apps.ocp4.rhlab.de/gogs/bobbycar.git'
+      type: git
+      sparseCheckoutDir: components
+      branch: master
+components:
+  - id: redhat/vscode-xml/latest
+    type: chePlugin
+  - id: redhat/vscode-apache-camel/latest
+    type: chePlugin
+  - id: redhat/vscode-camelk/latest
+    type: chePlugin
+    alias: vscode-camelk
