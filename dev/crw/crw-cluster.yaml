@@ -1,0 +1,33 @@
+apiVersion: org.eclipse.che/v1
+kind: CheCluster
+metadata:
+  name: codeready-workspaces
+spec:
+  auth:
+    openShiftoAuth: true
+  database:
+    externalDb: false
+  imagePuller:
+    enable: false
+    spec: {}
+  k8s: {}
+  metrics:
+    enable: true
+  server:
+    cheLogLevel: INFO
+    externalDevfileRegistry: false
+    selfSignedCert: false
+    cheDebug: 'false'
+    tlsSupport: true
+    allowUserDefinedWorkspaceNamespaces: false
+    externalPluginRegistry: false
+    gitSelfSignedCert: false
+    useInternalClusterSVCNames: true
+    cheFlavor: codeready
+    customCheProperties:
+      CHE_LIMITS_USER_WORKSPACES_RUN_COUNT: '10'
+      CHE_LIMITS_WORKSPACE_IDLE_TIMEOUT: '-1'
+  storage:
+    preCreateSubPaths: true
+    pvcClaimSize: 1Gi
+    pvcStrategy: common

@@ -1,0 +1,124 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: carsim-pipe
+spec:
+  tasks:
+    - name: git-clone
+      params:
+        - name: url
+          value: http://gogs-bobbycar-dev.apps.ocp4.rhlab.de/gogs/bobbycar.git
+        - name: revision
+          value: master
+        - name: submodules
+          value: "true"
+        - name: depth
+          value: "1"
+        - name: sslVerify
+          value: "true"
+        - name: deleteExisting
+          value: "true"
+      taskRef:
+        kind: ClusterTask
+        name: git-clone
+      workspaces:
+        - name: output
+          workspace: shared-workspace
+    - name: unit-tests
+      params:
+        - name: GOALS
+          value:
+            - -f
+            - components/car-simulator/pom.xml
+            - org.jacoco:jacoco-maven-plugin:0.8.6:prepare-agent
+            - test
+            - org.jacoco:jacoco-maven-plugin:0.8.6:report
+        - name: MAVEN_MIRROR_URL
+          value: http://nexus3-bobbycar-dev.apps.ocp4.rhlab.de/repository/maven-public/
+        - name: PROXY_PROTOCOL
+          value: http
+      runAfter:
+        - git-clone
+      taskRef:
+        kind: ClusterTask
+        name: maven
+      workspaces:
+        - name: maven-settings
+          workspace: maven-settings
+        - name: source
+          workspace: shared-workspace
+    - name: sonar-scan
+      params:
+        - name: GOALS
+          value:
+            - org.sonarsource.scanner.maven:sonar-maven-plugin:3.6.0.1398:sonar
+            - -f
+            - components/car-simulator/pom.xml
+            - -Dsonar.host.url=http://sonarqube-bobbycar-dev.apps.ocp4.rhlab.de/
+            - -Dsonar.projectKey=car-simulator
+            - -Dsonar.login=9d964bbf333b925a86cf4d0058cabe2173a9e1c9
+        - name: MAVEN_MIRROR_URL
+          value: http://nexus3-bobbycar-dev.apps.ocp4.rhlab.de/repository/maven-public/
+        - name: PROXY_PROTOCOL
+          value: http
+      runAfter:
+        - unit-tests
+      taskRef:
+        kind: ClusterTask
+        name: maven
+      workspaces:
+        - name: maven-settings
+          workspace: maven-settings
+        - name: source
+          workspace: shared-workspace
+    - name: deploy-artifact
+      params:
+        - name: GOALS
+          value:
+            - deploy
+            - -f
+            - components/car-simulator/pom.xml
+            - -Dmaven.test.skip=true
+            - -Drepos.snapshot.url=http://nexus3-bobbycar-dev.apps.ocp4.rhlab.de/repository/maven-snapshots/
+            - -Drepos.release.url=http://nexus3-bobbycar-dev.apps.ocp4.rhlab.de/repository/maven-releases/
+        - name: MAVEN_MIRROR_URL
+          value: http://nexus3-bobbycar-dev.apps.ocp4.rhlab.de/repository/maven-public/
+        - name: PROXY_PROTOCOL
+          value: http
+      runAfter:
+        - sonar-scan
+      taskRef:
+        kind: ClusterTask
+        name: maven
+      workspaces:
+        - name: maven-settings
+          workspace: maven-settings
+        - name: source
+          workspace: shared-workspace
+    - name: build-image
+      params:
+        - name: IMAGE
+          value: image-registry.openshift-image-registry.svc:5000/bobbycar-dev/car-simulator
+        - name: BUILDER_IMAGE
+          value: quay.io/buildah/stable:v1.14.8
+        - name: STORAGE_DRIVER
+          value: overlay
+        - name: DOCKERFILE
+          value: ./src/main/docker/Dockerfile.jvm
+        - name: CONTEXT
+          value: ./components/car-simulator/
+        - name: TLSVERIFY
+          value: "false"
+        - name: FORMAT
+          value: oci
+      runAfter:
+        - deploy-artifact
+      taskRef:
+        kind: Task
+        name: buildah
+      workspaces:
+        - name: source
+          workspace: shared-workspace
+  workspaces:
+    - name: shared-workspace
+    - name: maven-settings
