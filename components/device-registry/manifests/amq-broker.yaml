@@ -1,0 +1,29 @@
+apiVersion: broker.amq.io/v2alpha4
+kind: ActiveMQArtemis
+metadata:
+  name: ex-aao
+spec:
+  acceptors:
+    - expose: true
+      name: all
+      port: 61616
+      sslEnabled: true
+      sslSecret: amq-tls-secret
+      verifyHost: false
+    - expose: true
+      name: mqtt
+      port: 1883
+      protocols: mqtt
+  adminPassword: admin
+  adminUser: admin
+  console:
+    expose: true
+  deploymentPlan:
+    image: 'registry.redhat.io/amq7/amq-broker:7.7'
+    jolokiaAgentEnabled: false
+    journalType: nio
+    managementRBACEnabled: true
+    messageMigration: false
+    persistenceEnabled: false
+    requireLogin: false
+    size: 1
