@@ -1,0 +1,77 @@
+apiVersion: 1.0.0
+metadata:
+  name: ansible-dev
+projects:
+  - name: demopoc
+    source:
+      location: 'https://github.com/victorock/demopoc'
+      type: git
+      branch: dev
+  - name: ansible-role-tower-config
+    source:
+      location: 'https://github.com/victorock/ansible-role-tower-config'
+      type: git
+      branch: dev
+  - name: workshops
+    source:
+      location: 'https://github.com/ansible/workshops'
+      type: git
+  - name: examples
+    source:
+      location: 'https://github.com/ansible/ansible-examples'
+      type: git
+components:
+  - mountSources: true
+    args:
+      - tail
+      - '-f'
+      - /dev/null
+    memoryLimit: 512M
+    type: dockerimage
+    alias: ansible
+    image: quay.io/sunix/che-remote-plugin-ansible
+    env:
+      - value: /projects/
+        name: HOME
+  - type: chePlugin
+    reference: 'https://raw.githubusercontent.com/sunix/che-ansible/master/plugin/meta.yaml'
+    alias: ansible-plugin
+  - id: redhat/vscode-yaml/latest
+    type: chePlugin
+commands:
+  - name: 'Molecule: Lint'
+    actions:
+      - workdir: /projects/ansible-role-tower-config
+        type: exec
+        command: molecule lint
+        component: ansible
+  - name: 'Yamllint: workshops'
+    actions:
+      - workdir: /projects/workshops
+        type: exec
+        command: yamllint .
+        component: ansible
+  - name: 'Workshop: RHEL'
+    actions:
+      - workdir: /projects/workshops/provisioner
+        type: exec
+        command: ansible-playbook provision_lab.yml -e @sample_workshops/sample-vars-rhel.yml
+        component: ansible
+  - name: 'Workshop: Networking'
+    actions:
+      - workdir: /projects/workshops/provisioner
+        type: exec
+        command: ansible-playbook provision_lab.yml -e @sample_workshops/sample-vars-networking.yml
+        component: ansible
+  - name: 'Workshop: Security'
+    actions:
+      - workdir: /projects/workshops/provisioner
+        type: exec
+        command: ansible-playbook provision_lab.yml -e @sample_workshops/sample-vars-security.yml
+        component: ansible
+  - name: 'Workshop: F5'
+    actions:
+      - workdir: /projects/workshops/provisioner
+        type: exec
+        command: ansible-playbook provision_lab.yml -e @sample_workshops/sample-vars-f5.yml
+        component: ansible
