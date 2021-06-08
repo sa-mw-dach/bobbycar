@@ -1,0 +1,93 @@
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: sonarqube-data
+  namespace: {{ .Release.Namespace }}
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.sonar.resources.storageData }}
+---
+kind: DeploymentConfig
+apiVersion: apps.openshift.io/v1
+metadata:
+  name: sonarqube
+  namespace: {{ .Release.Namespace }}
+spec:
+  strategy:
+    type: Rolling
+    rollingParams:
+      updatePeriodSeconds: 1
+      intervalSeconds: 1
+      timeoutSeconds: 600
+      maxUnavailable: 25%
+      maxSurge: 25%
+    resources: {}
+    activeDeadlineSeconds: 21600
+  replicas: 1
+  revisionHistoryLimit: 10
+  test: false
+  selector:
+    app: sonarqube
+    deploymentconfig: sonarqube
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: sonarqube
+        deploymentconfig: sonarqube
+    spec:
+      containers:
+        - name: sonarqube
+          image: {{ .Values.sonar.image.repository }}
+          ports:
+            - containerPort: {{ .Values.sonar.image.containerPort }}
+              protocol: TCP
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+            - mountPath: /opt/sonarqube/data
+              name: sonarqube-data
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      volumes:
+        - name: sonarqube-data
+          persistentVolumeClaim:
+            claimName: sonarqube-data
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: sonarqube
+  namespace: {{ .Release.Namespace }}
+spec:
+  ports:
+    - name: 9000-tcp
+      protocol: TCP
+      port: {{ .Values.sonar.image.containerPort }}
+      targetPort: {{ .Values.sonar.image.containerPort }}
+  selector:
+    app: sonarqube
+    deploymentconfig: sonarqube
+  type: ClusterIP
+  sessionAffinity: None
+---
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  name: sonarqube
+  namespace: {{ .Release.Namespace }}
+spec:
+  to:
+    kind: Service
+    name: sonarqube
+    weight: 100
+  port:
+    targetPort: 9000-tcp
+  wildcardPolicy: None
+
