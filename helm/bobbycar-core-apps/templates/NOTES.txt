@@ -11,3 +11,9 @@ Bobbycar core application components:
 
 1.0.1
 - Disabled Quarkus Runtime for Camel-K integrations.
+
+1.0.2
+- Add Schema Json for values file
+
+1.0.3
+- Add Modern Webapp Image Stream

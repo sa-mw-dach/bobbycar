@@ -1,0 +1,57 @@
+kind: ImageStream
+apiVersion: image.openshift.io/v1
+metadata:
+  name: modern-webapp
+  namespace: openshift
+  labels:
+    samples.operator.openshift.io/managed: 'true'
+  annotations:
+    openshift.io/display-name: Tech Preview - Modern Web Applications
+    "helm.sh/resource-policy": keep
+spec:
+  lookupPolicy:
+    local: false
+  tags:
+    - name: 10.x
+      annotations:
+        description: >-
+          Build and run Modern Web Applications on RHEL 7. For more information
+          about using this builder image, including OpenShift considerations,
+          see https://github.com/nodeshift/centos7-s2i-web-app.
+        iconClass: icon-js
+        openshift.io/display-name: Tech Preview - Modern Web Applications (10.x)
+        openshift.io/provider-display-name: 'Red Hat, Inc.'
+        sampleRepo: 'https://github.com/nodeshift-starters/react-web-app'
+        supports: modern-webapp
+        tags: 'builder,modern-webapp, webapp'
+        version: '10'
+      from:
+        kind: DockerImage
+        name: registry.redhat.io/rhoar-nodejs-tech-preview/rhoar-nodejs-10-webapp
+      importPolicy: {}
+      referencePolicy:
+        type: Local
+    - name: latest
+      annotations:
+        description: >-
+          Build and run Modern Web Applications on RHEL 7. For more information
+          about using this builder image, including OpenShift considerations,
+          see https://github.com/nodeshift/centos7-s2i-web-app.
+
+
+          WARNING: By selecting this tag, your application will automatically
+          update to use the latest version of Node.js available on OpenShift,
+          including major versions updates.
+        iconClass: icon-js
+        openshift.io/display-name: Tech Preview - Modern Web Applications (Latest)
+        openshift.io/provider-display-name: 'Red Hat, Inc.'
+        sampleRepo: 'https://github.com/nodeshift-starters/react-web-app'
+        supports: modern-webapp
+        tags: 'builder,modern-webapp, webapp'
+      from:
+        kind: ImageStreamTag
+        name: 10.x
+      importPolicy: {}
+      referencePolicy:
+        type: Local
+
