@@ -1,0 +1,120 @@
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: gogs-data
+  namespace: {{ .Release.Namespace }}
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.gogs.resources.storageData }}
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: gogs-config
+  namespace: {{ .Release.Namespace }}
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.gogs.resources.storageConfig }}
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  annotations:
+    app.openshift.io/connects-to: >-
+      [{"apiVersion":"apps.openshift.io/v1","kind":"DeploymentConfig","name":"postgresql"}]
+  name: gogs
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/part-of: {{ include "app.name" . }}
+    helm.sh/chart: {{ include "chart.name-version" . }}
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: gogs
+  template:
+    metadata:
+      labels:
+        app: gogs
+    spec:
+      containers:
+        - name: gogs
+          image: {{ .Values.gogs.image.repository }}
+          ports:
+            - containerPort: {{ .Values.gogs.image.containerPort }}
+              protocol: TCP
+              name: http
+          resources:
+            requests:
+              memory: {{ .Values.gogs.image.requests.memory }}
+              cpu: {{ .Values.gogs.image.requests.cpu }}
+            limits:
+              memory: {{ .Values.gogs.image.limits.memory }}
+              cpu: {{ .Values.gogs.image.limits.cpu }}
+          volumeMounts:
+            - name: data
+              mountPath: /opt/gogs/data
+            - name: config
+              mountPath: /opt/gogs/custom
+          startupProbe:
+            httpGet:
+              path: /
+              port: http
+            failureThreshold: 30
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            failureThreshold: 3
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            failureThreshold: 3
+            periodSeconds: 10
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: gogs-data
+        - name: config
+          persistentVolumeClaim:
+            claimName: gogs-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gogs
+  namespace: {{ .Release.Namespace }}
+spec:
+  selector:
+    app: gogs
+  ports:
+    - protocol: TCP
+      port: {{ .Values.gogs.image.containerPort }}
+---
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  name: gogs
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    openshift.io/host.generated: 'true'
+spec:
+  to:
+    kind: Service
+    name: gogs
+    weight: 100
+  port:
+    targetPort: {{ .Values.gogs.image.containerPort }}
+  wildcardPolicy: None

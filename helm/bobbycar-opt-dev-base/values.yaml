@@ -1,0 +1,38 @@
+nameOverride: ""
+fullnameOverride: ""
+
+gogs:
+  resources:
+    storageData: "1Gi"
+    storageConfig: "1Gi"
+    storageDatabase: "1Gi"
+  image:
+    repository: 'quay.io/davivcgarcia/ubi-gogs:v0.11.91-2'
+    containerPort: 3000
+    requests:
+      memory: "512Mi"
+      cpu: "200m"
+    limits:
+      memory: "512Mi"
+      cpu: "2"
+  database:
+    name: "gogs"
+    password: "gogs"
+    user: "gogs"
+    image:
+      containerPort: 5432
+      repository: "image-registry.openshift-image-registry.svc:5000/openshift/postgresql"
+
+nexus:
+  resources:
+    storage: "2Gi"
+  image:
+    repository: 'sonatype/nexus3'
+    containerPort: 8081
+
+sonar:
+  resources:
+    storageData: "2Gi"
+  image:
+    repository: 'sonarqube:latest'
+    containerPort: 9000
