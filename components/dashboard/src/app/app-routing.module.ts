@@ -18,6 +18,10 @@ const routes: Routes = [
   {
     path: 'car-detail/:id',
     loadChildren: () => import('./car-detail/car-detail.module').then( m => m.CarDetailPageModule)
+  },
+  {
+    path: 'hddp',
+    loadChildren: () => import('./hddp/hddp.module').then( m => m.HddpPageModule)
   }
 ];
 
