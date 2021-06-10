@@ -30,6 +30,7 @@ export class CarDetailPage implements OnInit {
   sv = new google.maps.StreetViewService();
   streetName = '';
   showHUD = false;
+  carBg = 'VW';
 
   constructor(
     private carEventsService: CarEventsService,
@@ -38,7 +39,7 @@ export class CarDetailPage implements OnInit {
     private zoneChangeService: ZoneChangeService,
     private route: ActivatedRoute,
     public toastController: ToastController,
-    private zone: NgZone
+    private zone: NgZone,
     ) {}
 
   initializeMap() {
