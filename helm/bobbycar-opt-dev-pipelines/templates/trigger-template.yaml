@@ -1,0 +1,34 @@
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: TriggerTemplate
+metadata:
+  name: car-sim-template
+  namespace: {{ .Release.Namespace }}
+spec:
+  params:
+    - default: main
+      description: The git revision
+      name: gitrevision
+    - description: The git repository url
+      name: gitrepositoryurl
+    - default: This is the default message
+      description: The message to print
+      name: message
+    - description: The Content-Type of the event
+      name: contenttype
+  resourcetemplates:
+    - apiVersion: tekton.dev/v1beta1
+      kind: PipelineRun
+      metadata:
+        generateName: car-sim-run-
+      spec:
+        pipelineRef:
+          name: carsim-pipe
+        serviceAccountName: pipeline
+        timeout: 1h0m0s
+        workspaces:
+          - name: shared-workspace
+            persistentVolumeClaim:
+              claimName: carsim-pipe-pvc
+          - configMap:
+              name: maven-settings
+            name: maven-settings

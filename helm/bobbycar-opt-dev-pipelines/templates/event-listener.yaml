@@ -1,0 +1,10 @@
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: EventListener
+metadata:
+  name: car-sim-triggerref
+  namespace: {{ .Release.Namespace }}
+spec:
+  podTemplate: {}
+  serviceAccountName: tekton-triggers-sa
+  triggers:
+    - triggerRef: car-sim-trigger
