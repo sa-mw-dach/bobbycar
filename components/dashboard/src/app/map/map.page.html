@@ -37,6 +37,11 @@
         <ion-checkbox slot="start"></ion-checkbox>
         <ion-label *ngIf="isQuery">7.6 l/100km</ion-label>
       </ion-item>
+      <ion-item>
+        <ion-label>Average Driver Distraction</ion-label>
+        <ion-checkbox slot="start"></ion-checkbox>
+        <ion-label *ngIf="isQuery">6.8</ion-label>
+      </ion-item>
     </ion-list>
     <ion-button (click)="simulateQuery()">
       <ion-icon name="search"></ion-icon> 
