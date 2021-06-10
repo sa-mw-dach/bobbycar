@@ -1,0 +1,26 @@
+nameOverride: ""
+fullnameOverride: ""
+
+pipeline:
+  serviceAccountName: "tekton-triggers-sa"
+  deployTektonTriggerClusterRole: true
+  bobbycar:
+    storage: "1Gi"
+    maven:
+      mirror: "http://nexus3-domain/repository/maven-public/"
+      repoRelease:
+        user: "admin"
+        password: ""
+      repoSnapshot:
+        user: "admin"
+        password: ""
+    gitCloneUrl: "http://domain/repo/bobbycar.git"
+    gitRevision: "master"
+    sonar:
+      host: "http://sonarqube-domain/"
+      projectKey: "car-simulator"
+      loginToken: "token"
+    nexus:
+      snapshotRepoUrl: "http://nexus3-domain/repository/maven-snapshots/"
+      releaseRepoUrl: "http://nexus3-domain/repository/maven-releases/"
+    containerImage: "image-registry.openshift-image-registry.svc:5000/namespace/car-simulator"

@@ -1,0 +1,40 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: maven-settings
+  namespace: {{ .Release.Namespace }}
+data:
+  settings.xml: >-
+    <?xml version="1.0" encoding="UTF-8"?> <settings
+    xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd">
+
+      <servers>
+        <server>
+          <id>repo-release</id>
+          <username>{{ .Values.pipeline.bobbycar.maven.repoRelease.user }}</username>
+          <password>{{ .Values.pipeline.bobbycar.maven.repoRelease.password }}</password>
+        </server>
+        <server>
+          <id>repo-snapshot</id>
+          <username>{{ .Values.pipeline.bobbycar.maven.repoSnapshot.user }}</username>
+          <password>{{ .Values.pipeline.bobbycar.maven.repoSnapshot.password }}</password>
+        </server>
+      </servers>
+      <mirrors>
+        <mirror>
+          <id>mirror.default</id>
+          <url>{{ .Values.pipeline.bobbycar.maven.mirror }}</url>
+          <mirrorOf>central</mirrorOf>
+        </mirror>
+      </mirrors>
+      <profiles>
+        <profile>
+          <id>nexus</id>
+        </profile>
+      </profiles>
+      <activeProfiles>
+        <activeProfile>nexus</activeProfile>
+      </activeProfiles>
+    </settings>

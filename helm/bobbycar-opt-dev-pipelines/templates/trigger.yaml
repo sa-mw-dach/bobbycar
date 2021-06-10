@@ -1,0 +1,11 @@
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: Trigger
+metadata:
+  name: car-sim-trigger
+  namespace: {{ .Release.Namespace }}
+spec:
+  bindings:
+    - kind: TriggerBinding
+      ref: car-sim-binding
+  template:
+    name: car-sim-template
