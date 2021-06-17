@@ -23,6 +23,12 @@
        min-height: 100vh;
     }
 
+ .image-box-skoda {
+        background: url("../../assets/skoda.jpg") center center no-repeat;
+        background-size: cover;
+        min-height: 100vh;
+     }
+
  .navi {
     position: absolute;
     top: 0%;
@@ -90,4 +96,10 @@
   position: absolute;
   top: 68%;
   left: 48%;
+}
+
+.menu-skoda {
+  position: absolute;
+  top: 48%;
+  left: 73%;
 }
