@@ -4,9 +4,10 @@
   </ion-toolbar>
 </ion-header>
 
+
 <ion-content padding color="light">
 
-  <div [ngClass]="{'image-box-s': carBg === 'S', 'image-box-vw': carBg === 'VW', 'image-box-bmw': carBg === 'BMW'}">
+  <div [ngClass]="{'image-box-s': carBg === 'S', 'image-box-vw': carBg === 'VW', 'image-box-bmw': carBg === 'BMW', 'image-box-skoda': carBg === 'SK'}">
     <div class="navi">
       <div id="map" style="border-radius:10px;"></div>
     </div>
@@ -23,11 +24,13 @@
               <span class="metricDisplayGrey" *ngIf="carBg==='VW'"> Volkswagen </span>
               <span class="metricDisplayGrey" *ngIf="carBg==='BMW'"> BMW </span>
               <span class="metricDisplayGrey" *ngIf="carBg==='S'"> Mercedes-Benz </span>
+              <span class="metricDisplayGrey" *ngIf="carBg==='SK'"> Skoda </span>
             </ion-item>
             <ion-item> Model:
               <span class="metricDisplayGrey" *ngIf="carBg==='VW'"> 2020 ID.3 </span>
               <span class="metricDisplayGrey" *ngIf="carBg==='BMW'"> 850 M </span>
               <span class="metricDisplayGrey" *ngIf="carBg==='S'"> S 500 </span>
+              <span class="metricDisplayGrey" *ngIf="carBg==='SK'"> Oktavia </span>
             </ion-item>
             <ion-item> Street: <span class="metricDisplayGrey"> {{streetName}} </span></ion-item>
             <ion-item> BobbycarZone: <span class="metricDisplayGrey"> {{carMetric.zone}} </span></ion-item>
@@ -36,10 +39,14 @@
         <ion-col>
           <ion-list style="border: 1px solid #000; border-radius: 5px;">
           <ion-item> Speed: <span class="metricDisplayGreen"> {{ carMetric.speed | number: '1.2-2' }} </span></ion-item>
-          <ion-item> RPM: <span class="metricDisplayGreen"> {{ carMetric.rpm | number: '1.2-2' }} </span></ion-item>
-          <ion-item> l/100km: <span class="metricDisplayGreen"> {{ carMetric.fuel | number: '1.2-2' }} </span></ion-item>
-          <ion-item> CO2: <span class="metricDisplayGreen"> {{ carMetric.co2 }} </span></ion-item>
-          <ion-item> Gear: <span class="metricDisplayGreen"> {{ carMetric.gear }} </span></ion-item>
+          <ion-item *ngIf="carBg!=='VW'"> RPM: <span class="metricDisplayGreen"> {{ carMetric.rpm | number: '1.2-2' }} </span></ion-item>
+          <ion-item *ngIf="carBg!=='VW'"> l/100km: <span class="metricDisplayGreen"> {{ carMetric.fuel | number: '1.2-2' }} </span></ion-item>
+          <ion-item *ngIf="carBg==='VW'"> kwh: <span class="metricDisplayGreen"> {{ carMetric.fuel | number: '1.2-2' }} </span></ion-item>
+          <ion-item *ngIf="carBg!=='VW'"> CO2: <span class="metricDisplayGreen"> {{ carMetric.co2 }} </span></ion-item>
+          <ion-item> Gear:
+            <span class="metricDisplayGreen" *ngIf="carBg!=='VW'"> {{ carMetric.gear }} </span>
+            <span class="metricDisplayGreen" *ngIf="carBg==='VW'"> D </span>
+          </ion-item>
         </ion-list>
         </ion-col>
       </ion-row>
@@ -47,7 +54,7 @@
 
 
     </div>
-    <ion-button [ngClass]="{'menu-s': carBg === 'S', 'menu': carBg === 'VW', 'menu-bmw': carBg === 'BMW'}" (click)="toggleHUD()">
+    <ion-button [ngClass]="{'menu-s': carBg === 'S', 'menu': carBg === 'VW', 'menu-bmw': carBg === 'BMW', 'menu-skoda': carBg === 'SK'}" (click)="toggleHUD()">
       HUD
     </ion-button>
     <!--<div id="chartdiv" style="width: 20%; height: 200px; top: 17%; left: 32%; position: absolute;"></div>-->
@@ -59,6 +66,7 @@
   <ion-toolbar>
   <ion-buttons slot="end">
     <ion-button size="small" (click)="carBg='VW'">VW</ion-button>
+    <ion-button size="small" (click)="carBg='SK'">Skoda</ion-button>
     <ion-button size="small" (click)="carBg='BMW'">BMW</ion-button>
     <ion-button size="small" (click)="carBg='S'">S</ion-button>
   </ion-buttons>
