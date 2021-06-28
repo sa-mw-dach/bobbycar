@@ -28,6 +28,7 @@ dashboard:
   config:
     googleApiKey:
     threeScaleApiKey: replaceme
+    hdppEndpoint:
 
 carSimulator:
   name: car-simulator 
