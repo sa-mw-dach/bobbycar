@@ -12,5 +12,6 @@ data:
         "CAR_EVENTS_ENDPOINT": "ws://dashboard-streaming-service-{{ .Values.namespace }}.{{ .Values.ocpDomain }}/api/carevents?sendToAll=true",
         "CAR_METRICS_ENDPOINT": "ws://dashboard-streaming-service-{{ .Values.namespace }}.{{ .Values.ocpDomain }}/api/carmetrics?sendToAll=true",
         "CAR_ZONECHANGE_ENDPOINT": "ws://dashboard-streaming-service-{{ .Values.namespace }}.{{ .Values.ocpDomain }}/api/zonechange?sendToAll=true",
-        "CACHE_ENDPOINT": "http://cache-service-{{ .Values.namespace }}.{{ .Values.ocpDomain }}"
+        "CACHE_ENDPOINT": "http://cache-service-{{ .Values.namespace }}.{{ .Values.ocpDomain }}",
+        "HDPP_ENDPOINT": {{ .Values.dashboard.config.hdppEndpoint }}
     }
