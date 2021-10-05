@@ -1,4 +1,4 @@
-apiVersion: kafka.strimzi.io/v1beta1
+apiVersion: kafka.strimzi.io/v1beta2
 kind: KafkaTopic
 metadata:
   name: {{ .Values.kafka.topic.zonechange.name }}
@@ -8,7 +8,9 @@ metadata:
 spec:
   partitions: {{ .Values.kafka.topic.zonechange.partitions }}
   replicas: {{ .Values.kafka.topic.zonechange.replicas }}
+  topicName: {{ .Values.kafka.topic.zonechange.name }}
   config:
     retention.ms: {{ .Values.kafka.topic.zonechange.retention }}
     segment.bytes: 1073741824
+
  

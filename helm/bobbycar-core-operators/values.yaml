@@ -6,11 +6,11 @@ installOperatorGroup: true
 installAmq: true
 amqOperator:
   installPlanApproval: Manual
-  startingCSV: amq-broker-operator.v0.18.0
+  startingCSV: amq-broker-operator.v7.8.2-opr-3
   channel: current
 
 # Camel-K Operator Subscription
-installCamelK: true
+installCamelK: false
 camelKOperator:
   installPlanApproval: Manual
   startingCSV: red-hat-camel-k-operator.v1.2.1
@@ -27,5 +27,5 @@ datagridOperator:
 installStrimzi: true
 strimziOperator:
   installPlanApproval: Manual
-  startingCSV: amqstreams.v1.6.2
-  channel: stable
+  startingCSV: amqstreams.v1.7.3
+  channel: amq-streams-1.7.x

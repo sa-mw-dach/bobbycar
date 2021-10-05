@@ -1,4 +1,4 @@
-apiVersion: kafka.strimzi.io/v1beta1
+apiVersion: kafka.strimzi.io/v1beta2
 kind: KafkaTopic
 metadata:
   name: {{ .Values.kafka.topic.metrics.name }}
@@ -8,6 +8,7 @@ metadata:
 spec:
   partitions: {{ .Values.kafka.topic.metrics.partitions }}
   replicas: {{ .Values.kafka.topic.metrics.replicas }}
+  topicName: {{ .Values.kafka.topic.metrics.name }}
   config:
     retention.ms: {{ .Values.kafka.topic.metrics.retention }}
     segment.bytes: 1073741824
