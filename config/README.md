@@ -33,3 +33,9 @@ or
 ```sh
 curl -k -H "Authorization: Bearer yourtoken" "https://api.ocp3.stormshift.coe.muc.redhat.com:6443/apis/bobbycar.redhat.com/v1alpha1/namespaces/bobbycar/zones/bobbycar-ffm"
 ```
+
+```shell
+oc adm policy add-cluster-role-to-user cluster-monitoring-view -z infinispan-monitoring
+
+oc serviceaccounts get-token infinispan-monitoring
+```
