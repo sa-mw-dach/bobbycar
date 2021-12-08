@@ -34,5 +34,5 @@ sonar:
   resources:
     storageData: "2Gi"
   image:
-    repository: 'sonarqube:latest'
+    repository: 'sonarqube:9.0.1-community'
     containerPort: 9000
