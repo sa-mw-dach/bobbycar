@@ -8,6 +8,8 @@ spec:
     metadata:
       annotations:
         autoscaling.knative.dev/target: "1"
+        #autoscaling.knative.dev/initialScale: "0"
+        autoscaling.knative.dev/window: "10s"
     spec:
       containers:
         - image: quay.io/bobbycar/zone-change-service
