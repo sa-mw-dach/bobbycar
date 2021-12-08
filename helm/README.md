@@ -93,7 +93,7 @@ You **need** to adjust these values:
 - ocpDomain
 
 ```sh
-helm install bobbycar-core-infra bobbycar-repo/bobbycar-core-infra --set-string namespace=bobbycar --set-string ocpDomain=api.ocp3.stormshift.coe.muc.redhat.com
+helm install bobbycar-core-infra bobbycar-repo/bobbycar-core-infra --set-string namespace=bobbycar --set-string ocpDomain=apps.ocp3.stormshift.coe.muc.redhat.com
 
 or
  
@@ -120,14 +120,7 @@ oc get Infinispan
 
 2. bobbycar-core-apps:
 
-First install this Builder image if it is not available in your OpenShift:
-
-```sh
-oc get is -n openshift | grep modern-webapp
-oc create -f https://raw.githubusercontent.com/sa-mw-dach/bobbycar/master/config/modern-webapp-is.yaml -n openshift
-```
-
-**!! Now get the datagrid operator password from the bobbycar-dg-generated-secret.**
+**!! Retrieve the Datagrid password for the user "operator".**
 ```sh 
 oc extract secret/bobbycar-dg-generated-secret --confirm && cat identities.yaml
 ```
