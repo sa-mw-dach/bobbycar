@@ -5,9 +5,13 @@ metadata:
   namespace: {{ .Values.namespace }}
 spec:
   template:
+    metadata:
+      annotations:
+        #autoscaling.knative.dev/initialScale: "0"
+        autoscaling.knative.dev/window: "10s"
     spec:
       containers:
-        - image: gcr.io/knative-releases/knative.dev/eventing-contrib/cmd/event_display
+        - image: gcr.io/knative-releases/knative.dev/eventing/cmd/event_display
 ---
 apiVersion: serving.knative.dev/v1
 kind: Service
@@ -16,6 +20,10 @@ metadata:
   namespace: {{ .Values.namespace }}
 spec:
   template:
+    metadata:
+      annotations:
+        #autoscaling.knative.dev/initialScale: "0"
+        autoscaling.knative.dev/window: "10s"
     spec:
       containers:
-        - image: gcr.io/knative-releases/knative.dev/eventing-contrib/cmd/event_display
+        - image: gcr.io/knative-releases/knative.dev/eventing/cmd/event_display
