@@ -35,7 +35,7 @@ spec:
             defaultMode: 420
       containers:
       - name: {{ .Values.carSimulator.name }}
-        image: {{ .Values.carSimulator.name }}:latest
+        image: quay.io/bobbycar/car-simulator:1.0.0
         imagePullPolicy: Always
         volumeMounts:
             - name: config
@@ -84,26 +84,6 @@ spec:
         resources: {}
         terminationMessagePath: /dev/termination-log
         terminationMessagePolicy: File
-        livenessProbe: 
-          httpGet:   
-            path: /health/live
-            port: 8080
-            scheme: HTTP
-          initialDelaySeconds: 15  
-          timeoutSeconds: 1
-          periodSeconds: 10
-          successThreshold: 1
-          failureThreshold: 3
-        readinessProbe:
-          httpGet:
-            path: /health/ready
-            port: 8080
-            scheme: HTTP
-          initialDelaySeconds: 1
-          timeoutSeconds: 1
-          periodSeconds: 10
-          successThreshold: 1
-          failureThreshold: 3
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       schedulerName: default-scheduler
@@ -111,12 +91,4 @@ spec:
       terminationGracePeriodSeconds: 30
   test: false
   triggers:
-    - imageChangeParams:
-        automatic: true
-        containerNames:
-          - {{ .Values.carSimulator.name }}
-        from:
-          kind: ImageStreamTag
-          name: '{{ .Values.carSimulator.name }}:latest'
-      type: ImageChange
     - type: ConfigChange

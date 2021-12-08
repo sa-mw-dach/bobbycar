@@ -28,8 +28,8 @@ spec:
         deploymentconfig: dashboard
     spec:
       containers:
-      - image: dashboard:latest
-        #imagePullPolicy: Always
+      - image: quay.io/bobbycar/dashboard:1.0.0
+        imagePullPolicy: Always
         name: dashboard
         ports:
         - containerPort: 8080
@@ -38,7 +38,7 @@ spec:
         terminationMessagePath: /dev/termination-log
         terminationMessagePolicy: File
         volumeMounts:
-            - mountPath: /opt/app-root/output/conf/config.json
+            - mountPath: /opt/app-root/src/conf/config.json
               name: dashboard-cfg-vol
               subPath: config.json
       dnsPolicy: ClusterFirst
@@ -54,11 +54,3 @@ spec:
   test: false
   triggers:
   - type: ConfigChange
-  - imageChangeParams:
-      automatic: true
-      containerNames:
-      - dashboard
-      from:
-        kind: ImageStreamTag
-        name: dashboard:latest
-    type: ImageChange

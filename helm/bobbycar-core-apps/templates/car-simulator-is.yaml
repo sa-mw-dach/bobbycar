@@ -1,9 +1,0 @@
-apiVersion: image.openshift.io/v1
-kind: ImageStream
-metadata:
-  labels:
-    app: {{ .Values.carSimulator.name }}
-  name: {{ .Values.carSimulator.name }}
-spec:
-  lookupPolicy:
-    local: false
