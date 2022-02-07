@@ -1,5 +1,7 @@
-# kafka-streaming-service
+# datagrid-rest-service
 
-## Dev
+## Dev mode
 
-`kamel run src/main/java/com/redhat/bobbycar/routes/DatagridToRestRoute.java --dev -d camel-undertow -d camel-infinispan --secret=bobbycar-kafka2datagrid-secret --profile=openshift`
+````shell
+kamel run src/main/java/com/redhat/bobbycar/routes/DatagridToRestRoute.java --dev -d camel-netty-http -d camel-infinispan --secret=datagrid2rest --profile=openshift --trait service.enabled=false
+````

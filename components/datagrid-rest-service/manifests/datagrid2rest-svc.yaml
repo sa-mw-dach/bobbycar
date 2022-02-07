@@ -1,7 +1,7 @@
 kind: Service
 apiVersion: v1
 metadata:
-  name: datagrid-to-rest-route
+  name: datagrid-to-rest
   labels:
     camel.apache.org/generation: '1'
     camel.apache.org/integration: datagrid-to-rest-route
@@ -11,7 +11,7 @@ spec:
     - name: http
       protocol: TCP
       port: 80
-      targetPort: http
+      targetPort: 9080
   selector:
     camel.apache.org/integration: datagrid-to-rest-route
   type: ClusterIP
