@@ -1,15 +1,13 @@
 kind: Route
 apiVersion: route.openshift.io/v1
 metadata:
-  name: dashboard-streaming-service
-  labels:
-    camel.apache.org/integration: dashboard-streaming-service
+  name: dashboard-streaming
 spec:
-  host: dashboard-streaming-service-{{ .Values.namespace }}.{{ .Values.ocpDomain }}
+  host: dashboard-streaming-{{ .Values.namespace }}.{{ .Values.ocpDomain }}
   to:
     kind: Service
-    name: dashboard-streaming-service
+    name: dashboard-streaming
     weight: 100
   port:
-    targetPort: http
+    targetPort: 8080
   wildcardPolicy: None

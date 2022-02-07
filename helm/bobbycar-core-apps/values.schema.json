@@ -264,8 +264,7 @@
         }
       ],
       "required": [
-        "cache",
-        "account"
+        "cache"
       ],
       "properties": {
         "cache": {
@@ -331,10 +330,6 @@
               "user": "operator",
               "password": "mypassword"
             }
-          ],
-          "required": [
-            "user",
-            "password"
           ],
           "properties": {
             "user": {

@@ -1,18 +1,19 @@
 kind: Service
 apiVersion: v1
 metadata:
-  name: dashboard-streaming-service
+  name: dashboard-streaming
+  namespace: {{ .Values.namespace }}
   labels:
-    camel.apache.org/generation: '1'
-    camel.apache.org/integration: dashboard-streaming-service
-    camel.apache.org/service.type: user
+    app: dashboard-streaming
+    app.kubernetes.io/component: dashboard-streaming
+    app.kubernetes.io/instance: dashboard-streaming
+    app.kubernetes.io/name: dashboard-streaming
 spec:
   ports:
-    - name: http
+    - name: 8080-tcp
       protocol: TCP
-      port: 80
-      targetPort: http
-  selector:
-    camel.apache.org/integration: dashboard-streaming-service
+      port: 8080
+      targetPort: 8080
   type: ClusterIP
-  sessionAffinity: None
+  selector:
+    app: dashboard-streaming
