@@ -24,6 +24,7 @@ import org.apache.camel.PropertyInject;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.infinispan.InfinispanConstants;
 import org.apache.camel.component.infinispan.InfinispanOperation;
+import org.apache.camel.component.netty.http.NettyHttpMessage;
 import org.apache.camel.model.OnCompletionDefinition;
 import org.apache.camel.model.rest.RestBindingMode;
 import org.apache.camel.processor.aggregate.DefaultAggregateController;
@@ -370,18 +371,35 @@ public class KafkaToDatagridRoute extends RouteBuilder {
 		initRemoteCache(cacheConfig);
 		bindToRegistry("cacheContainerConfiguration", cacheConfig);
 
+		restConfiguration().host("0.0.0.0").port(9080).component("netty-http")
+			.bindingMode(RestBindingMode.json)
+			.dataFormatProperty("prettyPrint", "true")
+			.contextPath("/");
+
 		///mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
 		storeZonesInCacheRoute();
 		storeCarEventsInCacheRoute();
+		clearCacheEndpoint();
 
 		if (aggregationInterval > 0) {
 			storeAggregatedSnaphotOfCarEventsInCacheRouteJson();
 		}
 	}
 
+	private void clearCacheEndpoint() {
+		from("rest:get:clearCache").routeId("clearCacheEndpoint")
+				.setHeader("Access-Control-Allow-Origin",constant("*"))
+				.process(ex -> {
+					zonesCache.clear();
+					carsCache.clear();
+					carsnapshotsCache.clear();
+				})
+				.log("Cleared all caches");
+	}
+
 	private void storeAggregatedSnaphotOfCarEventsInCacheRouteJson() {
-		from("kafka:{{com.redhat.bobbycar.camelk.kafka.topic}}?clientId=kafkaToDatagridAggregatorCamelClient&brokers={{com.redhat.bobbycar.camelk.kafka.brokers}}")
+		from("kafka:{{com.redhat.bobbycar.camelk.kafka.topic}}?clientId=kafkaToDatagridAggregatorCamelClient&brokers={{com.redhat.bobbycar.camelk.kafka.brokers}}").routeId("storeAggregatedSnaphotOfCarEventsInCacheRouteJson")
 			//.unmarshal().json(JsonLibrary.Jackson, CarEvent.class)
 			.process(ex -> 
 				ex.getIn().setBody(mapper.readValue(ex.getIn().getBody(String.class), CarEvent.class))
@@ -414,20 +432,27 @@ public class KafkaToDatagridRoute extends RouteBuilder {
 	}
 	
 	private void storeZonesInCacheRoute() throws IOException {
-		restConfiguration().component("undertow").host("https://"+ocpAPIHost).port(6443).bindingMode(RestBindingMode.json);
+		// restConfiguration().component("netty-http").host("https://"+ocpAPIHost).port(6443).bindingMode(RestBindingMode.json);
 		bindToRegistry("sslConfiguration", configureSslForApiAccess());
 		String token = retrieveServiceAccountToken();
-		from("scheduler://foo?delay=60000")
+		from("scheduler://foo?delay={{com.redhat.bobbycar.camelk.dg.refresh.interval}}").routeId("storeZonesInCache")
 			.process(ex -> {
 				zonesCache.clear();
 			})
 			.setHeader("Authorization").constant("Bearer " + token)
 			.setHeader(Exchange.HTTP_METHOD, constant("GET"))
 			.setHeader("Connection", constant("Keep-Alive"))
-			.to("undertow:https://" + ocpAPIHost + ":6443/apis/bobbycar.redhat.com/v1alpha1/namespaces/" + namespace + "/bobbycarzones?sslContextParameters=#sslConfiguration&keepAlive=true")
-			.log("Response was ${body}")
-			.split().jsonpathWriteAsString("$.items")
-			.log("Item is ${body} of type ${body.class}")
+			.setHeader(Exchange.CONTENT_TYPE, constant("application/json"))
+			.to("netty-http:https://" + ocpAPIHost + ":6443/apis/bobbycar.redhat.com/v1alpha1/namespaces/" + namespace + "/bobbycarzones?sslContextParameters=#sslConfiguration&keepAlive=true")
+			//.log("Response was ${body}")
+				.process(exchange -> {
+					NettyHttpMessage msg = exchange.getIn(NettyHttpMessage.class);
+					String payload = msg.getBody(String.class);
+					String zonesData = payload.substring(payload.indexOf("\"items\":[")+8, payload.indexOf(",\"kind\":\"BobbycarZoneList\""));
+					exchange.getIn().setBody(zonesData);
+				})
+			.split().jsonpathWriteAsString("$")
+			//.log("Item is ${body} of type ${body.class}")
 			.setHeader(InfinispanConstants.KEY).expression(jsonpath("$.metadata.name", String.class))
 			.setHeader(InfinispanConstants.VALUE).expression(simple("${body}"))
 			.log("Saving data to cache with value: ${headers[CamelInfinispanValue]}")
@@ -443,7 +468,7 @@ public class KafkaToDatagridRoute extends RouteBuilder {
 		// clear the cars cache before starting the route
 		carsCache.clear();
 
-		from("kafka:{{com.redhat.bobbycar.camelk.kafka.topic}}?clientId=kafkaToDatagridCamelClient&brokers={{com.redhat.bobbycar.camelk.kafka.brokers}}")
+		from("kafka:{{com.redhat.bobbycar.camelk.kafka.topic}}?clientId=kafkaToDatagridCamelClient&brokers={{com.redhat.bobbycar.camelk.kafka.brokers}}").routeId("storeCarEventsInCache")
 			.log("Received ${body} from Kafka")
 			.setHeader(InfinispanConstants.OPERATION).constant(InfinispanOperation.PUT)
 			.setHeader(InfinispanConstants.KEY).expression(jsonpath("$.carid"))
@@ -530,7 +555,6 @@ public class KafkaToDatagridRoute extends RouteBuilder {
 		zonesCache = cacheManager.administration().getOrCreateCache(zonesCacheName, CACHE_TEMPLATE);
 		carsCache = cacheManager.administration().getOrCreateCache(carsCacheName, CACHE_TEMPLATE);
 		carsnapshotsCache = cacheManager.administration().getOrCreateCache(carsnapshotCacheName, CACHE_TEMPLATE);
-		cacheManager.start();
 	}
 	
 	private Configuration createCacheConfig() {
@@ -540,16 +564,16 @@ public class KafkaToDatagridRoute extends RouteBuilder {
 	        	.marshaller(new StringMarshaller(Charset.defaultCharset()))
 	        .clientIntelligence(ClientIntelligence.HASH_DISTRIBUTION_AWARE)
 	        	.security()
-	        		.authentication().enable()
-	        		.username(datagridUsername)
-	        		.password(datagridPassword)
-	        		.serverName("infinispan")
-	        		.saslQop(SaslQop.AUTH)
-	        		.saslMechanism("DIGEST-MD5")
-	        		
-			/*.ssl()
-	        	.sniHostName(datagridHost)
-	        	.trustStorePath(PATH_TO_SERVICE_CA)*/
+	        		//.authentication().enable()
+	        		//.username(datagridUsername)
+	        		//.password(datagridPassword)
+	        		//.serverName("infinispan")
+	        		//.saslQop(SaslQop.AUTH)
+	        		//.saslMechanism("DIGEST-MD5")
+				.ssl()
+					.sniHostName(datagridHost)
+					.trustStoreFileName(PATH_TO_SERVICE_CA)
+					.trustStoreType("pem")
         .build();
 	}
 	
