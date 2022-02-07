@@ -1,4 +1,4 @@
-apiVersion: broker.amq.io/v2alpha4
+apiVersion: broker.amq.io/v2alpha5
 kind: ActiveMQArtemis
 metadata:
   name: bobbycar-amq-mqtt
@@ -6,7 +6,7 @@ metadata:
 spec:
   deploymentPlan:
     size: {{ .Values.amqBroker.instances }}
-    image: registry.redhat.io/amq7/amq-broker:7.8
+    image: placeholder
     requireLogin: false
     persistenceEnabled: false
     journalType: nio

@@ -8,16 +8,20 @@ spec:
   service:
     type: {{ .Values.datagrid.type }}
     container:
-      storage: 2Gi
+      storage: 1Gi
   container:
     cpu: {{ .Values.datagrid.cpu }}
-    extraJvmOpts: '-XX:NativeMemoryTracking=summary'
+    extraJvmOpts: '-XX:NativeMemoryTracking=summary -Dinfinispan.bind.address=0.0.0.0'
     memory: {{ .Values.datagrid.memory }}
   expose:
     type: Route
+  security:
+    authorization:
+      enabled: false
+    endpointAuthentication: false
   logging:
     categories: 
       org.infinispan: info
       org.jgroups: info
       org.jgroups.protocols.TCP: error
-      org.jgroups.protocols.relay.RELAY2: fatal
+      org.jgroups.protocols.relay.RELAY2: error
