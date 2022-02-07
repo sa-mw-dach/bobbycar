@@ -1,0 +1,8 @@
+apiVersion: operators.coreos.com/v1
+kind: OperatorGroup
+metadata:
+  name: bobbycar-og
+  namespace: {{NAMESPACE}}
+spec:
+  targetNamespaces:
+  - {{NAMESPACE}}
