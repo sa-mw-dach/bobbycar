@@ -4,15 +4,13 @@ import java.util.stream.Collectors;
 
 import org.apache.camel.PropertyInject;
 import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.component.infinispan.InfinispanComponent;
 import org.apache.camel.component.infinispan.InfinispanConstants;
 import org.apache.camel.component.infinispan.InfinispanOperation;
 import org.apache.camel.model.rest.RestBindingMode;
 import org.infinispan.client.hotrod.RemoteCache;
 import org.infinispan.client.hotrod.RemoteCacheManager;
-import org.infinispan.client.hotrod.configuration.ClientIntelligence;
-import org.infinispan.client.hotrod.configuration.Configuration;
-import org.infinispan.client.hotrod.configuration.ConfigurationBuilder;
-import org.infinispan.client.hotrod.configuration.SaslQop;
+import org.infinispan.client.hotrod.configuration.*;
 import org.infinispan.commons.marshall.StringMarshaller;
 
 public class DatagridToRestRoute extends RouteBuilder {
@@ -26,11 +24,13 @@ public class DatagridToRestRoute extends RouteBuilder {
 	private RemoteCacheManager cacheManager;
 	private RemoteCache<String, String> zonesCache;
 	private RemoteCache<String, String> carsCache;
+
+	private InfinispanComponent infinispan;
 	
 	@Override
 	public void configure() throws Exception {
 		
-		restConfiguration().host("0.0.0.0").port(8080).component("undertow")
+		restConfiguration().host("0.0.0.0").port(9080).component("netty-http")
 			//.enableCORS(true)
 			//.corsAllowCredentials(true)
 			//.corsHeaderProperty("Access-Control-Allow-Origin","*")
@@ -38,8 +38,11 @@ public class DatagridToRestRoute extends RouteBuilder {
 			.bindingMode(RestBindingMode.json)
 			.dataFormatProperty("prettyPrint", "true")
 			.contextPath("/");
+
+		// cacheManager = getContext().getRegistry().lookupByNameAndType("cacheManager", RemoteCacheManager.class);
+
 		Configuration cacheConfig = createCacheConfig();
-		bindToRegistry("cacheManager", cacheConfig);
+		//bindToRegistry("cacheManager", cacheConfig);
 		bindToRegistry("cacheContainerConfiguration", cacheConfig);
 		initRemoteCache(cacheConfig);
 		from("rest:get:cars")
@@ -50,7 +53,7 @@ public class DatagridToRestRoute extends RouteBuilder {
 		from("rest:get:cars/{carid}")
 			 .setHeader(InfinispanConstants.OPERATION).constant(InfinispanOperation.GET)
 			 .setHeader(InfinispanConstants.KEY).expression(simple("${headers[carid]}"))
-			.to("infinispan://{{com.redhat.bobbycar.camelk.dg.car.cacheName}}?cacheContainerConfiguration=#cacheContainerConfiguration");
+			.to("infinispan://{{com.redhat.bobbycar.camelk.dg.car.cacheName}}?cacheContainerConfiguration=#cacheContainerConfiguration&hosts=bobbycar-dg");
 		from("rest:get:zones")
 			.setHeader("Access-Control-Allow-Origin",constant("*"))
 			.process(ex -> {
@@ -67,24 +70,29 @@ public class DatagridToRestRoute extends RouteBuilder {
 		cacheManager.start();
 		zonesCache = cacheManager.administration().getOrCreateCache("zones", "org.infinispan.DIST_ASYNC");
 		carsCache = cacheManager.administration().getOrCreateCache("cars", "org.infinispan.DIST_ASYNC");
-		cacheManager.start();
+		// cacheManager.start();
 	}
 	
 	private Configuration createCacheConfig() {
 		ConfigurationBuilder hotRodBuilder = new ConfigurationBuilder();
-		return hotRodBuilder.addServer()
-	        .host(datagridHost).port(11222)
+		return hotRodBuilder
+				.addServer()
+	        		.host(datagridHost)
+					.port(11222)
 	        	.marshaller(new StringMarshaller(Charset.defaultCharset()))
-	        .clientIntelligence(ClientIntelligence.HASH_DISTRIBUTION_AWARE)
+	        	.clientIntelligence(ClientIntelligence.HASH_DISTRIBUTION_AWARE)
 	        	.security()
-	        		.authentication().enable()
-	        		.username(datagridUsername)
-	        		.password(datagridPassword)
-	        		.serverName("infinispan")
-	        		.saslQop(SaslQop.AUTH)
-	        		.saslMechanism("DIGEST-MD5")
+	        		//.authentication()
+					//	.username(datagridUsername)
+					//	.password(datagridPassword)
+					//	.serverName("default")
+					//	.saslQop(SaslQop.AUTH)
+					//  .saslMechanism("DIGEST-MD5")
+					.ssl()
+						.sniHostName(datagridHost)
+						.trustStoreFileName("/var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt")
+						.trustStoreType("pem")
         .build();
 	}
-	
 	
 }
