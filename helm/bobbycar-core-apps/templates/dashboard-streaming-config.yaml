@@ -1,0 +1,13 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: dashboard-streaming-config
+  namespace: {{ .Values.namespace }}
+data:
+  kafka.bootstrap.servers: {{ .Values.kafka.bootstrap.servers }}
+  mp.messaging.incoming.bobbycar-gps.broadcast: 'true'
+  mp.messaging.incoming.bobbycar-gps.topic: {{ .Values.kafka.topic.gps }}
+  mp.messaging.incoming.bobbycar-metrics.broadcast: 'true'
+  mp.messaging.incoming.bobbycar-metrics.topic: {{ .Values.kafka.topic.metrics }}
+  mp.messaging.incoming.bobbycar-zonechange.broadcast: 'true'
+  mp.messaging.incoming.bobbycar-zonechange.topic: {{ .Values.kafka.topic.zonechange }}

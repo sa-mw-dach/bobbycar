@@ -1,19 +1,10 @@
 Bobbycar core application components:
 
-- Bobbycar vehicle simulator: Quarkus app
+- Bobbycar vehicle simulator: Quarkus JVM app
 - Dashboard: Angular/Ionic app
-- BobbycarZone CRD
-- 3 BobbycarZone CRs
+- Dashboard Streaming Service: Quarkus native app
 - Cache Service: Camel-K app
-- Dashboard Streaming Service: Camel-K app
 - Kafka2Datagrid Service: Camel-K app
 - MQTT2Kafka Service: Camel-K app
-
-1.0.1
-- Disabled Quarkus Runtime for Camel-K integrations.
-
-1.0.2
-- Add Schema Json for values file
-
-1.0.3
-- Add Modern Webapp Image Stream
+- BobbycarZone CRD
+- 3 BobbycarZone CRs

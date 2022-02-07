@@ -11,7 +11,7 @@ spec:
     - name: http
       protocol: TCP
       port: 80
-      targetPort: http
+      targetPort: 9080
   selector:
     camel.apache.org/integration: cache-service
   type: ClusterIP
