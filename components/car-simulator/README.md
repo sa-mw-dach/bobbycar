@@ -1,3 +1,5 @@
+
+
 # code-with-quarkus project
 
 This project uses Quarkus, the Supersonic Subatomic Java Framework.
@@ -8,7 +10,7 @@ If you want to learn more about Quarkus, please visit its website: https://quark
 
 You can run your application in dev mode that enables live coding using:
 ```
-./mvnw quarkus:dev
+./mvnw quarkus:dev -Dcom.redhat.bobbycar.carsim.route=test-classes/gps/gpx/test/
 ```
 
 ## Packaging and running the application
