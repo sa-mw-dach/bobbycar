@@ -1,6 +1,0 @@
-This Chart installs the Bobbycar Operator Dependencies:
-
-- AMQ Broker Operator Subscription
-- Camel-K Operator Subscription
-- Datagrid Operator Subscription
-- AMQ Streams Operator Subscription
