@@ -11,7 +11,7 @@ spec:
     - name: http
       protocol: TCP
       port: 80
-      targetPort: http
+      targetPort: 8080
   selector:
     camel.apache.org/integration: kafka-streaming-service
   type: ClusterIP
