@@ -8,7 +8,7 @@
 	<properties>
 		<maven.compiler.source>11</maven.compiler.source>
 		<maven.compiler.target>11</maven.compiler.target>
-		<camel.version>3.7.0</camel.version>
+		<camel.version>3.11.2</camel.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -19,6 +19,16 @@
 		<dependency>
 			<groupId>org.apache.camel</groupId>
 			<artifactId>camel-kafka</artifactId>
+			<version>${camel.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.camel</groupId>
+			<artifactId>camel-netty-http</artifactId>
+			<version>${camel.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.camel</groupId>
+			<artifactId>camel-rest</artifactId>
 			<version>${camel.version}</version>
 		</dependency>
 		<dependency>
