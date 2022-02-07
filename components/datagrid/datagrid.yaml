@@ -2,30 +2,25 @@ apiVersion: infinispan.org/v1
 kind: Infinispan
 metadata:
   name: bobbycar-dg
-  namespace: $(NS_BOBBYCAR)
 spec:
   container:
-    cpu: ''
-    extraJvmOpts: ''
-    memory: ''
-  expose: {}
-  image: ''
+    cpu: 200m
+    extraJvmOpts: '-XX:NativeMemoryTracking=summary -Dinfinispan.bind.address=0.0.0.0'
+    memory: 1Gi
+  expose:
+    type: Route
   logging:
-    categories: 
+    categories:
       org.infinispan: info
+      org.jgroups: info
+      org.jgroups.protocols.TCP: error
+      org.jgroups.protocols.relay.RELAY2: error
   replicas: 1
   security:
-    endpointEncryption:
-      certSecretName: bobbycar-dg-certs-secret
-      certServiceName: service.beta.openshift.io
-      type: service
-  endpointSecretName: bobbycar-dg-generated-secret
+    authorization:
+      enabled: false
+    endpointAuthentication: false
   service:
     container:
-      storage: ''
-    sites:
-      local:
-        expose: {}
-        name: ''
-      locations: null
-    type: Cache
+      storage: 1Gi
+    type: DataGrid
