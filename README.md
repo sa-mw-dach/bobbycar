@@ -1,39 +1,55 @@
 # Bobbycar
 
-Bobbycar is a Service based cloud-native application and demo, highlighting **Red Hat OpenShift** and most of the **Red Hat Middleware** portfolio in a business relevant IoT context.
-
-It is also a sample implementation of an **IoT Reference Architecture** built with Red Hat products.
+Bobbycar is a distributed cloud-native application that implements **key aspects** of a modern **IoT architecture** in an exemplary manner. 
+This demo is based on Red Hat's Kubernetes Distribution, **Red Hat OpenShift Container Platform**, and uses various middleware components optimized for a cloud-native usage.
 
 ## About
 
-Bobbycars are actually vehicle simulators implemented in Quarkus, simulating cars and sending telemetry data to an IoT Cloud Gateway.
+Bobbycars are actually vehicle simulators implemented in **Quarkus**, simulating cars and sending telemetry data to an IoT Cloud Gateway.
 
 The data is then being used in different data processing flows for visualization, realtime analytics, machine learning and other use cases.
 
-## Quickstart
+## Installation
 
-If you want to install Bobbycar in your own environment, please follow the [Helm installation instructions!](https://github.com/sa-mw-dach/bobbycar/tree/master/helm)
+You can use the **install.sh** script to simply install demo.
+
+1. Fill in the mandatory properties in **install_cleanup_vars.sh**, i.e.:
+
+
+    NAMESPACE=bobbycar
+
+    APP_DOMAIN=apps.ocp.domain
+
+    API_DOMAIN=api.ocp.domain
+
+    GOOGLE_API_KEY=here_goes_my_maps_api_key
+
+2. Run the **install.sh** script
+
+3. Run the **cleanup.sh** script to uninstall the demo
+
+If you want to manually install Bobbycar in your own environment, please follow these [installation instructions!](https://github.com/sa-mw-dach/bobbycar/tree/master/helm)
 
 ## Purpose
 
-+ Accelerate customers building IoT solutions faster with Red Hat technologies.
++ Accelerate building IoT solutions faster with Red Hat technologies.
   
 + Bobbycar aims to showcase the COMPLETE Red Hat Middleware stack on OpenShift in a real world IoT context.
-  
-+ Involve customers and partners to extend the demo and integrate with real devices.
 
-+ Involve developers getting a more realistic hands-on experience with cloud-native development and OpenShift
++ Getting a more realistic hands-on experience with cloud-native development and OpenShift
 
-## Technologies involved
+## Technologies
 
-+ OpenShift, Kubernetes
-+ OpenShift Serverless, Knative  
++ RH OpenShift, Enterprise Kubernetes
++ RH OpenShift Serverless, based on Knative  
 + RH Runtimes, Quarkus
-+ AMQ Broker, MQTT
-+ AMQ Streams, Apache Kafka
++ RH AMQ Broker, MQTT
++ RH AMQ Streams, Apache Kafka
 + RH Fuse, Apache Camel-K
 + RH Datagrid, Distributed Caching
++ RH OpenShift Pipelines
++ RH CodeReady Workspaces
++ RH OpenJDK
 + Angular, Ionic
-+ Google Maps
-+ OpenJDK
++ Gogs, Nexus, Sonarqube
 

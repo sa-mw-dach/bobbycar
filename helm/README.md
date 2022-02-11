@@ -1,34 +1,36 @@
-# Bobbycar Core Demo Installation
+# Bobbycar Manual Installation
 To set up the core Bobbycar demo, you have to install the required operators and the mandatory core components provided by two Helm charts.
 
 ### 1. Create a new OpenShift Project
 ````sh
 oc new-project bobbycar
 ````
-### 2. Install Camel-K v1.2 Operator manually
-````sh
-kamel install --olm=false --operator-image=registry.redhat.io/integration-tech-preview/camel-k-rhel8-operator:1.2.0
-````
-### 3. Install the required Operators
+
+### 2. Install the required Operators
 
 Log in to the OpenShift Admin Console with a privileged user account and install the following operators in the bobbycar namespace:  
 
 **1. AMQ Streams**  
-startingCSV: amqstreams.v1.7.3  
-channel: amq-streams-1.7.x  
-update approval: Manual
+startingCSV: amqstreams.v2.0.0-0
+channel: stable
+installPlanApproval: Automatic
 
-**2. AMQ Broker**  
-startingCSV: amq-broker-operator.v7.8.2-opr-3  
-channel: current  
-update approval: Manual  
+**2. AMQ Broker**
+startingCSV: amq-broker-operator.v7.9.1-opr-2
+channel: 7.x
+installPlanApproval: Automatic
 
 **3. Datagrid**  
-startingCSV: datagrid-operator.v8.0.3  
-channel: 8.0.x  
-update approval: Manual
+startingCSV: datagrid-operator.v8.2.8
+channel: 8.2.x
+installPlanApproval: Automatic
 
-### 4. Install the Bobbycar Helm Charts
+**4. Camel-K**
+startingCSV: red-hat-camel-k-operator.v1.6.3
+channel: 1.6.x
+installPlanApproval: Automatic
+
+### 3. Install the Bobbycar Helm Charts
 
 There are 2 Helm charts, that needs to be installed:
 
@@ -120,17 +122,10 @@ oc get Infinispan
 
 2. bobbycar-core-apps:
 
-**!! Retrieve the Datagrid password for the user "operator".**
-```sh 
-oc extract secret/bobbycar-dg-generated-secret --confirm && cat identities.yaml
-```
-And use it as Helm value for : datagrid.account.password
-
-You **need** to adjust these values:
+3. You **need** to adjust these values:
 - namespace
 - ocpDomain
 - ocpApi
-- datagrid.account.password
 - dashboard.config.googleApiKey
 
 ```sh
@@ -138,7 +133,6 @@ helm install bobbycar-core-apps bobbycar-repo/bobbycar-core-apps \
 --set-string ocpDomain=apps.ocp3.stormshift.coe.muc.redhat.com \
 --set-string ocpApi=api.ocp3.stormshift.coe.muc.redhat.com \
 --set-string namespace=bobbycar \
---set-string datagrid.account.password=YourDatagridOperatorPassword \
 --set-string dashboard.config.googleApiKey=YourGoogleApiKey
 
 or
