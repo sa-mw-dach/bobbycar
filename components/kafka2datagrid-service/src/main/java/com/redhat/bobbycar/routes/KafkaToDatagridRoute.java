@@ -54,6 +54,7 @@ public class KafkaToDatagridRoute extends RouteBuilder {
 	private static final String ZONE_PREV_HEADER = "previousZone";
 	private static final String ZONE_NXT_HEADER = "nextZone";
 	private static final String CAR_ID_HEADER = "carid";
+	private static final String VIN_HEADER = "vin";
 	private static final String CACHE_TEMPLATE = "org.infinispan.DIST_ASYNC";
 	private static final String PATH_TO_SERVICE_CA = "/var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt";
 	private static final Logger LOGGER = LoggerFactory.getLogger(KafkaToDatagridRoute.class);
@@ -88,12 +89,14 @@ public class KafkaToDatagridRoute extends RouteBuilder {
 		private final String previousZoneId;
 		private final String nextZoneId;
 		private final String carId;
+		private final String vin;
 		
-		public ZoneChangeEvent(String previousZoneId, String nextZoneId, String carId) {
+		public ZoneChangeEvent(String previousZoneId, String nextZoneId, String carId, String vin) {
 			super();
 			this.previousZoneId = previousZoneId;
 			this.nextZoneId = nextZoneId;
 			this.carId = carId;
+			this.vin = vin;
 		}
 		public String getPreviousZoneId() {
 			return previousZoneId;
@@ -103,6 +106,9 @@ public class KafkaToDatagridRoute extends RouteBuilder {
 		}
 		public String getCarId() {
 			return carId;
+		}
+		public String getVin() {
+			return vin;
 		}
 	}
 	
@@ -115,6 +121,8 @@ public class KafkaToDatagridRoute extends RouteBuilder {
 		private double elevation;
 		@JsonProperty("carid")
 		private String carId;
+		@JsonProperty("vin")
+		private String vin;
 		private long eventTime;
 		private Zone zone;
 		
@@ -142,6 +150,12 @@ public class KafkaToDatagridRoute extends RouteBuilder {
 		public void setCarId(String carId) {
 			this.carId = carId;
 		}
+		public String getVin() {
+			return vin;
+		}
+		public void setVin(String vin) {
+			this.vin = vin;
+		}
 		public long getEventTime() {
 			return eventTime;
 		}
@@ -167,7 +181,7 @@ public class KafkaToDatagridRoute extends RouteBuilder {
 			if (getClass() != obj.getClass())
 				return false;
 			CarEvent other = (CarEvent) obj;
-			return Objects.equals(carId, other.carId);
+			return Objects.equals(carId, other.carId) && Objects.equals(vin, other.vin);
 		}
 		@Override
 		public int compareTo(CarEvent o) {
@@ -179,8 +193,8 @@ public class KafkaToDatagridRoute extends RouteBuilder {
 		}
 		@Override
 		public String toString() {
-			return String.format("CarEvent [latitude=%s, longitude=%s, elevation=%s, carId=%s, eventTime=%s, zone=%s]",
-					latitude, longitude, elevation, carId, eventTime, zone);
+			return String.format("CarEvent [latitude=%s, longitude=%s, elevation=%s, carId=%s, eventTime=%s, zone=%s, vin=%s]",
+					latitude, longitude, elevation, carId, eventTime, zone, vin);
 		}
 	}
 	
@@ -503,8 +517,9 @@ public class KafkaToDatagridRoute extends RouteBuilder {
 		Optional<Zone> previousZone = (Optional<Zone>) ex.getIn().getHeader(ZONE_PREV_HEADER);
 		Optional<Zone> nextZone = (Optional<Zone>) ex.getIn().getHeader(ZONE_NXT_HEADER);
 		String carId = (String) ex.getIn().getHeader(CAR_ID_HEADER);
+		String vin = (String) ex.getIn().getHeader(VIN_HEADER);
 		ex.getIn().setBody(new ZoneChangeEvent(previousZone.map(z -> z.getMetadata().getName()).orElse(null), 
-				nextZone.map(z -> z.getMetadata().getName()).orElse(null), carId));
+				nextZone.map(z -> z.getMetadata().getName()).orElse(null), carId, vin));
 	}
 
 	private void processZoneData(Exchange ex) {
@@ -512,6 +527,7 @@ public class KafkaToDatagridRoute extends RouteBuilder {
 		double lat = car.getLatitude();
 		double lng = car.getLongitude();
 		ex.getIn().setHeader(CAR_ID_HEADER, car.getCarId());
+		ex.getIn().setHeader(VIN_HEADER, car.getVin());
 		Optional<Zone> matchingZone = zonesCache.values().stream()
 			.map(zs -> {
 				try {
