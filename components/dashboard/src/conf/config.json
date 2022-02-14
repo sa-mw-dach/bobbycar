@@ -2,9 +2,10 @@
     "GOOGLE_API_KEY": "",
     "BOBBYCAR_API_KEY": "",
     "SSE_ENDPOINT": "http://localhost:8080",
-    "CAR_EVENTS_ENDPOINT": "ws://dashboard-streaming-service-bobbycar.apps.ocp4.rhlab.de/api/carevents?sendToAll=true",
-    "CAR_METRICS_ENDPOINT": "ws://dashboard-streaming-service-bobbycar.apps.ocp4.rhlab.de/api/carmetrics?sendToAll=true",
-    "CAR_ZONECHANGE_ENDPOINT": "ws://dashboard-streaming-service-bobbycar.apps.ocp4.rhlab.de/api/zonechange?sendToAll=true",
+    "CAR_EVENTS_ENDPOINT": "ws://dashboard-streaming-bobbycar.apps.ocp4.rhlab.de/api/carevents?sendToAll=true",
+    "CAR_METRICS_ENDPOINT": "ws://dashboard-streaming-bobbycar.apps.ocp4.rhlab.de/api/carmetrics?sendToAll=true",
+    "CAR_ZONECHANGE_ENDPOINT": "ws://dashboard-streaming-bobbycar.apps.ocp4.rhlab.de/api/zonechange?sendToAll=true",
     "CACHE_ENDPOINT": "http://cache-service-bobbycar.apps.ocp4.rhlab.de",
+    "CAR_ENDPOINT": "http://car-simulator-bobbycar.apps.ocp4.rhlab.de",
     "HDPP_ENDPOINT": "http://127.0.0.1:8080/playlist.m3u8"
 }

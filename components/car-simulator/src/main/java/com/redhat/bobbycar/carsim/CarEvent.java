@@ -11,13 +11,15 @@ public class CarEvent {
 	private final BigDecimal latitude; 
 	private final BigDecimal elevation; 
 	private final Optional<ZonedDateTime> time;
+	private final String vin;
 	
-	public CarEvent(BigDecimal longitude, BigDecimal latitude, BigDecimal elevation, Optional<ZonedDateTime> time) {
+	public CarEvent(BigDecimal longitude, BigDecimal latitude, BigDecimal elevation, Optional<ZonedDateTime> time, String vin) {
 		super();
 		this.longitude = longitude;
 		this.latitude = latitude;
 		this.elevation = elevation;
 		this.time = time;
+		this.vin = vin;
 	}
 	
 	public BigDecimal getElevation() {
@@ -36,9 +38,11 @@ public class CarEvent {
 		return time;
 	}
 
+	public String getVin() { return vin;}
+
 	@Override
 	public int hashCode() {
-		return Objects.hash(elevation, latitude, longitude, time);
+		return Objects.hash(elevation, latitude, longitude, time, vin);
 	}
 
 	@Override
@@ -51,7 +55,7 @@ public class CarEvent {
 			return false;
 		CarEvent other = (CarEvent) obj;
 		return Objects.equals(elevation, other.elevation) && Objects.equals(latitude, other.latitude)
-				&& Objects.equals(longitude, other.longitude) && Objects.equals(time, other.time);
+				&& Objects.equals(longitude, other.longitude) && Objects.equals(time, other.time) && Objects.equals(vin, other.vin);
 	}
 
 	@Override

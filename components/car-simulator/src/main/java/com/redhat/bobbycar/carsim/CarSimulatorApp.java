@@ -26,6 +26,9 @@ import javax.net.ssl.SSLException;
 import javax.ws.rs.core.MediaType;
 import javax.xml.bind.JAXBException;
 
+import com.redhat.bobbycar.carsim.consumer.OTAConsumer;
+import com.redhat.bobbycar.carsim.consumer.OTAListener;
+import com.redhat.bobbycar.carsim.data.CarDao;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.metrics.MetricRegistry;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
@@ -67,7 +70,7 @@ public class CarSimulatorApp {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(CarSimulatorApp.class);
 	// Config Properties
-	@ConfigProperty(name = "com.redhat.bobbycar.carsim.cars", defaultValue = "1")
+	@ConfigProperty(name = "com.redhat.bobbycar.carsim.cars", defaultValue = "10")
 	int cars;
 	@ConfigProperty(name = "com.redhat.bobbycar.carsim.route")
 	String pathToRoutes;
@@ -88,6 +91,8 @@ public class CarSimulatorApp {
 	@Inject
     DriverDao driverDao;
 	@Inject
+	CarDao carDao;
+	@Inject
 	GpxReader gpxReader;
 	@Inject
 	MetricRegistry registry;
@@ -99,6 +104,8 @@ public class CarSimulatorApp {
 	DriverMetrics driverMetrics;
 	@Inject
 	ZoneChangeConsumer zoneChangeConsumer;
+	@Inject
+	OTAConsumer otaConsumer;
 	@Inject
 	CarMetricsEventPublisher carMetricsPublisher;
 	// Rest Clients
@@ -132,8 +139,11 @@ public class CarSimulatorApp {
 		    	TimedEngine engine = TimedEngine.builder().withSpeedVariationInKmH(5).withStartingPoint(route.getPoints().findFirst().orElse(null))
 							.withConfig(new JsonEngineConfiguration()).withMetrics(engineMetrics).build();
 		    	Car car = Car.builder().withModel("M3 Coupe").withManufacturer("BMW")
-						.withEngine(engine).withDriverId(id)
+						.withEngine(engine)
+						.withDriverId(id)
+						.withVin(id.toString())
 						.build();
+				otaConsumer.registerOTAListener(id.toString(), car);
 		    	engine.registerEventListener(e -> carMetricsPublisher.publish(CarMetricsEvent.create(car, e.getEngineData())));
 				zoneChangeConsumer.registerZoneChangeListener(onZoneChange(id));
 				TimedDrivingStrategy strategy = TimedDrivingStrategy.builder()
@@ -149,10 +159,12 @@ public class CarSimulatorApp {
 		        		.withStartDelay(delay * (c + 1))
 		        		.withId(id)
 		        		.build();
+				LOGGER.info("Created driver with id: "+id);
 		        onCarEvent(driver);
 		        futures.put(id, CompletableFuture.runAsync(driver, carPoolExecutor));
 		        car.start(enginePoolExecutor);
 		        driverDao.create(driver.getId(), driver);
+				carDao.create(car.getDriverId(), car);
 		        if (repeat && LOGGER.isInfoEnabled()) {
 		        	LOGGER.info("Will repeat route when finished");
 		        }
@@ -223,7 +235,7 @@ public class CarSimulatorApp {
 
 	private void publishToKafka(Driver driver, CarEvent evt) {
 		List<KafkaCarRecord> records = new ArrayList<>();
-		 records.add(new KafkaCarRecord(driver.getId().toString(), new KafkaCarPosition(evt.getLatitude().doubleValue(), evt.getLongitude().doubleValue(), evt.getElevation().doubleValue(), driver.getId().toString(), evt.getTime().orElse(null))));
+		 records.add(new KafkaCarRecord(driver.getId().toString(), new KafkaCarPosition(evt.getLatitude().doubleValue(), evt.getLongitude().doubleValue(), evt.getElevation().doubleValue(), driver.getId().toString(), evt.getTime().orElse(null), evt.getVin())));
 		 KafkaCarEvent event = new KafkaCarEvent(records);
 		 try {
 			 kafkaService.publishCarEvent(apiKey.orElse(null), event);
