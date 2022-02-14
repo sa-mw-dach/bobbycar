@@ -54,6 +54,10 @@ public class TimedEngine implements Engine{
 		}
 		metrics.ifPresent(m -> registerEventListener(evt -> m.updateEngineData(evt.getEngineData())));
 	}
+
+	public EngineConfiguration getEngineConfiguration() {
+		return this.config;
+	}
 	
 	@Override
 	public TimedEngine nextRoutePoint(RoutePoint next) {

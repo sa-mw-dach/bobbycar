@@ -9,4 +9,6 @@ public interface Engine extends Runnable{
 	TimedEngine nextRoutePoint(RoutePoint next);
 	
 	void stop();
+
+	EngineConfiguration getEngineConfiguration();
 }

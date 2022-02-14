@@ -49,7 +49,7 @@ public class TimedDrivingStrategy implements DrivingStrategy{
 				if (sleepTime > 0) {
 					TimeUnit.MILLISECONDS.sleep(sleepTime);
 				}
-				consumer.accept(new CarEvent(to.getLongitude(), to.getLatitude(), to.getElevation(), Optional.of(ZonedDateTime.now())));
+				consumer.accept(new CarEvent(to.getLongitude(), to.getLatitude(), to.getElevation(), Optional.of(ZonedDateTime.now()), car.get().getVin()));
 				
 			}catch (InterruptedException e) {
 				LOGGER.error("Cannot pause thread to wait for next point", e);
@@ -58,7 +58,7 @@ public class TimedDrivingStrategy implements DrivingStrategy{
 		});
 		if (from.isEmpty()) {
 			LOGGER.debug("First event, driving instantly");
-			consumer.accept(new CarEvent(to.getLongitude(), to.getLatitude(), to.getElevation(), Optional.of(ZonedDateTime.now())));
+			consumer.accept(new CarEvent(to.getLongitude(), to.getLatitude(), to.getElevation(), Optional.of(ZonedDateTime.now()), car.get().getVin()));
 		}
 		lastActionTimeMillis = Optional.of(System.currentTimeMillis());
 	}
