@@ -14,7 +14,7 @@
   },
   "private": true,
   "dependencies": {
-    "@amcharts/amcharts4": "^4.9.28",
+    "@amcharts/amcharts4": "^4.10.24",
     "@angular/common": "~9.1.6",
     "@angular/core": "~9.1.6",
     "@angular/forms": "~9.1.6",
@@ -30,7 +30,7 @@
     "highcharts": "^9.0.0",
     "rxjs": "~6.5.1",
     "tslib": "^1.10.0",
-    "video.js": "^7.12.3",
+    "video.js": "^7.18.0",
     "zone.js": "~0.10.2"
   },
   "devDependencies": {
@@ -47,7 +47,7 @@
     "codelyzer": "^5.1.2",
     "jasmine-core": "~3.5.0",
     "jasmine-spec-reporter": "~4.2.1",
-    "karma": "~5.0.0",
+    "karma": "~6.3.14",
     "karma-chrome-launcher": "~3.1.0",
     "karma-coverage-istanbul-reporter": "~2.1.0",
     "karma-jasmine": "~3.0.1",

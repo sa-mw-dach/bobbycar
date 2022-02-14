@@ -20,5 +20,4 @@ export class CacheService {
     getCars() {
         return this.http.get<any[]>(this.configService.CACHE_ENDPOINT+this.carsUrl+'?user_key='+this.configService.BOBBYCAR_API_KEY);
     }
-
 }

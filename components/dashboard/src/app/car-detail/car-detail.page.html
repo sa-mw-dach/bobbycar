@@ -20,6 +20,7 @@
         <ion-col>
           <ion-list style="border: 1px solid #000; border-radius: 5px;">
             <ion-item>Car ID: <span class="metricDisplayGrey"> {{ carMetric.driverId }} </span></ion-item>
+            <ion-item>VIN: <span class="metricDisplayGrey"> {{ carMetric.vin }} </span></ion-item>
             <ion-item>Manufacturer:
               <span class="metricDisplayGrey" *ngIf="carBg==='VW'"> Volkswagen </span>
               <span class="metricDisplayGrey" *ngIf="carBg==='BMW'"> BMW </span>
@@ -51,12 +52,16 @@
         </ion-col>
       </ion-row>
     </ion-grid>
+    </div >
 
-
+    <div [ngClass]="{'menu-s': carBg === 'S', 'menu': carBg === 'VW', 'menu-bmw': carBg === 'BMW', 'menu-skoda': carBg === 'SK'}">
+      <ion-button  (click)="toggleHUD()">
+        HUD
+      </ion-button>
+      <ion-button (click)="showConfig()">
+        ENGINE
+      </ion-button>
     </div>
-    <ion-button [ngClass]="{'menu-s': carBg === 'S', 'menu': carBg === 'VW', 'menu-bmw': carBg === 'BMW', 'menu-skoda': carBg === 'SK'}" (click)="toggleHUD()">
-      HUD
-    </ion-button>
     <!--<div id="chartdiv" style="width: 20%; height: 200px; top: 17%; left: 32%; position: absolute;"></div>-->
  </div>
 
