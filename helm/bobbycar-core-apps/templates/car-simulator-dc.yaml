@@ -35,7 +35,7 @@ spec:
             defaultMode: 420
       containers:
       - name: {{ .Values.carSimulator.name }}
-        image: quay.io/bobbycar/car-simulator:1.0.0
+        image: quay.io/bobbycar/car-simulator:1.1.0
         imagePullPolicy: Always
         volumeMounts:
             - name: config
@@ -74,6 +74,16 @@ spec:
               value: 'bobbycar-amq-mqtt-all-0-svc'
             - name: mp.messaging.outgoing.enginemetrics.port
               value: '61616'
+            - name: mp.messaging.incoming.ota-updates.host
+              value: 'bobbycar-amq-mqtt-all-0-svc'
+            - name: mp.messaging.incoming.ota-updates.port
+              value: '61616'
+            - name: mp.messaging.incoming.ota-updates.topic
+              value: 'ota/+'
+            - name: mp.messaging.incoming.ota-updates.type
+              value: 'smallrye-mqtt'
+            - name: quarkus.http.cors
+              value: 'true'
         ports:
           - containerPort: 8080
             name: http
