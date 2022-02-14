@@ -15,21 +15,23 @@ public class CarMetricsEvent implements Serializable{
 	private String model;
 	private String manufacturer;
 	private String driverId;
+	private String vin;
 
 	public CarMetricsEvent() {
 
 	}
 
-	public CarMetricsEvent(EngineData engineData, String model, String manufacturer, String driverId) {
+	public CarMetricsEvent(EngineData engineData, String model, String manufacturer, String driverId, String vin) {
 		super();
 		this.engineData = engineData;
 		this.model = model;
 		this.manufacturer = manufacturer;
 		this.driverId = driverId;
+		this.vin = vin;
 	}
 
 	public static CarMetricsEvent create(Car car, EngineData currentData) {
-		return new CarMetricsEvent(currentData, car.getModel(), car.getManufacturer(), car.getDriverId().toString());
+		return new CarMetricsEvent(currentData, car.getModel(), car.getManufacturer(), car.getDriverId().toString(), car.getVin());
 	}
 
 	public EngineData getEngineData() {
@@ -64,9 +66,17 @@ public class CarMetricsEvent implements Serializable{
 		this.driverId = driverId;
 	}
 
+	public String getVin() {
+		return vin;
+	}
+
+	public void setVin(String vin) {
+		this.vin = vin;
+	}
+
 	@Override
 	public int hashCode() {
-		return Objects.hash(driverId, engineData, manufacturer, model);
+		return Objects.hash(driverId, engineData, manufacturer, model, vin);
 	}
 
 	@Override
@@ -79,12 +89,12 @@ public class CarMetricsEvent implements Serializable{
 			return false;
 		CarMetricsEvent other = (CarMetricsEvent) obj;
 		return Objects.equals(driverId, other.driverId) && Objects.equals(engineData, other.engineData)
-				&& Objects.equals(manufacturer, other.manufacturer) && Objects.equals(model, other.model);
+				&& Objects.equals(manufacturer, other.manufacturer)  && Objects.equals(vin, other.vin);
 	}
 
 	@Override
 	public String toString() {
-		return String.format("EngineMetricsEvent [engineData=%s, model=%s, manufacturer=%s, driverId=%s]", engineData,
-				model, manufacturer, driverId);
+		return String.format("EngineMetricsEvent [engineData=%s, model=%s, manufacturer=%s, driverId=%s, vin=%s]", engineData,
+				model, manufacturer, driverId, vin);
 	}
 }

@@ -4,6 +4,7 @@ import { CarEventsService } from '../providers/ws.service';
 import { CarMetricsService } from '../providers/carmetrics.service';
 import { ZoneChangeService } from '../providers/zonechange.service';
 import { CacheService } from '../providers/cache.service';
+import { CarService } from '../providers/car.service';
 import { ToastController } from '@ionic/angular';
 import { map, tap, delay, retryWhen, delayWhen } from 'rxjs/operators';
 
@@ -24,7 +25,7 @@ export class CarDetailPage implements OnInit {
   map: google.maps.Map;
   initialPosition = { lat: 50.1146997, lng: 8.6185411 };
   carId = '';
-  carMetric = { driverId: '', manufacturer: '', model: '', co2: '', fuel: '', gear: '', rpm: '', speed: '', zone: 'Default Zone' };
+  carMetric = { driverId: '', manufacturer: '', model: '', co2: '', fuel: '', gear: '', rpm: '', speed: '', zone: 'Default Zone', vin: '' };
   marker: google.maps.Marker;
   panorama: google.maps.StreetViewPanorama;
   sv = new google.maps.StreetViewService();
@@ -36,6 +37,7 @@ export class CarDetailPage implements OnInit {
     private carEventsService: CarEventsService,
     private carMetricsService: CarMetricsService,
     private cacheService: CacheService,
+    private carService: CarService,
     private zoneChangeService: ZoneChangeService,
     private route: ActivatedRoute,
     public toastController: ToastController,
@@ -80,6 +82,30 @@ export class CarDetailPage implements OnInit {
       this.showHUD = true;
     }
   }
+
+  async showConfig(){
+    let temp = await this.carService.getCarById(this.carId).subscribe((data) => {
+        this.presentConfig(JSON.stringify(data));
+    })
+  }
+
+  async presentConfig(data) {
+      const toast = await this.toastController.create({
+        message: "<h2>Current Engine configuration:</h2>" + data,
+        color: 'light',
+        position: 'top',
+        buttons: [
+                {
+                  text: 'Close',
+                  role: 'cancel',
+                  handler: () => {
+                    console.log('Cancel clicked');
+                  }
+                }
+              ]
+      });
+      toast.present();
+    }
 
   async presentToast() {
     const toast = await this.toastController.create({
@@ -162,6 +188,7 @@ export class CarDetailPage implements OnInit {
       msg => {
           if(msg.driverId === this.carId){
             this.carMetric.driverId = msg.driverId;
+            this.carMetric.vin = msg.vin;
             this.carMetric.manufacturer = msg.manufacturer;
             this.carMetric.model = msg.model;
             this.carMetric.co2 = msg.engineData.co2Emission;
