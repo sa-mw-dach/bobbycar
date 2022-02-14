@@ -15,6 +15,7 @@ export class ConfigService {
     CAR_ZONECHANGE_ENDPOINT;
     CACHE_ENDPOINT;
     HDPP_ENDPOINT;
+    CAR_ENDPOINT;
 
     constructor(public http: HttpClient) {}
 
@@ -33,6 +34,7 @@ export class ConfigService {
         this.CAR_ZONECHANGE_ENDPOINT = data.CAR_ZONECHANGE_ENDPOINT;
         this.CACHE_ENDPOINT = data.CACHE_ENDPOINT;
         this.HDPP_ENDPOINT = data.HDPP_ENDPOINT;
+        this.CAR_ENDPOINT = data.CAR_ENDPOINT;
     }
 
 }
