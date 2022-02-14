@@ -8,6 +8,7 @@ import java.util.function.Predicate;
 
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
+import javax.json.bind.JsonbException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -87,7 +88,18 @@ public class JsonEngineConfiguration implements EngineConfiguration {
 				.map(GearBehavior::getGear)
 				.orElseThrow(() -> new EngineException("No gears found"));
 	}
-	
+
+	public void updateEngineConfiguration(String config) {
+		try {
+			LOGGER.info("Updating engine configuration");
+			this.engineBehavior = jsonb.fromJson(config, EngineBehavior.class);
+			//TODO Notify dashboard -> MQTT, Kafka, SSE?
+		} catch (JsonbException  ex) {
+			LOGGER.error("ERROR converting OTA payload to EngineBehavior: " + ex.getMessage());
+		}
+
+	}
+
 	private EngineBehavior readConfiguration() {
 		return jsonb.fromJson(JsonEngineConfiguration.class.getResourceAsStream(DEFAULT_ENGINE_CONFIG_JSON),
 				EngineBehavior.class);
@@ -154,5 +166,9 @@ public class JsonEngineConfiguration implements EngineConfiguration {
 	private Predicate<? super GearEntry> gearAndRpmCanAchieve(double speed) {
 		return s -> (s.getRpm() <= rpmToSwitchGear && s.getSpeed() >= speed) 
 				|| (s.getGear() == maxGear && s.getSpeed() >= speed);
+	}
+
+	public EngineBehavior getEngineBehavior() {
+		return engineBehavior;
 	}
 }

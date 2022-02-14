@@ -4,16 +4,18 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 
+import com.redhat.bobbycar.carsim.consumer.OTAListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.redhat.bobbycar.carsim.routes.RoutePoint;
 
-public class Car {
+public class Car implements OTAListener {
 	private final String model;
 	private final String manufacturer;
 	private final Engine engine;
 	private final UUID driverId;
+	private String vin;
 	private static final Logger LOGGER = LoggerFactory.getLogger(Car.class);
 
 	private Car(Builder builder) {
@@ -21,7 +23,14 @@ public class Car {
 		this.manufacturer = builder.manufacturer;
 		this.driverId = builder.driverId;
 		this.engine = builder.engine;
+		this.vin = builder.vin;
 	}
+
+	public void onUpdate(String event){
+		LOGGER.info("Received OTA update for car with driverId: " + driverId);
+		LOGGER.debug("OTA payload: " + event);
+		this.getEngine().getEngineConfiguration().updateEngineConfiguration(event);
+	};
 
 	public void start(Executor executor) {
 		LOGGER.debug("Starting engine");
@@ -46,6 +55,18 @@ public class Car {
 		return driverId;
 	}
 
+	public Engine getEngine() {
+		return engine;
+	}
+
+	public String getVin() {
+		return vin;
+	}
+
+	public void assignVin(String vin) {
+		this.vin = vin;
+	}
+
 	/**
 	 * Creates builder to build {@link Car}.
 	 * @return created builder
@@ -59,6 +80,7 @@ public class Car {
 		private String manufacturer;
 		private UUID driverId;
 		private Engine engine;
+		private String vin;
 
 		private Builder() {
 		}
@@ -80,6 +102,11 @@ public class Car {
 		
 		public Builder withEngine(Engine engine) {
 			this.engine = engine;
+			return this;
+		}
+
+		public Builder withVin(String vin) {
+			this.vin = vin;
 			return this;
 		}
 
