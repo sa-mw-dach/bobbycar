@@ -14,5 +14,3 @@ spec:
     name: {{ .Values.carSimulator.name }}
     weight: 100
   wildcardPolicy: None
-status:
-  ingress: []
