@@ -14,5 +14,3 @@ spec:
     name: car-simulator
     weight: 100
   wildcardPolicy: None
-status:
-  ingress: []

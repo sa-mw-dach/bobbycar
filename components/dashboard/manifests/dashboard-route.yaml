@@ -13,5 +13,3 @@ spec:
     name: dashboard
     weight: 100
   wildcardPolicy: None
-status:
-  ingress: []
