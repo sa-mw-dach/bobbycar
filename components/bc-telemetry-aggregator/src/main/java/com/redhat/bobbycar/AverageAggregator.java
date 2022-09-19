@@ -1,9 +1,7 @@
 package com.redhat.bobbycar;
 
 import java.time.Duration;
-
 import javax.enterprise.inject.Produces;
-
 import com.redhat.bobbycar.model.Aggregation;
 import com.redhat.bobbycar.model.CarMetricsEvent;
 import org.apache.kafka.common.serialization.Serdes;
@@ -12,9 +10,6 @@ import org.apache.kafka.streams.KeyValue;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.Topology;
 import org.apache.kafka.streams.kstream.*;
-import org.apache.kafka.streams.state.KeyValueBytesStoreSupplier;
-import org.apache.kafka.streams.state.Stores;
-
 import io.quarkus.kafka.client.serialization.ObjectMapperSerde;
 import org.apache.kafka.streams.state.WindowStore;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
@@ -43,11 +38,7 @@ public class AverageAggregator {
 
         Duration windowSize = Duration.ofMinutes(metrics_aggregation_windowsize);
         Duration advanceSize = Duration.ofSeconds(30);
-        //TimeWindows hoppingWindow = TimeWindows.of(windowSize).advanceBy(advanceSize);
-        TimeWindows hoppingWindow = TimeWindows.of(windowSize);
-
-        KeyValueBytesStoreSupplier storeSupplier = Stores.persistentKeyValueStore(
-                CAR_METRICS_STORE);
+        TimeWindows hoppingWindow = TimeWindows.of(windowSize).advanceBy(advanceSize);
 
         builder.stream(metrics_topic, Consumed.with(Serdes.String(), metricsSerde))
                 //.peek((key, value) -> System.out.println("Incoming record - key " +key +" value " + value))
@@ -56,9 +47,9 @@ public class AverageAggregator {
                 .aggregate(
                         Aggregation::new,
                         (vin, carMetricsEvent, aggregation) -> aggregation.updateFrom(carMetricsEvent),
-                        Materialized.<String, Aggregation, WindowStore<Bytes, byte[]>> as(CAR_METRICS_STORE)
-                                .withKeySerde(Serdes.String())
-                                .withValueSerde(aggregationSerde)
+                        Materialized.<String, Aggregation, WindowStore<Bytes, byte[]>>as(CAR_METRICS_STORE)
+                                    .withKeySerde(Serdes.String())
+                                    .withValueSerde(aggregationSerde)
                 )
                 //.suppress(untilWindowCloses(unbounded()))
                 .toStream()
@@ -71,7 +62,7 @@ public class AverageAggregator {
 
         builder.stream(metrics_aggregated_topic, Consumed.with(Serdes.String(), aggregationSerde))
                 .filter((key,aggregate) -> aggregate.speedAvg > speed_alert_threshold)
-                .peek((key, value) -> System.out.println("Speed Alert for - VIN: " +key +" payload: " + value.toString()))
+                //.peek((key, value) -> System.out.println("Speed Alert for - VIN: " +key +" payload: " + value.toString()))
                 .to(
                         speed_alert_topic,
                         Produced.with(Serdes.String(), aggregationSerde)
