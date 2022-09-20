@@ -16,6 +16,10 @@ public class KafkaConsumer {
     CarMetricsSocket carMetricsSocket;
     @Inject
     ZoneChangeSocket zoneChangeSocket;
+    @Inject
+    CarMetricsAggregatedSocket carMetricsAggregatedSocket;
+    @Inject
+    SpeedAlertSocket speedAlertSocket;
 
     private static final Logger LOGGER = Logger.getLogger(KafkaConsumer.class.getName());
 
@@ -26,15 +30,27 @@ public class KafkaConsumer {
     }
 
     @Incoming("bobbycar-metrics")
-    public void consumeMetrics(String metrics) {
-        LOGGER.info("Received Kafka engine data:" + metrics);
-        carMetricsSocket.broadcast(metrics);
+    public void consumeMetrics(String metric) {
+        LOGGER.info("Received Kafka engine data:" + metric);
+        carMetricsSocket.broadcast(metric);
     }
 
     @Incoming("bobbycar-zonechange")
     public void consumeZoneChange(String zoneChangeEvent) {
         LOGGER.info("Received Kafka zone change event:" + zoneChangeEvent);
         zoneChangeSocket.broadcast(zoneChangeEvent);
+    }
+
+    @Incoming("bobbycar-metrics-aggregated")
+    public void consumeAggregatedMetrics(String metric) {
+        LOGGER.info("Received Kafka aggregated metric event:" + metric);
+        carMetricsAggregatedSocket.broadcast(metric);
+    }
+
+    @Incoming("bobbycar-speed-alert")
+    public void consumeSpeedALerts(String alert) {
+        LOGGER.info("Received Kafka speed alert event:" + alert);
+        carMetricsAggregatedSocket.broadcast(alert);
     }
 
 }
