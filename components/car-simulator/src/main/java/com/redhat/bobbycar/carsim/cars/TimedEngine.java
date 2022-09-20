@@ -2,6 +2,7 @@ package com.redhat.bobbycar.carsim.cars;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
+import java.math.RoundingMode;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -97,13 +98,20 @@ public class TimedEngine implements Engine{
 		return distanceInKilometers.divide(durationInHours, MATH_CTX).add(speedVariationAmount).doubleValue();
 	}
 
+	private double calculateCo2InRange(int min, int max){
+		double co2 = ((Math.random() * (max - min)) + min);
+		return BigDecimal.valueOf(co2).setScale(2, RoundingMode.HALF_UP).doubleValue();
+	}
+
 	@Override
 	public EngineData currentData() {
+		double co2 = calculateCo2InRange(100,120);
 		Optional<Double> currentSpeedInKmH = currentSpeedInKmH();
 		LOGGER.debug("Current speed {}", currentSpeedInKmH);
 		com.redhat.bobbycar.carsim.cars.EngineData.Builder builder = EngineData.builder();
 		currentSpeedInKmH.ifPresent(speed -> {
-			config.co2FromSpeed(speed).ifPresent(builder::withCo2Emission);
+			//config.co2FromSpeed(speed).ifPresent(builder::withCo2Emission);
+			builder.withCo2Emission(co2);
 			config.fuelConsumptionPer100KmFromSpeed(speed).ifPresent(builder::withFuelConsumptionPer100km);
 			config.gearFromSpeed(speed).ifPresent(builder::withGear);
 			config.rpmFromSpeed(speed).ifPresent(builder::withRpm);
