@@ -31,7 +31,7 @@ export class CarDetailPage implements OnInit {
   sv = new google.maps.StreetViewService();
   streetName = '';
   showHUD = false;
-  carBg = 'VW';
+  carBg = 'S';
 
   constructor(
     private carEventsService: CarEventsService,

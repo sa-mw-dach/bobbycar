@@ -3,6 +3,8 @@ import { Platform } from '@ionic/angular';
 import { Router } from '@angular/router';
 import { ConfigService } from '../providers/config.service';
 import { CarEventsService } from '../providers/ws.service';
+import { CarMetricsAggregatedService } from '../providers/carmetrics-aggregated.service';
+import { SpeedAlertService } from '../providers/speed-alert.service';
 import { CacheService } from '../providers/cache.service';
 import { map, tap, delay, retryWhen, delayWhen } from 'rxjs/operators';
 
@@ -21,11 +23,16 @@ export class MapPage implements OnInit {
     zones = [];
     searchArea: google.maps.Circle;
     isQuery = false;
+    showSpeedAlerts = false;
+    metricsAggregated = new Map();
+    speedAlerts = new Map();
 
     constructor(
         private platform: Platform,
         private carEventsService: CarEventsService,
         private cacheService: CacheService,
+        private metricsAggregatedService: CarMetricsAggregatedService,
+        private speedAlertService: SpeedAlertService,
         private router: Router
         ) {}
 
@@ -42,11 +49,41 @@ export class MapPage implements OnInit {
         }, 10);
     }
 
+    displaySpeedAlerts(){
+        if(this.showSpeedAlerts){
+            this.showSpeedAlerts = false;
+            this.speedAlertService.close();
+            this.speedAlerts.clear();
+        } else {
+            this.showSpeedAlerts = true;
+            this.speedAlertService.connect();
+            this.speedAlertService.getMessages().pipe(retryWhen((errors) => errors.pipe(delay(1_000)))).subscribe(
+                msg => {
+                    this.speedAlerts.set(msg.vin, msg);
+                    console.log(msg);
+                }, // Called whenever there is a message from the server.
+                err => console.error(err), // Called if at any point WebSocket API signals some kind of error.
+                () => console.log('complete') // Called when connection is closed (for whatever reason).
+            );
+        }
+    }
+
     simulateQuery(){
         if(this.isQuery){
             this.isQuery = false;
+            this.metricsAggregatedService.close();
+            this.metricsAggregated.clear();
         } else {
             this.isQuery = true;
+            this.metricsAggregatedService.connect();
+            this.metricsAggregatedService.getMessages().pipe(retryWhen((errors) => errors.pipe(delay(1_000)))).subscribe(
+                msg => {
+                    this.metricsAggregated.set(msg.vin, msg);
+                    //console.log(this.metricsAggregated);
+                }, // Called whenever there is a message from the server.
+                err => console.error(err), // Called if at any point WebSocket API signals some kind of error.
+                () => console.log('complete') // Called when connection is closed (for whatever reason).
+            );
         }
     }
 
@@ -200,12 +237,14 @@ export class MapPage implements OnInit {
     ionViewWillLeave(){
         console.debug('ionViewWillLeave()');
         this.carEventsService.close();
+        this.metricsAggregatedService.close();
     }
 
     async ngOnInit() {
 
         this.initializeMap();
         this.carEventsService.connect();
+        //this.metricsAggregatedService.connect();
 
         this.cacheService.getZones().subscribe((data) => {
             if(this.map){
