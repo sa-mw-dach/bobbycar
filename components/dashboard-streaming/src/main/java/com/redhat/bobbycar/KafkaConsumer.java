@@ -48,9 +48,9 @@ public class KafkaConsumer {
     }
 
     @Incoming("bobbycar-speed-alert")
-    public void consumeSpeedALerts(String alert) {
+    public void consumeSpeedAlerts(String alert) {
         LOGGER.info("Received Kafka speed alert event:" + alert);
-        carMetricsAggregatedSocket.broadcast(alert);
+        speedAlertSocket.broadcast(alert);
     }
 
 }
