@@ -1,17 +1,21 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>Bobbycar - Map ({{bobbycars.size}})</ion-title>
+    <ion-title> Red Hat Connected Vehicle Architecture - Map ({{bobbycars.size}})</ion-title>
   </ion-toolbar>
   <ion-toolbar>
     <ion-button (click)="createZone()">
       <ion-icon name="create-outline"></ion-icon> 
       Create Zone
     </ion-button>
-    <ion-button (click)="realtimeQuery()">
-      <ion-icon name="search"></ion-icon> 
-      Realtime Query
+    <ion-button (click)="simulateQuery()" color="danger">
+      <ion-icon name="analytics-outline"></ion-icon>
+      Realtime Aggregation
     </ion-button>
-    <ion-button color="danger" (click)="resetMap()">
+    <ion-button (click)="displaySpeedAlerts()" color="danger">
+      <ion-icon name="alert-circle-outline"></ion-icon>
+      Speed Alerts
+    </ion-button>
+    <ion-button color="light" (click)="resetMap()">
       <ion-icon name="refresh-outline"></ion-icon> 
       Reset Map
     </ion-button>
@@ -51,6 +55,53 @@
 </ion-header>
 
 <ion-content padding color="light">
+
+    <ion-list lines="full" *ngIf="isQuery">
+      <ion-list-header style="font-size: 20px;">
+        <span style="width: 400px; font-weight: bold; color: #CC0000;">
+          <img src="../assets/kafka-ocp.png" style="width: 350px;"/>
+        </span>
+        <span style="width: 400px; font-weight: bold;font-size: 25px;">Kafka Streams - <br/> Realtime Windowed Averages</span>
+      </ion-list-header>
+      <ion-item>
+        <span style="width: 400px; font-weight: bold; color: #CC0000;">VIN</span>
+        <span style="width: 100px; font-weight: bold; color: #CC0000;">Speed</span>
+        <span style="width: 100px; font-weight: bold; color: #CC0000;">RPM</span>
+        <span style="width: 100px; font-weight: bold; color: #CC0000;">CO2</span>
+        <span style="width: 100px; font-weight: bold; color: #CC0000;">Fuel</span>
+      </ion-item>
+      <div *ngFor="let mapEntry of metricsAggregated | keyvalue">
+        <ion-item>
+          <span style="width: 400px;">{{mapEntry.value.vin}}</span>
+          <span style="width: 100px;">{{mapEntry.value.speedAvg}}</span>
+          <span style="width: 100px;">{{mapEntry.value.rpmAvg}}</span>
+          <span style="width: 100px;">{{mapEntry.value.co2Avg}}</span>
+          <span style="width: 100px;">{{mapEntry.value.fuelAvg}}</span>
+        </ion-item>
+      </div>
+    </ion-list>
+
+  <ion-list lines="full" *ngIf="showSpeedAlerts">
+    <ion-list-header style="font-size: 20px;">
+      Speed Alerts - Vehicles with speed average over 100km/h
+    </ion-list-header>
+    <ion-item>
+      <span style="width: 400px; font-weight: bold; color: #CC0000;">VIN</span>
+      <span style="width: 100px; font-weight: bold; color: #CC0000;">Speed</span>
+      <span style="width: 100px; font-weight: bold; color: #CC0000;">RPM</span>
+      <span style="width: 100px; font-weight: bold; color: #CC0000;">CO2</span>
+      <span style="width: 100px; font-weight: bold; color: #CC0000;">Fuel</span>
+    </ion-item>
+    <div *ngFor="let mapEntry of speedAlerts | keyvalue">
+      <ion-item>
+        <span style="width: 400px;"><ion-button>{{mapEntry.value.vin}}</ion-button></span>
+        <span style="width: 100px;">{{mapEntry.value.speedAvg}}</span>
+        <span style="width: 100px;">{{mapEntry.value.rpmAvg}}</span>
+        <span style="width: 100px;">{{mapEntry.value.co2Avg}}</span>
+        <span style="width: 100px;">{{mapEntry.value.fuelAvg}}</span>
+      </ion-item>
+    </div>
+  </ion-list>
 
  <div id="map"></div>
 

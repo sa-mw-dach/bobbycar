@@ -11,7 +11,7 @@
         <ion-list>
           <ion-menu-toggle auto-hide="false" *ngFor="let p of appPages">
             <ion-item [routerDirection]="'root'" [routerLink]="[p.url]">
-              <ion-icon slot="start" [name]="p.icon"></ion-icon>
+              <ion-icon slot="start" [name]="p.icon" style="color: #CC0000;"></ion-icon>
               <ion-label>
                 {{p.title}}
               </ion-label>
@@ -19,7 +19,7 @@
           </ion-menu-toggle>
         </ion-list>
         <div style="margin-left: 50px;">
-          <img src="assets/rh-logo.png" alt="" width="150px"/>
+          <img src="assets/rh-logo.png" alt="" width="100px"/>
         </div>
 
       </ion-content>

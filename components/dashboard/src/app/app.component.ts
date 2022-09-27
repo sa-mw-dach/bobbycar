@@ -25,7 +25,7 @@ export class AppComponent {
       icon: 'map'
     },
     {
-      title: 'Emotional Recognition',
+      title: 'Driver Recognition - AI/ML',
       url: '/hddp',
       icon: 'speedometer-outline'
     }
