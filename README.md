@@ -15,14 +15,12 @@ You can use the **install.sh** script to simply install demo.
 
 1. Fill in the mandatory properties in **install_cleanup_vars.sh**, i.e.:
 
-
-    NAMESPACE=bobbycar
-
-    APP_DOMAIN=apps.ocp.domain
-
-    API_DOMAIN=api.ocp.domain
-
-    GOOGLE_API_KEY=here_goes_my_maps_api_key
+   ```
+   NAMESPACE=bobbycar
+   APP_DOMAIN=apps.ocp.domain
+   API_DOMAIN=api.ocp.domain
+   GOOGLE_API_KEY=here_goes_my_maps_api_key
+   ```
 
 2. Run the **install.sh** script
 
