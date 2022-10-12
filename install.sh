@@ -69,7 +69,7 @@ wait_for_operator "Camel-K" red-hat-camel-k
 fi ;
 
 log "Installing the infra Helm release: $HELM_INFRA_RELEASE_NAME"
-helm install "$HELM_INFRA_RELEASE_NAME" --set-string namespace="$NAMESPACE" --set-string ocpDomain="$APP_DOMAIN" helm/bobbycar-core-infra/
+helm upgrade --install "$HELM_INFRA_RELEASE_NAME" --set-string namespace="$NAMESPACE" --set-string ocpDomain="$APP_DOMAIN" helm/bobbycar-core-infra/
 
 sleep 30s
 
@@ -83,7 +83,7 @@ log "Waiting for Kafka Bridge pod"
 oc wait --for=condition=Available deployment/bobbycar-bridge --timeout 300s
 
 log "Installing the apps Helm release: $HELM_APP_RELEASE_NAME"
-helm install "$HELM_APP_RELEASE_NAME" helm/bobbycar-core-apps \
+helm upgrade --install "$HELM_APP_RELEASE_NAME" helm/bobbycar-core-apps \
 --set-string ocpDomain="$APP_DOMAIN" \
 --set-string ocpApi="$API_DOMAIN" \
 --set-string namespace="$NAMESPACE" \
