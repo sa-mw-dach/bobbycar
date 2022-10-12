@@ -7,6 +7,44 @@ log() {
   echo "##### $*"
 }
 
+terminate() {
+    log "$*"
+    exit 1
+}
+
+wait_for_resource() {
+  local timeout=$(($(date +%s) + 300))
+
+  while ((timeout > $(date +%s))); do
+    [[ $(oc get -n "$NAMESPACE" "$@" -o 'go-template={{len .items}}' 2>/dev/null) -gt 0 ]] && break
+  done
+
+  set +x
+
+  if [[ ${timeout} < "$(date +%s)" ]]; then
+      terminate "Error: timed out while waiting for '$*' (in namespace: $NAMESPACE) to exist."
+  fi
+}
+
+# Wait for an operator to exist and be ready.
+#
+# $1 the label of the operator, for showing the user
+# $2 the name of the operator resource (.spec.name from Subscription)
+wait_for_operator() {
+  local name="$1"
+  shift
+  local subscription="$1"
+  shift
+
+  local sel="deployment -l operators.coreos.com/${subscription}.${NAMESPACE}"
+
+  log "Waiting for $name operator"
+  # shellcheck disable=SC2086
+  wait_for_resource $sel
+  # shellcheck disable=SC2086
+  oc wait --for=condition=Available $sel --timeout=300s
+}
+
 source install_cleanup_vars.sh
 
 if [[ "$INSTALL_OPERATORS" == true ]]; then
@@ -23,20 +61,11 @@ sed "s:{{NAMESPACE}}:$NAMESPACE:g" config/operators/datagrid-subscription.yaml |
 log "Installing the Camel-K operator"
 sed "s:{{NAMESPACE}}:$NAMESPACE:g" config/operators/camel-k-operator-subscription.yaml | oc apply -f -
 
-sleep 30s
+wait_for_operator "AMQ Broker" amq-broker-rhel8
+wait_for_operator "AMQ Streams" amq-streams
+wait_for_operator "Datagrid" datagrid
+wait_for_operator "Camel-K" red-hat-camel-k
 
-log "Waiting for AMQ Broker operator"
-AMQ_BROKER_POD=$(oc get pod -l name=amq-broker-operator -o jsonpath="{.items[0].metadata.name}")
-oc wait --for=condition=Ready pod/"$AMQ_BROKER_POD" --timeout 300s
-log "Waiting for AMQ Streams operator"
-AMQ_STREAMS_POD=$(oc get pod -l name=amq-streams-cluster-operator -o jsonpath="{.items[0].metadata.name}")
-oc wait --for=condition=Ready pod/"$AMQ_STREAMS_POD" --timeout 300s
-log "Waiting for Datagrid operator"
-DATAGRID_POD=$(oc get pod -l name=infinispan-operator -o jsonpath="{.items[0].metadata.name}")
-oc wait --for=condition=Ready pod/"$DATAGRID_POD" --timeout 300s
-log "Waiting for Camel-K operator"
-CAMEL_K_POD=$(oc get pod -l name=camel-k-operator -o jsonpath="{.items[0].metadata.name}")
-oc wait --for=condition=Ready pod/"$CAMEL_K_POD" --timeout 300s
 fi ;
 
 log "Installing the infra Helm release: $HELM_INFRA_RELEASE_NAME"
