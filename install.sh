@@ -40,7 +40,7 @@ wait_for_operator() {
   # shellcheck disable=SC2086
   wait_for_resource $sel
   # shellcheck disable=SC2086
-  oc wait --for=condition=Available $sel --timeout=300s
+  oc -n "${NAMESPACE}" wait --for=condition=Available $sel --timeout=300s
 }
 
 source install_cleanup_vars.sh
