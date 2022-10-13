@@ -10,11 +10,13 @@ log() {
 source install_cleanup_vars.sh
 
 log "Uninstalling Helm app release: $HELM_APP_RELEASE_NAME"
-helm uninstall "$HELM_APP_RELEASE_NAME" || true
-sleep 10s
+# shellcheck disable=SC2015
+helm uninstall "$HELM_APP_RELEASE_NAME" && sleep 10s || true
+
 log "Uninstalling Helm infra release: $HELM_INFRA_RELEASE_NAME"
-helm uninstall "$HELM_INFRA_RELEASE_NAME" || true
-sleep 10s
+# shellcheck disable=SC2015
+helm uninstall "$HELM_INFRA_RELEASE_NAME" && sleep 10s || true
+
 log "Deleting namespace $NAMESPACE"
 oc delete namespace "$NAMESPACE" --wait=true || true
 
