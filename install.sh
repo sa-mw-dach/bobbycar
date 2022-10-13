@@ -19,8 +19,6 @@ wait_for_resource() {
     [[ $(oc get -n "$NAMESPACE" "$@" -o 'go-template={{len .items}}' 2>/dev/null) -gt 0 ]] && break
   done
 
-  set +x
-
   if [[ ${timeout} < "$(date +%s)" ]]; then
       terminate "Error: timed out while waiting for '$*' (in namespace: $NAMESPACE) to exist."
   fi
