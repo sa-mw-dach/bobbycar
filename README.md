@@ -28,6 +28,17 @@ You can use the **install.sh** script to simply install demo.
 
 If you want to manually install Bobbycar in your own environment, please follow these [installation instructions!](https://github.com/sa-mw-dach/bobbycar/tree/master/helm)
 
+### Red Hat OpenShift Local
+
+When using [OpenShift Local](https://developers.redhat.com/products/openshift-local/overview),
+you can use the following values:
+
+```
+NAMESPACE=bobbycar
+APP_DOMAIN=apps-crc.testing
+API_DOMAIN=api-crc-testing
+```
+
 ## Purpose
 
 + Accelerate building IoT solutions faster with Red Hat technologies.
