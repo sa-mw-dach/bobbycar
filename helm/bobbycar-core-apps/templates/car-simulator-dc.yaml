@@ -63,9 +63,9 @@ spec:
             - name: mp.messaging.incoming.zonechange.port
               value: '61616'
             - name: com.redhat.bobbycar.carsim.datagrid.url
-              value: 'https://cache-service-{{ .Values.namespace }}.{{ .Values.ocpDomain }}'
+              value: 'http://cache-service-{{ .Values.namespace }}.{{ .Values.ocpDomain }}'
             - name: com.redhat.bobbycar.carsim.kafka.url
-              value: 'https://bobbycar-{{ .Values.namespace }}.{{ .Values.ocpDomain }}'
+              value: 'http://bobbycar-{{ .Values.namespace }}.{{ .Values.ocpDomain }}'
             - name: mp.messaging.outgoing.enginemetrics.type
               value: 'smallrye-mqtt'
             - name: mp.messaging.outgoing.enginemetrics.topic
