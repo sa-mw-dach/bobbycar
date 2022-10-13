@@ -16,7 +16,8 @@ wait_for_resource() {
   local timeout=$(($(date +%s) + 300))
 
   while ((timeout > $(date +%s))); do
-    [[ $(oc get -n "$NAMESPACE" "$@" -o 'go-template={{len .items}}' 2>/dev/null) -gt 0 ]] && break
+    [[ "$(oc get -n "$NAMESPACE" "$@" -o 'go-template={{len .items}}' 2>/dev/null)" -gt 0 ]] && break
+    sleep 5s
   done
 
   if [[ ${timeout} < "$(date +%s)" ]]; then
