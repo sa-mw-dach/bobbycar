@@ -17,7 +17,6 @@ spec:
       app: dashboard-streaming
   template:
     metadata:
-      creationTimestamp: null
       labels:
         app: dashboard-streaming
     spec:
