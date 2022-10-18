@@ -482,17 +482,25 @@
         "endpoints": {
           "type": "object",
           "required": [
-            "port"
+            "mqtt"
           ],
           "properties": {
-            "host": {
-              "type": "string"
-            },
-            "port": {
-              "type": "number",
-              "default": 1883,
-              "minimum": 0,
-              "maximum": 65536
+            "mqtt": {
+              "type": "object",
+              "required": [
+                "port"
+              ],
+              "properties": {
+                "host": {
+                  "type": "string"
+                },
+                "port": {
+                  "type": "number",
+                  "default": 1883,
+                  "minimum": 0,
+                  "maximum": 65536
+                }
+              }
             }
           }
         },
