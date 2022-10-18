@@ -1,6 +1,7 @@
 package com.redhat.bobbycar.routes;
 
 import java.io.ByteArrayInputStream;
+import java.util.Base64;
 import java.util.Iterator;
 import java.util.List;
 
@@ -11,6 +12,8 @@ import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.aws.s3.S3Constants;
 import org.apache.camel.model.OnCompletionDefinition;
 import org.apache.camel.processor.aggregate.GroupedBodyAggregationStrategy;
+import org.apache.camel.util.json.JsonObject;
+import org.apache.camel.util.json.Jsoner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -87,26 +90,73 @@ public class Kafka2S3Route extends RouteBuilder {
 
 	}
 
+	/**
+	 * Process Cloud Events.
+	 * <p>
+	 * This is a very basic processing of Cloud Events. It simply normalizes the events on the binary encoding. We need to do this since:
+	 * a) Camel doesn't haven good support for Cloud Events so far and b) the sender may choose the format (binary, structured) and we need to
+	 * handle either of them.
+	 * <p>
+	 * So this method will normalize on the binary encoding, so that functionality following this call can always expect the same format.
+	 */
+	private static void processCloudEvent(Exchange ex) throws Exception {
+		var contentType = ex.getIn().getHeader("content-type", String.class);
+		if (contentType != null && contentType.startsWith("application/cloudevents+json")) {
+			// structured mode
+			var value = Jsoner.deserialize(ex.getIn(String.class));
+			if ( !(value instanceof JsonObject)) {
+				return;
+			}
+			var json = (JsonObject)value;
+
+			for (var entry : json.entrySet()) {
+				switch (entry.getKey()) {
+				case "datacontenttype":
+					ex.getIn().setHeader("content-type", entry.getValue());
+					break;
+				case "data":
+					ex.getIn().setBody(Jsoner.serialize(entry.getValue()));
+					break;
+				case "data_base64":
+					if(entry.getValue() != null) {
+						var data = Base64.getDecoder().decode(entry.getValue().toString());
+						ex.getIn().setBody(data);
+					}
+					break;
+				default:
+					ex.getIn().setHeader("ce_" + entry.getKey(), entry.getValue());
+					break;
+				}
+
+			}
+		} else {
+			// binary mode
+			// nothing to do
+		}
+	}
+
 	private void storeGpsInS3() {
 		from("kafka:{{kafka.broker.topic.gps}}?brokers={{kafka.broker.uri}}")
-			.convertBodyTo(String.class)
-			.aggregate(simple("true"), new GroupedBodyAggregationStrategy()).completionInterval(Long.valueOf(s3_message_aggregation_interval))
-			.process(new Processor() {
-				@Override
-				public void process(Exchange exchange) throws Exception {
-					List<Exchange> data = exchange.getIn().getBody(List.class);
-					StringBuffer sb = new StringBuffer();
-					for (Iterator iterator = data.iterator(); iterator.hasNext();) {
-						String ex = (String) iterator.next();
-						sb.append(ex+"\n");
+			.process(Kafka2S3Route::processCloudEvent)
+			.filter(simple("${header[ce_subject]} == 'car'"))
+				.convertBodyTo(String.class)
+				.aggregate(simple("true"), new GroupedBodyAggregationStrategy()).completionInterval(Long.valueOf(s3_message_aggregation_interval))
+				.process(new Processor() {
+					@Override
+					public void process(Exchange exchange) throws Exception {
+						List<Exchange> data = exchange.getIn().getBody(List.class);
+						StringBuffer sb = new StringBuffer();
+						for (Iterator iterator = data.iterator(); iterator.hasNext();) {
+							String ex = (String) iterator.next();
+							sb.append(ex+"\n");
+						}
+						exchange.getIn().setBody(new ByteArrayInputStream(sb.toString().getBytes()));
 					}
-					exchange.getIn().setBody(new ByteArrayInputStream(sb.toString().getBytes()));
-				}
-			})
-		  .setHeader(S3Constants.KEY, simple("bobbycar-gps-${date:now}.txt"))
-		  .to("aws-s3://{{s3.bucket.name}}?amazonS3Client=#client")
-		  .log("Uploaded Vibration dataset to S3");
-			 
+				})
+				.setHeader(S3Constants.KEY, simple("bobbycar-gps-${date:now}.txt"))
+				.to("aws-s3://{{s3.bucket.name}}?amazonS3Client=#client")
+				.log("Uploaded Vibration dataset to S3")
+			.end();
 	}
 
 	@Override
