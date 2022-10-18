@@ -86,8 +86,8 @@ helm upgrade --install "$HELM_INFRA_RELEASE_NAME" \
 
 #log "Waiting for AMQ Broker pod"
 #oc wait --for=condition=Ready pod/bobbycar-amq-mqtt-ss-0 --timeout 300s
-#log "Waiting for Kafka Broker pod"
-#oc wait --for=condition=Ready pod/bobbycar-cluster-kafka-0 --timeout 300s
+log "Waiting for Kafka Broker pod"
+oc wait --for=condition=Ready pod/drogue-iot-kafka-0 --timeout 300s
 log "Waiting for Datagrid pod"
 oc wait --for=condition=Ready pod/bobbycar-dg-0 --timeout 300s
 #log "Waiting for Kafka Bridge pod"
