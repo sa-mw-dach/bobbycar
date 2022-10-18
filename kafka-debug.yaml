@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kafka-logger
+  labels:
+    app.kubernetes.io/name: kafka-logger
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: kafka-logger
+
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: kafka-logger
+
+    spec:
+      enableServiceLinks: false
+      securityContext:
+        runAsNonRoot: true
+      containers:
+        - name: logger
+          image: docker.io/bitnami/kafka:3.2
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: [ "ALL" ]
+            seccompProfile:
+              type: RuntimeDefault
+          env:
+            - name: KAFKA_JAAS_CONFIG
+              valueFrom:
+                secretKeyRef:
+                  name: drogue-iot # name of the kafka broker secret
+                  key: sasl.jaas.config
+          command:
+            - kafka-console-consumer.sh
+            - --bootstrap-server
+            - drogue-iot-kafka-bootstrap:9092 # replace with your kafka bootstrap server
+            - --consumer-property
+            - security.protocol=SASL_PLAINTEXT
+            - --consumer-property
+            - sasl.mechanism=SCRAM-SHA-512
+            - --consumer-property
+            - sasl.jaas.config=$(KAFKA_JAAS_CONFIG)
+            - --topic
+            - bobbycar-zonechange
+            - --group
+            - kafka-logger

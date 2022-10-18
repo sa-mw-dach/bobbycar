@@ -25,3 +25,11 @@ podman build . -t quay.io/ctrontesting/dashboard:latest
 podman push quay.io/ctrontesting/dashboard:latest
 popd
 ```
+
+## Log a Kafka topic
+
+```shell
+podman run --rm -ti docker.io/bitnami/kafka:latest kafka-console-consumer.sh \
+  --topic {topic} \
+  --bootstrap-server {bootstrap}
+```
