@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: {{ .Values.carSimulator.name }}
+    app.kubernetes.io/name: {{ .Values.carSimulator.name }}
     app.kubernetes.io/part-of: {{ .Values.appName }}
   name: {{ .Values.carSimulator.name }}
 spec:
@@ -10,7 +10,7 @@ spec:
   revisionHistoryLimit: 10
   selector:
     matchLabels:
-      deploymentConfig: {{ .Values.carSimulator.name }}
+      app.kubernetes.io/name: {{ .Values.carSimulator.name }}
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -19,8 +19,7 @@ spec:
   template:
     metadata:
       labels:
-        app: {{ .Values.carSimulator.name }}
-        deploymentConfig: {{ .Values.carSimulator.name }}
+        app.kubernetes.io/name: {{ .Values.carSimulator.name }}
       name: {{ .Values.carSimulator.name }}
     spec:
       volumes:
