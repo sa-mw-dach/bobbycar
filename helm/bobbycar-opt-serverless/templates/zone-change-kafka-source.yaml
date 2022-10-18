@@ -1,3 +1,4 @@
+---
 apiVersion: sources.knative.dev/v1beta1
 kind: KafkaSource
 metadata:
@@ -5,14 +6,23 @@ metadata:
   namespace: {{ .Values.namespace }}
 spec:
   bootstrapServers:
-    - 'bobbycar-cluster-kafka-bootstrap.bobbycar.svc:9092'
-    - 'bobbycar-cluster-kafka-bootstrap.bobbycar.svc:9093'
+    - {{ .Values.kafka.bootstrap.servers | quote }}
   consumerGroup: KnativeZoneChangeSource
   net:
     sasl:
-      password: { }
-      type: { }
-      user: { }
+      enable: true
+      password:
+        secretKeyRef:
+          name: drogue-iot
+          key: password
+      type:
+        secretKeyRef:
+          name: zone-change-kafka-source
+          key: type
+      user:
+        secretKeyRef:
+          name: zone-change-kafka-source
+          key: user
     tls:
       caCert: { }
       cert: { }
@@ -24,3 +34,12 @@ spec:
       name: {{ .Values.broker.name }}
   topics:
     - {{ .Values.kafkaTopic }}
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: zone-change-kafka-source
+  namespace: {{ .Values.namespace }}
+data:
+  user: {{ "drogue-iot" | b64enc }}
+  type: {{ "SCRAM-SHA-512" | b64enc }}

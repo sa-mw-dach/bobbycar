@@ -3,3 +3,7 @@ broker:
   name: bobbycar
 # The Kafka zone change topic
 kafkaTopic: bobbycar-zonechange
+
+kafka:
+  bootstrap:
+    servers: drogue-iot-kafka-bootstrap:9092
