@@ -16,12 +16,6 @@
         "cpu": "500m",
         "memory": "1Gi"
       },
-      "amqBroker": {
-        "instances": 1,
-        "console": {
-          "expose": true
-        }
-      },
       "kafka": {
         "cluster": {
           "brokerReplicas": 2,
@@ -59,7 +53,6 @@
     "appName",
     "ocpDomain",
     "datagrid",
-    "amqBroker",
     "kafka"
   ],
   "properties": {
@@ -160,66 +153,6 @@
       },
       "additionalProperties": true
     },
-    "amqBroker": {
-      "$id": "#/properties/amqBroker",
-      "type": "object",
-      "title": "The amqBroker Custom Resource",
-      "description": "Configures the amqBroker Custom Resource.",
-      "default": {},
-      "examples": [
-        {
-          "instances": 1,
-          "console": {
-            "expose": true
-          }
-        }
-      ],
-      "required": [
-        "instances",
-        "console"
-      ],
-      "properties": {
-        "instances": {
-          "$id": "#/properties/amqBroker/properties/instances",
-          "type": "integer",
-          "title": "instances",
-          "description": "How many broker instances should be installed",
-          "default": 0,
-          "examples": [
-            1
-          ]
-        },
-        "console": {
-          "$id": "#/properties/amqBroker/properties/console",
-          "type": "object",
-          "title": "Admin console",
-          "description": "Admin console config",
-          "default": {},
-          "examples": [
-            {
-              "expose": true
-            }
-          ],
-          "required": [
-            "expose"
-          ],
-          "properties": {
-            "expose": {
-              "$id": "#/properties/amqBroker/properties/console/properties/expose",
-              "type": "boolean",
-              "title": "expose",
-              "description": "Should the broker admin console be exposed.",
-              "default": false,
-              "examples": [
-                true
-              ]
-            }
-          },
-          "additionalProperties": true
-        }
-      },
-      "additionalProperties": true
-    },
     "kafka": {
       "$id": "#/properties/kafka",
       "type": "object",
@@ -299,46 +232,6 @@
               "default": 0,
               "examples": [
                 3
-              ]
-            }
-          },
-          "additionalProperties": true
-        },
-        "bridge": {
-          "$id": "#/properties/kafka/properties/bridge",
-          "type": "object",
-          "title": "Kafka bridge",
-          "description": "Kafka bridge CR configuration",
-          "default": {},
-          "examples": [
-            {
-              "replicas": 1,
-              "port": 8080
-            }
-          ],
-          "required": [
-            "replicas",
-            "port"
-          ],
-          "properties": {
-            "replicas": {
-              "$id": "#/properties/kafka/properties/bridge/properties/replicas",
-              "type": "integer",
-              "title": "replicas",
-              "description": "How many Kafka Bridge instances should be installed.",
-              "default": 0,
-              "examples": [
-                1
-              ]
-            },
-            "port": {
-              "$id": "#/properties/kafka/properties/bridge/properties/port",
-              "type": "integer",
-              "title": "port",
-              "description": "The port to listen for the Kafka bridge instances.",
-              "default": 0,
-              "examples": [
-                8080
               ]
             }
           },

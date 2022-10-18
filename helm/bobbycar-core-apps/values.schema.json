@@ -11,12 +11,6 @@
       "appName": "Bobbycar",
       "ocpDomain": "apps.ocp3.stormshift.coe.muc.redhat.com",
       "ocpApi": "api.ocp3.stormshift.coe.muc.redhat.com",
-      "mqtt": {
-        "topic": {
-          "mqttZoneChangeTopic": "bobbycar/zonechange",
-          "mqttMetricsTopic": "bobbycar/enginemetrics"
-        }
-      },
       "kafka": {
         "topic": {
           "gps": "bobbycar-gps",
@@ -58,7 +52,6 @@
     "appName",
     "ocpDomain",
     "ocpApi",
-    "mqtt",
     "kafka",
     "datagrid",
     "dashboard",
@@ -103,72 +96,11 @@
       "type": "string",
       "title": "ocpApi",
       "description": "The OpenShift API domain name.",
-      "default": "",
-      "pattern": "^.+$",
+      "default": "https://kubernetes.default.svc",
+      "pattern": "(^https?://.+$|)",
       "examples": [
-        "api.ocp3.stormshift.coe.muc.redhat.com"
+        "https://api.ocp3.stormshift.coe.muc.redhat.com:6443"
       ]
-    },
-    "mqtt": {
-      "$id": "#/properties/mqtt",
-      "type": "object",
-      "title": "The mqtt configuration",
-      "description": "The MQTT Topic config.",
-      "default": {},
-      "examples": [
-        {
-          "topic": {
-            "mqttZoneChangeTopic": "bobbycar/zonechange",
-            "mqttMetricsTopic": "bobbycar/enginemetrics"
-          }
-        }
-      ],
-      "required": [
-        "topic"
-      ],
-      "properties": {
-        "topic": {
-          "$id": "#/properties/mqtt/properties/topic",
-          "type": "object",
-          "title": "topic",
-          "description": "The MQTT Topic section.",
-          "default": {},
-          "examples": [
-            {
-              "mqttZoneChangeTopic": "bobbycar/zonechange",
-              "mqttMetricsTopic": "bobbycar/enginemetrics"
-            }
-          ],
-          "required": [
-            "mqttZoneChangeTopic",
-            "mqttMetricsTopic"
-          ],
-          "properties": {
-            "mqttZoneChangeTopic": {
-              "$id": "#/properties/mqtt/properties/topic/properties/mqttZoneChangeTopic",
-              "type": "string",
-              "title": "mqttZoneChangeTopic",
-              "description": "The MQTT Zonechange topic name.",
-              "default": "",
-              "examples": [
-                "bobbycar/zonechange"
-              ]
-            },
-            "mqttMetricsTopic": {
-              "$id": "#/properties/mqtt/properties/topic/properties/mqttMetricsTopic",
-              "type": "string",
-              "title": "mqttMetricsTopic",
-              "description": "The MQTT Metrics topic name.",
-              "default": "",
-              "examples": [
-                "bobbycar/enginemetrics"
-              ]
-            }
-          },
-          "additionalProperties": true
-        }
-      },
-      "additionalProperties": true
     },
     "kafka": {
       "$id": "#/properties/kafka",
@@ -531,6 +463,32 @@
         }
       },
       "additionalProperties": true
+    },
+    "drogue": {
+      "type": "object",
+      "required": [
+        "application",
+        "gateway"
+      ],
+      "properties": {
+        "application": {
+          "type": "string",
+          "default": "bobbycar",
+          "title": "Drogue IoT application name",
+          "description": ""
+        },
+        "gateway": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "password": {
+              "type": "string"
+            }
+          }
+        }
+      }
     }
   },
   "additionalProperties": true

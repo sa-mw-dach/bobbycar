@@ -1,5 +1,5 @@
-apiVersion: apps.openshift.io/v1
-kind: DeploymentConfig
+apiVersion: apps/v1
+kind: Deployment
 metadata:
   labels:
     app: car-simulator
@@ -7,24 +7,29 @@ metadata:
   name: car-simulator
   annotations:
     app.openshift.io/connects-to: bobbycar-amq-mqtt-ss
+    image.openshift.io/triggers: |
+      [
+        {
+          "from": {
+            "kind":"ImageStreamTag",
+            "name":"car-simulator:latest"
+          },
+          "fieldPath":"spec.template.spec.containers[?(@.name==\"car-simulator\")].image"
+        }
+      ]
 spec:
   replicas: 1
   revisionHistoryLimit: 10
   selector:
-    deploymentConfig: car-simulator
+    matchLabels:
+      deploymentConfig: car-simulator
   strategy:
-    activeDeadlineSeconds: 21600
-    resources: {}
-    type: Rolling
-    rollingParams:
-      updatePeriodSeconds: 1
-      intervalSeconds: 1
-      timeoutSeconds: 600
+    type: RollingUpdate
+    rollingUpdate:
       maxUnavailable: 25%
       maxSurge: 25%
   template:
     metadata:
-      creationTimestamp: null
       labels:
         app: car-simulator
         deploymentConfig: car-simulator
@@ -95,7 +100,7 @@ spec:
             - name: com.redhat.bobbycar.carsim.kafka.trustStorePassword
               value: 'xVu212U35%?sseTrwsaahh21'
             - name: com.redhat.bobbycar.carsim.delay
-              value: 1000
+              value: "1000"
             - name: com.redhat.bobbycar.carsim.kafka.apiKey
               value: ''
             - name: quarkus.log.level
@@ -135,14 +140,3 @@ spec:
       schedulerName: default-scheduler
       securityContext: {}
       terminationGracePeriodSeconds: 30
-  test: false
-  triggers:
-    - imageChangeParams:
-        automatic: true
-        containerNames:
-          - car-simulator
-        from:
-          kind: ImageStreamTag
-          name: 'car-simulator:latest'
-      type: ImageChange
-    - type: ConfigChange

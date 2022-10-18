@@ -22,17 +22,25 @@ spec:
     spec:
       containers:
         - name: dashboard-streaming
-          image: quay.io/bobbycar/dashboard-streaming:native-1.0
+          #image: quay.io/bobbycar/dashboard-streaming:native-1.0
+          image: quay.io/ctrontesting/dashboard-streaming:latest
           ports:
             - containerPort: 8080
               protocol: TCP
+          env:
+            - name: kafka.sasl.jaas.config
+              valueFrom:
+                secretKeyRef:
+                  name: drogue-iot
+                  key: sasl.jaas.config
           envFrom:
             - configMapRef:
                 name: dashboard-streaming-config
           resources: {}
           terminationMessagePath: /dev/termination-log
           terminationMessagePolicy: File
-          imagePullPolicy: IfNotPresent
+          #imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
       restartPolicy: Always
       terminationGracePeriodSeconds: 30
       dnsPolicy: ClusterFirst

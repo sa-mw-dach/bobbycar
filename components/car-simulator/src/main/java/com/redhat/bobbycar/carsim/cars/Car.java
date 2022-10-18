@@ -1,6 +1,5 @@
 package com.redhat.bobbycar.carsim.cars;
 
-import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 
@@ -14,7 +13,7 @@ public class Car implements OTAListener {
 	private final String model;
 	private final String manufacturer;
 	private final Engine engine;
-	private final UUID driverId;
+	private final String driverId;
 	private String vin;
 	private static final Logger LOGGER = LoggerFactory.getLogger(Car.class);
 
@@ -27,8 +26,8 @@ public class Car implements OTAListener {
 	}
 
 	public void onUpdate(String event){
-		LOGGER.info("Received OTA update for car with driverId: " + driverId);
-		LOGGER.debug("OTA payload: " + event);
+		LOGGER.info("Received OTA update for car with driverId {}", driverId);
+		LOGGER.debug("OTA payload: {}", event);
 		this.getEngine().getEngineConfiguration().updateEngineConfiguration(event);
 	};
 
@@ -51,7 +50,7 @@ public class Car implements OTAListener {
 		return manufacturer;
 	}
 
-	public UUID getDriverId() {
+	public String getDriverId() {
 		return driverId;
 	}
 
@@ -78,7 +77,7 @@ public class Car implements OTAListener {
 	public static final class Builder {
 		private String model;
 		private String manufacturer;
-		private UUID driverId;
+		private String driverId;
 		private Engine engine;
 		private String vin;
 
@@ -95,7 +94,7 @@ public class Car implements OTAListener {
 			return this;
 		}
 
-		public Builder withDriverId(UUID driverId) {
+		public Builder withDriverId(String driverId) {
 			this.driverId = driverId;
 			return this;
 		}

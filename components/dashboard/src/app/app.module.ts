@@ -8,9 +8,10 @@ import { StatusBar } from '@ionic-native/status-bar/ngx';
 
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HttpClientJsonpModule } from '@angular/common/http';
 
 import { ConfigService } from './providers/config.service';
+import { GoogleMapsModule } from '@angular/google-maps';
 
 @NgModule({
   declarations: [AppComponent],
@@ -18,7 +19,9 @@ import { ConfigService } from './providers/config.service';
   imports: [
     BrowserModule,
     HttpClientModule,
+    HttpClientJsonpModule,
     IonicModule.forRoot(),
+    GoogleMapsModule,
     AppRoutingModule
   ],
   providers: [

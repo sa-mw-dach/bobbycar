@@ -51,56 +51,67 @@ log "Creating namespace $NAMESPACE for Bobbycar demo"
 oc new-project "$NAMESPACE" || true
 log "Installing operator group"
 sed "s:{{NAMESPACE}}:$NAMESPACE:g" config/operators/operator-group.yaml | oc apply -f -
-log "Installing the AMQ Broker operator"
-sed "s:{{NAMESPACE}}:$NAMESPACE:g" config/operators/amq-operator-subscription.yaml | oc apply -f -
+#log "Installing the AMQ Broker operator"
+#sed "s:{{NAMESPACE}}:$NAMESPACE:g" config/operators/amq-operator-subscription.yaml | oc apply -f -
 log "Installing the AMQ Streams operator"
 sed "s:{{NAMESPACE}}:$NAMESPACE:g" config/operators/amq-streams-operator-subscription.yaml | oc apply -f -
 log "Installing the Datagrid operator"
 sed "s:{{NAMESPACE}}:$NAMESPACE:g" config/operators/datagrid-subscription.yaml | oc apply -f -
 log "Installing the Camel-K operator"
 sed "s:{{NAMESPACE}}:$NAMESPACE:g" config/operators/camel-k-operator-subscription.yaml | oc apply -f -
+log "Installing the Single Sign-On operator"
+sed "s:{{NAMESPACE}}:$NAMESPACE:g" config/operators/rhsso-operator-subscription.yaml | oc apply -f -
 
-wait_for_operator "AMQ Broker" amq-broker-rhel8
+#wait_for_operator "AMQ Broker" amq-broker-rhel8
 wait_for_operator "AMQ Streams" amq-streams
 wait_for_operator "Datagrid" datagrid
 wait_for_operator "Camel-K" red-hat-camel-k
+#wait_for_operator "Single Sign-On" rhsso-operator
+
+log "Installing SSO CRDs"
+oc apply -f config/keycloakrealmimports.k8s.keycloak.org-v1.yml
+oc apply -f config/keycloaks.k8s.keycloak.org-v1.yml
 
 fi ;
 
 log "Installing the infra Helm release: $HELM_INFRA_RELEASE_NAME"
-helm upgrade --install "$HELM_INFRA_RELEASE_NAME" --set-string namespace="$NAMESPACE" --set-string ocpDomain="$APP_DOMAIN" helm/bobbycar-core-infra/
+helm dependency update helm/bobbycar-core-infra
+helm upgrade --install "$HELM_INFRA_RELEASE_NAME" \
+  --set-string namespace="$NAMESPACE" --set-string ocpDomain="$APP_DOMAIN" \
+  --set-string global.domain="-${NAMESPACE}.${APP_DOMAIN}" \
+  helm/bobbycar-core-infra/
 
-sleep 30s
+#sleep 30s
 
-log "Waiting for AMQ Broker pod"
-oc wait --for=condition=Ready pod/bobbycar-amq-mqtt-ss-0 --timeout 300s
-log "Waiting for Kafka Broker pod"
-oc wait --for=condition=Ready pod/bobbycar-cluster-kafka-0 --timeout 300s
+#log "Waiting for AMQ Broker pod"
+#oc wait --for=condition=Ready pod/bobbycar-amq-mqtt-ss-0 --timeout 300s
+#log "Waiting for Kafka Broker pod"
+#oc wait --for=condition=Ready pod/bobbycar-cluster-kafka-0 --timeout 300s
 log "Waiting for Datagrid pod"
 oc wait --for=condition=Ready pod/bobbycar-dg-0 --timeout 300s
-log "Waiting for Kafka Bridge pod"
-oc wait --for=condition=Available deployment/bobbycar-bridge --timeout 300s
+#log "Waiting for Kafka Bridge pod"
+#oc wait --for=condition=Available deployment/bobbycar-bridge --timeout 300s
 
 log "Installing the apps Helm release: $HELM_APP_RELEASE_NAME"
 helm upgrade --install "$HELM_APP_RELEASE_NAME" helm/bobbycar-core-apps \
 --set-string ocpDomain="$APP_DOMAIN" \
---set-string ocpApi="$API_DOMAIN" \
+--set-string ocpApi="$API_URL" \
 --set-string namespace="$NAMESPACE" \
 --set-string dashboard.config.googleApiKey="$GOOGLE_API_KEY"
 
-sleep 30s
+#sleep 30s
 
 log "Waiting for Bobbycar pod"
-oc wait --for=condition=Available dc/car-simulator --timeout 300s
+oc wait --for=condition=Available deployment/car-simulator --timeout 300s
 log "Waiting for Bobbycar Dashboard pod"
-oc wait --for=condition=Available dc/dashboard --timeout 300s
+oc wait --for=condition=Available deployment/dashboard --timeout 300s
 log "Waiting for Dashboard Streaming service pod"
 oc wait --for=condition=Available deployment/dashboard-streaming --timeout 300s
 
 log "Waiting for Camel-K integrations to complete..."
 oc wait --for=condition=Ready integration/cache-service --timeout 1800s
 oc wait --for=condition=Ready integration/kafka2datagrid --timeout 1800s
-oc wait --for=condition=Ready integration/mqtt2kafka --timeout 1800s
+#oc wait --for=condition=Ready integration/mqtt2kafka --timeout 1800s
 
 log "Installation completed! Open the Bobbycar dashboard and get started:"
-oc get route dashboard -o json | jq -r .spec.host
+echo "   https://$(oc get route dashboard -o json | jq -r .spec.host)"

@@ -3,18 +3,14 @@ appName: Bobbycar
 ocpDomain:
 ocpApi:
 
-mqtt:
-  topic:
-    mqttZoneChangeTopic: bobbycar/zonechange
-    mqttMetricsTopic: bobbycar/enginemetrics
-
 kafka:
   topic:
     gps: bobbycar-gps
-    metrics: bobbycar-metrics
+    metrics: events-bobbycar # depends on .Values.drogue.application
     zonechange: bobbycar-zonechange
+    drogueEvents: events-bobbycar # depends on .Values.drogue.application
   bootstrap:
-    servers: bobbycar-cluster-kafka-bootstrap:9092
+    servers: drogue-iot-kafka-bootstrap:9092
 
 datagrid:
   cache:
@@ -41,3 +37,13 @@ carSimulator:
     carsimFactor: 3
     carsimRepeat: true
     carsimDelay: 1000
+
+drogue:
+  application: bobbycar
+  endpoints:
+    mqtt:
+      # host: <override mqtt endpoint host>
+      port: 1883
+  gateway:
+    name: car-gw
+    password: car123456

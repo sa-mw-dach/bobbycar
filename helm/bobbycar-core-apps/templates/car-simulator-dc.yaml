@@ -1,5 +1,5 @@
-apiVersion: apps.openshift.io/v1
-kind: DeploymentConfig
+apiVersion: apps/v1
+kind: Deployment
 metadata:
   labels:
     app: {{ .Values.carSimulator.name }}
@@ -9,20 +9,15 @@ spec:
   replicas: {{ .Values.carSimulator.replicas }}
   revisionHistoryLimit: 10
   selector:
-    deploymentConfig: {{ .Values.carSimulator.name }}
+    matchLabels:
+      deploymentConfig: {{ .Values.carSimulator.name }}
   strategy:
-    activeDeadlineSeconds: 21600
-    resources: {}
-    type: Rolling
-    rollingParams:
-      updatePeriodSeconds: 1
-      intervalSeconds: 1
-      timeoutSeconds: 600
+    type: RollingUpdate
+    rollingUpdate:
       maxUnavailable: 25%
       maxSurge: 25%
   template:
     metadata:
-      creationTimestamp: null
       labels:
         app: {{ .Values.carSimulator.name }}
         deploymentConfig: {{ .Values.carSimulator.name }}
@@ -33,14 +28,38 @@ spec:
           configMap:
             name: {{ .Values.carSimulator.name }}-config
             defaultMode: 420
+        - name: java-truststore
+          emptyDir: {}
+        - name: drogue-ca
+          configMap:
+            name: trust-anchor
+      initContainers:
+      - name: truststore
+        image: quay.io/ctrontesting/car-simulator:latest
+        imagePullPolicy: Always
+        command:
+          - bash
+          - -ec
+          - |
+            keytool -storepass 'SetecAstronomy' -import -alias ca -file /etc/drogue/ca/root-cert.pem -keystore /var/log/output/truststore.p12 -deststoretype PKCS12 -noprompt
+        volumeMounts:
+          - name: drogue-ca
+            mountPath: /etc/drogue/ca
+          - name: java-truststore
+            readOnly: false
+            mountPath: /var/log/output
       containers:
       - name: {{ .Values.carSimulator.name }}
-        image: quay.io/bobbycar/car-simulator:1.1.1
+        #image: quay.io/bobbycar/car-simulator:1.1.1
+        image: quay.io/ctrontesting/car-simulator:latest
         imagePullPolicy: Always
         volumeMounts:
             - name: config
               readOnly: true
               mountPath: /opt/routes
+            - name: java-truststore
+              readOnly: true
+              mountPath: /etc/drogue/ca
         env:
             - name: com.redhat.bobbycar.carsim.route
               value: '/opt/routes'
@@ -51,39 +70,24 @@ spec:
             - name: com.redhat.bobbycar.carsim.repeat
               value: {{ .Values.carSimulator.config.carsimRepeat | quote }}
             - name: quarkus.log.level
-              value: 'INFO'
+              value: INFO
+            - name: QUARKUS_LOG_CATEGORY_COMREDHAT_LEVEL
+              value: DEBUG
             - name: com.redhat.bobbycar.carsim.delay
               value: {{ .Values.carSimulator.config.carsimDelay | quote }}
-            - name: mp.messaging.incoming.zonechange.type
-              value: 'smallrye-mqtt'
-            - name: mp.messaging.incoming.zonechange.topic
-              value: {{ .Values.mqtt.topic.mqttZoneChangeTopic | quote }}
-            - name: mp.messaging.incoming.zonechange.host
-              value: 'bobbycar-amq-mqtt-all-0-svc'
-            - name: mp.messaging.incoming.zonechange.port
-              value: '61616'
             - name: com.redhat.bobbycar.carsim.datagrid.url
               value: 'http://cache-service-{{ .Values.namespace }}.{{ .Values.ocpDomain }}'
-            - name: com.redhat.bobbycar.carsim.kafka.url
-              value: 'http://bobbycar-{{ .Values.namespace }}.{{ .Values.ocpDomain }}'
-            - name: mp.messaging.outgoing.enginemetrics.type
-              value: 'smallrye-mqtt'
-            - name: mp.messaging.outgoing.enginemetrics.topic
-              value: {{ .Values.mqtt.topic.mqttMetricsTopic | quote }}
-            - name: mp.messaging.outgoing.enginemetrics.host
-              value: 'bobbycar-amq-mqtt-all-0-svc'
-            - name: mp.messaging.outgoing.enginemetrics.port
-              value: '61616'
-            - name: mp.messaging.incoming.ota-updates.host
-              value: 'bobbycar-amq-mqtt-all-0-svc'
-            - name: mp.messaging.incoming.ota-updates.port
-              value: '61616'
-            - name: mp.messaging.incoming.ota-updates.topic
-              value: 'ota/+'
-            - name: mp.messaging.incoming.ota-updates.type
-              value: 'smallrye-mqtt'
             - name: quarkus.http.cors
               value: 'true'
+
+            {{- include "mqtt.env-vars" (dict "root" . "direction" "incoming" "channel" "drogue-commands" ) | nindent 12 }}
+            - name: mp.messaging.incoming.drogue-commands.topic
+              value: "command/inbox/#"
+            {{- include "mqtt.env-vars" (dict "root" . "direction" "outgoing" "channel" "drogue-telemetry" ) | nindent 12 }}
+
+            - name: drogue.application
+              value: {{ .Values.drogue.application | quote }}
+
         ports:
           - containerPort: 8080
             name: http
@@ -99,6 +103,3 @@ spec:
       schedulerName: default-scheduler
       securityContext: {}
       terminationGracePeriodSeconds: 30
-  test: false
-  triggers:
-    - type: ConfigChange

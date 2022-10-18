@@ -1,5 +1,5 @@
-apiVersion: apps.openshift.io/v1
-kind: DeploymentConfig
+apiVersion: apps/v1
+kind: Deployment
 metadata:
   labels:
     app.kubernetes.io/part-of: {{ .Values.appName }}
@@ -9,18 +9,14 @@ spec:
   replicas: 1
   revisionHistoryLimit: 10
   selector:
-    component: dashboard
-    deploymentconfig: dashboard
+    matchLabels:
+      component: dashboard
+      deploymentconfig: dashboard
   strategy:
-    activeDeadlineSeconds: 21600
-    resources: {}
-    rollingParams:
-      intervalSeconds: 1
+    rollingUpdate:
       maxSurge: 25%
       maxUnavailable: 25%
-      timeoutSeconds: 600
-      updatePeriodSeconds: 1
-    type: Rolling
+    type: RollingUpdate
   template:
     metadata:
       labels:
@@ -28,7 +24,7 @@ spec:
         deploymentconfig: dashboard
     spec:
       containers:
-      - image: quay.io/bobbycar/dashboard:1.0.1
+      - image: quay.io/ctrontesting/dashboard:latest
         imagePullPolicy: Always
         name: dashboard
         ports:
@@ -51,6 +47,3 @@ spec:
             defaultMode: 438
             name: dashboard-config
           name: dashboard-cfg-vol
-  test: false
-  triggers:
-  - type: ConfigChange

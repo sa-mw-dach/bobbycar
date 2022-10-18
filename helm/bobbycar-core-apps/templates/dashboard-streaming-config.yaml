@@ -5,9 +5,9 @@ metadata:
   namespace: {{ .Values.namespace }}
 data:
   kafka.bootstrap.servers: {{ .Values.kafka.bootstrap.servers }}
-  mp.messaging.incoming.bobbycar-gps.broadcast: 'true'
-  mp.messaging.incoming.bobbycar-gps.topic: {{ .Values.kafka.topic.gps }}
-  mp.messaging.incoming.bobbycar-metrics.broadcast: 'true'
-  mp.messaging.incoming.bobbycar-metrics.topic: {{ .Values.kafka.topic.metrics }}
+  kafka.security.protocol: SASL_PLAINTEXT
+  kafka.sasl.mechanism: SCRAM-SHA-512
+  mp.messaging.incoming.drogue-events.broadcast: 'true'
+  mp.messaging.incoming.drogue-events.topic: {{ .Values.kafka.topic.drogueEvents }}
   mp.messaging.incoming.bobbycar-zonechange.broadcast: 'true'
   mp.messaging.incoming.bobbycar-zonechange.topic: {{ .Values.kafka.topic.zonechange }}

@@ -8,9 +8,9 @@ import { CarService } from '../providers/car.service';
 import { ToastController } from '@ionic/angular';
 import { map, tap, delay, retryWhen, delayWhen } from 'rxjs/operators';
 
-import * as am4core from "@amcharts/amcharts4/core";
-import * as am4charts from "@amcharts/amcharts4/charts";
-import am4themes_animated from "@amcharts/amcharts4/themes/animated";
+import * as am4core from '@amcharts/amcharts4/core';
+import * as am4charts from '@amcharts/amcharts4/charts';
+import am4themes_animated from '@amcharts/amcharts4/themes/animated';
 
 am4core.useTheme(am4themes_animated);
 
@@ -228,7 +228,7 @@ export class CarDetailPage implements OnInit {
       const chart = am4core.create('chartdiv', am4charts.GaugeChart);
 
       // Create axis
-      let axis = chart.xAxes.push(new am4charts.ValueAxis<am4charts.AxisRendererCircular>()); 
+      let axis = chart.xAxes.push(new am4charts.ValueAxis<am4charts.AxisRendererCircular>());
       axis.min = 0;
       axis.max = 100;
       axis.strictMinMax = true;

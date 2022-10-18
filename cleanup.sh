@@ -23,6 +23,10 @@ oc delete namespace "$NAMESPACE" --wait=true || true
 if [[ "$DELETE_CRD" == true ]]; then
   log "Deleting Custom Resource Definition BobbycarZone"
   oc delete crd bobbycarzones.bobbycar.redhat.com || true
+
+  log "Deleting Custom Resource Definition SSO 8"
+  oc delete -f config/keycloakrealmimports.k8s.keycloak.org-v1.yml
+  oc delete -f config/keycloaks.k8s.keycloak.org-v1.yml
 fi;
 
 log "Uninstallation complete!!!"
