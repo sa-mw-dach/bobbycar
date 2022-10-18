@@ -69,7 +69,7 @@ wait_for_operator "Datagrid" datagrid
 wait_for_operator "Camel-K" red-hat-camel-k
 #wait_for_operator "Single Sign-On" rhsso-operator
 
-log "Installing SSO CRDs"
+log "Installing Keycloak CRDs"
 oc apply -f config/keycloakrealmimports.k8s.keycloak.org-v1.yml
 oc apply -f config/keycloaks.k8s.keycloak.org-v1.yml
 
