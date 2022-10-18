@@ -55,7 +55,8 @@
     "kafka",
     "datagrid",
     "dashboard",
-    "carSimulator"
+    "carSimulator",
+    "drogue"
   ],
   "properties": {
     "namespace": {
@@ -468,6 +469,7 @@
       "type": "object",
       "required": [
         "application",
+        "endpoints",
         "gateway"
       ],
       "properties": {
@@ -477,8 +479,29 @@
           "title": "Drogue IoT application name",
           "description": ""
         },
+        "endpoints": {
+          "type": "object",
+          "required": [
+            "port"
+          ],
+          "properties": {
+            "host": {
+              "type": "string"
+            },
+            "port": {
+              "type": "number",
+              "default": 1883,
+              "minimum": 0,
+              "maximum": 65536
+            }
+          }
+        },
         "gateway": {
           "type": "object",
+          "required": [
+            "name",
+            "password"
+          ],
           "properties": {
             "name": {
               "type": "string"
