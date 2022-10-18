@@ -9,9 +9,9 @@ spec:
     defaultConfig:
       numPartitions: 2
       replicationFactor: 1
-      bootstrapServers: 'bobbycar-cluster-kafka-bootstrap.bobbycar.svc.cluster.local:9092'
+      bootstrapServers: 'drogue-iot-kafka-bootstrap.bobbycar.svc.cluster.local:9092'
   source:
     enabled: true
   channel:
     enabled: true
-    bootstrapServers: 'bobbycar-cluster-kafka-bootstrap.bobbycar.svc.cluster.local:9092'
+    bootstrapServers: 'drogue-iot-kafka-bootstrap.bobbycar.svc.cluster.local:9092'
