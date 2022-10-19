@@ -472,7 +472,7 @@ public class KafkaToDatagridRoute extends RouteBuilder {
 	
 	private void storeZonesInCacheRoute() throws Exception {
 		// restConfiguration().component("netty-http").host("https://"+ocpAPIHost).port(6443).bindingMode(RestBindingMode.json);
-		bindToRegistry("sslConfiguration", configureSslForApiAccess());
+		bindToRegistry("sslConfiguration", configureSslForApiAccess(this.ocpAPI));
 		String token = retrieveServiceAccountToken();
 		from("scheduler://foo?delay={{com.redhat.bobbycar.camelk.dg.refresh.interval}}").routeId("storeZonesInCache")
 			.process(ex -> {
@@ -598,13 +598,18 @@ public class KafkaToDatagridRoute extends RouteBuilder {
 				nextZone.map(z -> z.getMetadata().getName()).orElse(null), carId, vin));
 	}
 
-	private void notifyZoneChangeEventRoute() {
+	private void notifyZoneChangeEventRoute() throws Exception {
+		bindToRegistry("sslConfiguration", configureSslForApiAccess(this.drogueCommandEndpoint));
 		var basicAuth = Base64.getEncoder().encodeToString(String.format("%s:%s", drogueCommandUser, drogueCommandToken).getBytes(StandardCharsets.UTF_8));
+		log.info("Sending zone change event to device");
 		from("kafka:{{com.redhat.bobbycar.camelk.kafka.topicZoneChange}}?brokers={{com.redhat.bobbycar.camelk.kafka.brokers}}")
 				.setHeader("Authorization").constant("Basic " + basicAuth)
 				.setHeader(Exchange.HTTP_METHOD, constant("POST"))
 				.setHeader(Exchange.CONTENT_TYPE, constant("application/json"))
-				.toD("netty-http:" + drogueCommandEndpoint + "/api/command/v1alpha1/apps/" + this.drogueApplication + "/devices/${header.carid}?command=zonechange")
+				.toD("netty-http:" + drogueCommandEndpoint
+						+ "/api/command/v1alpha1/apps/"
+						+ this.drogueApplication
+						+ "/devices/${header.carid}?command=zonechange&sslContextParameters=#sslConfiguration")
 				.end();
 	}
 
@@ -679,10 +684,10 @@ public class KafkaToDatagridRoute extends RouteBuilder {
         .build();
 	}
 	
-	private SSLContextParameters configureSslForApiAccess() throws Exception {
+	private SSLContextParameters configureSslForApiAccess(String urlStr) throws Exception {
 		SSLContextParameters params = new SSLContextParameters();
 		params.setCamelContext(getContext());
-		URL url = new URL(ocpAPI);
+		URL url = new URL(urlStr);
 		SSLContextClientParameters clientParameters = new SSLContextClientParameters();
 		clientParameters.setSniHostName(url.getHost());
 		FilterParameters cipherSuitesFilter = new FilterParameters();
