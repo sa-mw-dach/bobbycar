@@ -7,7 +7,7 @@
     "ng": "npx ng",
     "serve:dev": "npx ng run app:serve --host=0.0.0.0 --port=8100 --disable-host-check",
     "start": "npx ng serve",
-    "build": "npx ng build",
+    "build": "npx ng build -c production",
     "test": "npx ng test",
     "lint": "npx ng lint",
     "e2e": "npx ng e2e"
