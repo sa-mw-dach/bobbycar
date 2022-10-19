@@ -18,6 +18,8 @@ spec:
       maxSurge: 25%
   template:
     metadata:
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/car-simulator-cm.yaml") . | sha256sum }}
       labels:
         app.kubernetes.io/name: {{ .Values.carSimulator.name }}
       name: {{ .Values.carSimulator.name }}

@@ -17,6 +17,8 @@ spec:
       app: dashboard-streaming
   template:
     metadata:
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/dashboard-streaming-config.yaml") . | sha256sum }}
       labels:
         app: dashboard-streaming
     spec:
