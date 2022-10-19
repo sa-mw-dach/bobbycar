@@ -34,6 +34,6 @@ export class CarEventsService {
     this.socket$.next(msg);
   }
   close(): void {
-    this.socket$.complete();
+    this.socket$?.complete();
   }
 }

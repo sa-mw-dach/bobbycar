@@ -34,5 +34,5 @@ export class ZoneChangeService {
     this.socket$.next(msg);
   }
   close(): void {
-    this.socket$.complete(); }
+    this.socket$?.complete(); }
 }
