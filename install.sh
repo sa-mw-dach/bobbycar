@@ -17,7 +17,7 @@ wait_for_resource() {
 
   while ((timeout > $(date +%s))); do
     [[ "$(oc get -n "$NAMESPACE" "$@" -o 'go-template={{len .items}}' 2>/dev/null)" -gt 0 ]] && break
-    sleep 5s
+    sleep 5
   done
 
   if [[ ${timeout} < "$(date +%s)" ]]; then
@@ -70,7 +70,7 @@ fi ;
 log "Installing the infra Helm release: $HELM_INFRA_RELEASE_NAME"
 helm upgrade --install "$HELM_INFRA_RELEASE_NAME" --set-string namespace="$NAMESPACE" --set-string ocpDomain="$APP_DOMAIN" helm/bobbycar-core-infra/
 
-sleep 30s
+sleep 30
 
 log "Waiting for AMQ Broker pod"
 oc wait --for=condition=Ready pod/bobbycar-amq-mqtt-ss-0 --timeout 300s
@@ -88,7 +88,7 @@ helm upgrade --install "$HELM_APP_RELEASE_NAME" helm/bobbycar-core-apps \
 --set-string namespace="$NAMESPACE" \
 --set-string dashboard.config.googleApiKey="$GOOGLE_API_KEY"
 
-sleep 30s
+sleep 30
 
 log "Waiting for Bobbycar pod"
 oc wait --for=condition=Available dc/car-simulator --timeout 300s
