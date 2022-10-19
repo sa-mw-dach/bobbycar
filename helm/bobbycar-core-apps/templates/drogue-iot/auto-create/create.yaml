@@ -1,3 +1,51 @@
+---
+kind: ServiceAccount
+apiVersion: v1
+metadata:
+  name: post-install-auto-create
+  labels:
+    app.kubernetes.io/name: post-install-auto-create
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/component: drogue-iot
+    app.kubernetes.io/part-of: {{ .Values.appName }}
+---
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: post-install-auto-create
+  labels:
+    app.kubernetes.io/name: post-install-auto-create
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/component: drogue-iot
+    app.kubernetes.io/part-of: {{ .Values.appName }}
+rules:
+  - verbs:
+      - create
+      - update
+      - get
+      - patch
+    apiGroups:
+      - ""
+    resources:
+      - secrets
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: post-install-auto-create
+  labels:
+    app.kubernetes.io/name: post-install-auto-create
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/component: drogue-iot
+    app.kubernetes.io/part-of: {{ .Values.appName }}
+roleRef:
+  kind: Role
+  apiGroup: rbac.authorization.k8s.io
+  name: post-install-auto-create
+subjects:
+  - kind: ServiceAccount
+    name: post-install-auto-create
+---
 kind: Job
 apiVersion: batch/v1
 metadata:
@@ -23,6 +71,7 @@ spec:
         app.kubernetes.io/instance: {{ .Release.Name }}
         app.kubernetes.io/component: drogue-iot
     spec:
+      serviceAccountName: post-install-auto-create
       restartPolicy: OnFailure
       containers:
         - name: "post-install"
@@ -39,7 +88,7 @@ spec:
                   name: keycloak-client-secret-services
                   key: CLIENT_SECRET
             - name: DROGUE_CONSOLE_BACKEND
-              value: http://console-backend:8080
+              value: http://console-backend:80
             - name: DROGUE_REGISTRY_URL
               value: http://device-management-service:80
           command:
@@ -66,7 +115,11 @@ spec:
               for i in $(ls /etc/post-install/device*.json); do
                 curl -svL -f -X POST -H "Authorization: Bearer $DROGUE_TOKEN" -H "Content-Type: application/json" --data-binary @${i} ${DROGUE_REGISTRY_URL}/api/registry/v1alpha1/apps/{{ .Values.drogue.application | urlquery }}/devices || true
               done
+              echo
 
+              # create Drogue Cloud access token
+              token=$(curl -svL -f -X POST -H "Authorization: Bearer $DROGUE_TOKEN" -H "Accept: application/json" ${DROGUE_CONSOLE_BACKEND}/api/tokens/v1alpha1 || true)
+              kubectl create secret generic drogue-iot-commands --from-literal=user=admin --from-literal=token=${token}
               echo
 
           volumeMounts:

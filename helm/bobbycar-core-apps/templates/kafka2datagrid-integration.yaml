@@ -24,6 +24,16 @@ spec:
                 secretKeyRef:
                   name: drogue-iot
                   key: sasl.jaas.config
+            - name: DROGUE_USER
+              valueFrom:
+                secretKeyRef:
+                  name: drogue-iot-commands
+                  key: user
+            - name: DROGUE_ACCESS_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: drogue-iot-commands
+                  key: token
   traits:
     logging:
       configuration:
