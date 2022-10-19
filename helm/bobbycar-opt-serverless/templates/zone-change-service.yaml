@@ -9,7 +9,8 @@ spec:
       annotations:
         autoscaling.knative.dev/target: "1"
         #autoscaling.knative.dev/initialScale: "0"
-        autoscaling.knative.dev/window: "10s"
+        autoscaling.knative.dev/window: "30s"
     spec:
       containers:
-        - image: quay.io/bobbycar/zone-change-service
+        - image: quay.io/bobbycar/zone-change-service:1.0-jvm
+        #- image: gcr.io/knative-releases/knative.dev/eventing/cmd/event_display
