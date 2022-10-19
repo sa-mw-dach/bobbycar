@@ -118,7 +118,7 @@ spec:
               echo
 
               # create Drogue Cloud access token
-              token=$(curl -svL -f -X POST -H "Authorization: Bearer $DROGUE_TOKEN" -H "Accept: application/json" ${DROGUE_CONSOLE_BACKEND}/api/tokens/v1alpha1 || true)
+              token=$(curl -svL -f -X POST -H "Authorization: Bearer $DROGUE_TOKEN" -H "Accept: application/json" ${DROGUE_CONSOLE_BACKEND}/api/tokens/v1alpha1 | jq -r .token || true)
               kubectl create secret generic drogue-iot-commands --from-literal=user=admin --from-literal=token=${token}
               echo
 
