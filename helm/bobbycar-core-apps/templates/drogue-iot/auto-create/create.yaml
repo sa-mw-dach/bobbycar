@@ -87,6 +87,16 @@ spec:
                 secretKeyRef:
                   name: keycloak-client-secret-services
                   key: CLIENT_SECRET
+            - name: DROGUE_KEYCLOAK_ADMIN
+              valueFrom:
+                secretKeyRef:
+                  name: sso-service-credentials
+                  key: username
+            - name: DROGUE_KEYCLOAK_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: sso-service-credentials
+                  key: password
             - name: DROGUE_CONSOLE_BACKEND
               value: http://console-backend:80
             - name: DROGUE_REGISTRY_URL
@@ -117,8 +127,12 @@ spec:
               done
               echo
 
+              # get bearer token for admin
+              ADMIN_TOKEN="$(curl -sL -k -o - -X POST -H "Content-Type: application/x-www-form-urlencoded" -d "client_id=$DROGUE_CLIENT_ID" -d "client_secret=$DROGUE_CLIENT_SECRET" -d "username=$DROGUE_KEYCLOAK_ADMIN" -d "password=$DROGUE_KEYCLOAK_ADMIN_PASSWORD" -d "grant_type=password" ${ISSUER_URL}/protocol/openid-connect/token | jq -r .access_token)"
+              echo
+
               # create Drogue Cloud access token
-              token=$(curl -svL -f -X POST -H "Authorization: Bearer $DROGUE_TOKEN" -H "Accept: application/json" ${DROGUE_CONSOLE_BACKEND}/api/tokens/v1alpha1 | jq -r .token || true)
+              token=$(curl -svL -f -X POST -H "Authorization: Bearer $ADMIN_TOKEN" -H "Accept: application/json" ${DROGUE_CONSOLE_BACKEND}/api/tokens/v1alpha1 | jq -r .token || true)
               kubectl create secret generic drogue-iot-commands --from-literal=user=admin --from-literal=token=${token}
               echo
 
