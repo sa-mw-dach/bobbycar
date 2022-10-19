@@ -84,6 +84,12 @@ drogueCloudCore:
       ingress:
         insecure: true
         port: 80
+    command:
+      service:
+        insecure: true
+      ingress:
+        insecure: true
+        port: 80
     registry:
       service:
         insecure: true
