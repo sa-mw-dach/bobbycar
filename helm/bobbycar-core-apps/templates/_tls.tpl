@@ -3,5 +3,5 @@
 {{- end }}
 
 {{ define "tls.ws.proto" }}
-{{- if .Values.tls.enabled }}https{{- else -}}http{{- end }}
+{{- if .Values.tls.enabled }}wss{{- else -}}ws{{- end }}
 {{- end }}
