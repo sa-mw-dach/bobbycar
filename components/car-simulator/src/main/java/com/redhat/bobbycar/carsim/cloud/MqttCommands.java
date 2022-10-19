@@ -51,29 +51,28 @@ public class MqttCommands implements Commands {
 
     private CompletionStage<Void> handleCommand(MqttMessage<byte[]> message) {
         var topic = message.getTopic();
-        var toks = topic.split("/", 4);
-        if (toks.length == 4 && toks[0].equals("command") && toks[1].equals("inbox")) {
-            return handleDeviceCommand(toks[2], toks[3], message.getPayload());
-        } else {
-            return CompletableFuture.completedFuture(null);
-        }
+        LOGGER.info("Device message - topic: {}", topic);
+
+        return CommandMetadata.fromCommandTopic(topic)
+                .map(command -> handleDeviceCommand(command, message.getPayload()))
+                .orElseGet(() -> CompletableFuture.completedFuture(null));
     }
 
-    private CompletionStage<Void> handleDeviceCommand(String device, String command, byte[] payload) {
+    private CompletionStage<Void> handleDeviceCommand(CommandMetadata meta, byte[] payload) {
         if (LOGGER.isInfoEnabled()) {
             var p = payload == null ? null : new String(payload);
-            LOGGER.info("Received command - device: {}, command: {}, payload: {}", device, command, p);
+            LOGGER.info("Received command - {}, payload: {}", meta, p);
         }
         if (payload == null) {
             return CompletableFuture.completedFuture(null);
         }
 
-        switch (command) {
+        switch (meta.getCommand()) {
         case "zonechange":
             var commandPayload = json.fromJson(new ByteArrayInputStream(payload), ZoneChangePayload.class);
-            return zonechange.send(new DeviceCommand<>(device, commandPayload));
+            return zonechange.send(new DeviceCommand<>(meta.getDevice(), commandPayload));
         case "ota":
-            return ota.send(new DeviceCommand<>(device, new String(payload)));
+            return ota.send(new DeviceCommand<>(meta.getDevice(), new String(payload)));
         default:
             return CompletableFuture.completedFuture(null);
         }
