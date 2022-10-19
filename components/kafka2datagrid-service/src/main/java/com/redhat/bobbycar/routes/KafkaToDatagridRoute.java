@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -82,6 +83,18 @@ public class KafkaToDatagridRoute extends RouteBuilder {
 	private String ocpAPI;
 	@PropertyInject(value = "com.redhat.bobbycar.camelk.dg.namespace")
 	private String namespace;
+
+	@PropertyInject(value = "com.redhat.bobbycar.camelk.drogue.endpoint")
+	private String drogueCommandEndpoint;
+
+	@PropertyInject(value = "com.redhat.bobbycar.camelk.drogue.user")
+	private String drogueCommandUser;
+
+	@PropertyInject(value = "com.redhat.bobbycar.camelk.drogue.token")
+	private String drogueCommandToken;
+
+	@PropertyInject(value = "com.redhat.bobbycar.camelk.drogue.application")
+	private String drogueApplication;
 
 	private RemoteCacheManager cacheManager;
 	private RemoteCache<String, String> zonesCache;
@@ -398,6 +411,7 @@ public class KafkaToDatagridRoute extends RouteBuilder {
 
 		storeZonesInCacheRoute();
 		storeCarEventsInCacheRoute();
+		notifyZoneChangeEventRoute();
 		clearCacheEndpoint();
 
 		if (aggregationInterval > 0) {
@@ -582,6 +596,16 @@ public class KafkaToDatagridRoute extends RouteBuilder {
 		String vin = (String) ex.getIn().getHeader(VIN_HEADER);
 		ex.getIn().setBody(new ZoneChangeEvent(previousZone.map(z -> z.getMetadata().getName()).orElse(null), 
 				nextZone.map(z -> z.getMetadata().getName()).orElse(null), carId, vin));
+	}
+
+	private void notifyZoneChangeEventRoute() {
+		var basicAuth = Base64.getEncoder().encodeToString(String.format("%s:%s", drogueCommandUser, drogueCommandToken).getBytes(StandardCharsets.UTF_8));
+		from("kafka:{{com.redhat.bobbycar.camelk.kafka.topicZoneChange}}?brokers={{com.redhat.bobbycar.camelk.kafka.brokers}}")
+				.setHeader("Authorization").constant("Basic " + basicAuth)
+				.setHeader(Exchange.HTTP_METHOD, constant("POST"))
+				.setHeader(Exchange.CONTENT_TYPE, constant("application/json"))
+				.toD("netty-http:" + drogueCommandEndpoint + "/api/command/v1alpha1/apps/" + this.drogueApplication + "/devices/${header.carid}?command=zonechange")
+				.end();
 	}
 
 	private void processZoneData(Exchange ex) {
