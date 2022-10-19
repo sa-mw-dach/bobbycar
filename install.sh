@@ -116,3 +116,4 @@ oc wait --for=condition=Ready integration/kafka2datagrid --timeout 1800s
 
 log "Installation completed! Open the Bobbycar dashboard and get started:"
 echo "   https://$(oc get route dashboard -o json | jq -r .spec.host)"
+echo "   http://$(oc get route dashboard -o json | jq -r .spec.host)"
