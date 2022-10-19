@@ -10,9 +10,11 @@ spec:
     kind: Service
     name: cache-service
     weight: 100
+  {{- if .Values.tls.enabled }}
   tls:
     insecureEdgeTerminationPolicy: Redirect
     termination: edge
+  {{- end }}
   port:
     targetPort: http
   wildcardPolicy: None

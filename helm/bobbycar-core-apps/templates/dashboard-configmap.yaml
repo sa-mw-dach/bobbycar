@@ -9,10 +9,10 @@ data:
         "GOOGLE_API_KEY": "{{ .Values.dashboard.config.googleApiKey }}",
         "BOBBYCAR_API_KEY": "{{ .Values.dashboard.config.threeScaleApiKey }}",
         "SSE_ENDPOINT": "",
-        "CAR_EVENTS_ENDPOINT": "wss://dashboard-streaming-{{ .Values.namespace }}.{{ .Values.ocpDomain }}/api/carevents?sendToAll=true",
-        "CAR_METRICS_ENDPOINT": "wss://dashboard-streaming-{{ .Values.namespace }}.{{ .Values.ocpDomain }}/api/carmetrics?sendToAll=true",
-        "CAR_ZONECHANGE_ENDPOINT": "wss://dashboard-streaming-{{ .Values.namespace }}.{{ .Values.ocpDomain }}/api/zonechange?sendToAll=true",
-        "CACHE_ENDPOINT": "https://cache-service-{{ .Values.namespace }}.{{ .Values.ocpDomain }}",
-        "CAR_ENDPOINT": "https://car-simulator-{{ .Values.namespace }}.{{ .Values.ocpDomain }}",
+        "CAR_EVENTS_ENDPOINT": "{{ include "tls.ws.proto" . }}://dashboard-streaming-{{ .Values.namespace }}.{{ .Values.ocpDomain }}/api/carevents?sendToAll=true",
+        "CAR_METRICS_ENDPOINT": "{{ include "tls.ws.proto" . }}://dashboard-streaming-{{ .Values.namespace }}.{{ .Values.ocpDomain }}/api/carmetrics?sendToAll=true",
+        "CAR_ZONECHANGE_ENDPOINT": "{{ include "tls.ws.proto" . }}://dashboard-streaming-{{ .Values.namespace }}.{{ .Values.ocpDomain }}/api/zonechange?sendToAll=true",
+        "CACHE_ENDPOINT": "{{ include "tls.http.proto" . }}://cache-service-{{ .Values.namespace }}.{{ .Values.ocpDomain }}",
+        "CAR_ENDPOINT": "{{ include "tls.http.proto" . }}://car-simulator-{{ .Values.namespace }}.{{ .Values.ocpDomain }}",
         "HDPP_ENDPOINT": "{{ .Values.dashboard.config.hdppEndpoint }}"
     }

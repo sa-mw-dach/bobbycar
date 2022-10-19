@@ -3,6 +3,9 @@ appName: Bobbycar
 ocpDomain:
 ocpApi:
 
+tls:
+  enabled: false
+
 kafka:
   topic:
     gps: bobbycar-gps
@@ -27,7 +30,7 @@ dashboard:
   config:
     googleApiKey:
     threeScaleApiKey: replaceme
-    hdppEndpoint: https://ntt-stream-hdpp.apps.ocp4.rhlab.de/playlist.m3u8
+    hdppEndpoint: http://ntt-stream-hdpp.apps.ocp4.rhlab.de/playlist.m3u8
 
 carSimulator:
   name: car-simulator 

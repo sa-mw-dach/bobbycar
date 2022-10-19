@@ -9,9 +9,11 @@ metadata:
 spec:
   port:
     targetPort: 8080-tcp
+  {{- if .Values.tls.enabled }}
   tls:
     insecureEdgeTerminationPolicy: Redirect
     termination: edge
+  {{- end }}
   to:
     kind: Service
     name: {{ .Values.carSimulator.name }}

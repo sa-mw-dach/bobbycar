@@ -9,9 +9,11 @@ spec:
   host: dashboard-{{ .Values.namespace }}.{{ .Values.ocpDomain }}
   port:
     targetPort: 8080-tcp
+  {{- if .Values.tls.enabled }}
   tls:
     insecureEdgeTerminationPolicy: Redirect
     termination: edge
+  {{- end }}
   to:
     kind: Service
     name: dashboard

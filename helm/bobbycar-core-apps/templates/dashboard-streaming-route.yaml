@@ -10,7 +10,9 @@ spec:
     weight: 100
   port:
     targetPort: 8080
+  {{- if .Values.tls.enabled }}
   tls:
     insecureEdgeTerminationPolicy: Redirect
     termination: edge
+  {{- end }}
   wildcardPolicy: None
