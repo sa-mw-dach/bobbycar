@@ -1,5 +1,6 @@
 package com.redhat.bobbycar;
 
+import java.math.BigDecimal;
 import java.time.Duration;
 import javax.enterprise.inject.Produces;
 import com.redhat.bobbycar.model.Aggregation;
@@ -61,8 +62,8 @@ public class AverageAggregator {
                 );
 
         builder.stream(metrics_aggregated_topic, Consumed.with(Serdes.String(), aggregationSerde))
-                .filter((key,aggregate) -> aggregate.speedAvg > speed_alert_threshold)
-                //.peek((key, value) -> System.out.println("Speed Alert for - VIN: " +key +" payload: " + value.toString()))
+                .filter((key,aggregate) -> (aggregate.speedAvg >= speed_alert_threshold))
+                //.peek((key, value) -> System.out.println("Speed Alert for - VIN: " +key +" Speed: " + value.speedAvg))
                 .to(
                         speed_alert_topic,
                         Produced.with(Serdes.String(), aggregationSerde)
