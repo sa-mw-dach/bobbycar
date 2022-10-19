@@ -4,19 +4,19 @@
   </ion-toolbar>
   <ion-toolbar>
     <ion-button (click)="createZone()">
-      <ion-icon name="create-outline"></ion-icon>
+      <ion-icon slot="start" name="create-outline"></ion-icon>
       Create Zone
     </ion-button>
     <ion-button (click)="simulateQuery()" color="danger">
-      <ion-icon name="analytics-outline"></ion-icon>
+      <ion-icon slot="start" name="analytics-outline"></ion-icon>
       Realtime Aggregation
     </ion-button>
     <ion-button (click)="displaySpeedAlerts()" color="danger">
-      <ion-icon name="alert-circle-outline"></ion-icon>
+      <ion-icon slot="start" name="alert-circle-outline"></ion-icon>
       Speed Alerts
     </ion-button>
     <ion-button color="light" (click)="resetMap()">
-      <ion-icon name="refresh-outline"></ion-icon>
+      <ion-icon slot="start" name="refresh-outline"></ion-icon>
       Reset Map
     </ion-button>
   </ion-toolbar>
