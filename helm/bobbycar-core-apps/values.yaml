@@ -13,6 +13,8 @@ kafka:
     gps: bobbycar-gps
     metrics: bobbycar-metrics
     zonechange: bobbycar-zonechange
+    metricsAggregated: bobbycar-metrics-aggregated
+    speedAlerts: bobbycar-speed-alert
   bootstrap:
     servers: bobbycar-cluster-kafka-bootstrap:9092
 
@@ -31,7 +33,12 @@ dashboard:
   config:
     googleApiKey:
     threeScaleApiKey: replaceme
-    hdppEndpoint: https://ntt-stream-hdpp.apps.ocp4.rhlab.de/playlist.m3u8
+    hdppEndpoint: http://localhost/playlist.m3u8
+
+telemetryAggregator:
+  config:
+    speedAlert: 100
+    windowsize: 2
 
 carSimulator:
   name: car-simulator 

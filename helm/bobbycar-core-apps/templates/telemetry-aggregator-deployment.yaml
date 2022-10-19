@@ -1,0 +1,59 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: bc-telemetry-aggregator-jvm
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: bc-telemetry-aggregator-jvm
+    app.kubernetes.io/part-of: {{ .Values.appName }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bc-telemetry-aggregator-jvm
+  template:
+    metadata:
+      labels:
+        app: bc-telemetry-aggregator-jvm
+    spec:
+      containers:
+        - name: bc-telemetry-aggregator-jvm
+          image: 'quay.io/bobbycar/bc-telemetry-aggregator:jvm-1.0.0'
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+            - containerPort: 8443
+              protocol: TCP
+            - containerPort: 8778
+              protocol: TCP
+          env:
+            - name: quarkus.kafka-streams.bootstrap-servers
+              value: {{ .Values.kafka.bootstrap.servers | quote }}
+            - name: quarkus.kafka-streams.topics
+              value: {{ .Values.kafka.topic.metrics | quote }}
+            - name: com.redhat.bobbycar.streams.metrics.aggregated.topic
+              value: {{ .Values.kafka.topic.metricsAggregated | quote }}
+            - name: com.redhat.bobbycar.streams.speedalert.topic
+              value: {{ .Values.kafka.topic.speedAlerts | quote }}
+            - name: com.redhat.bobbycar.streams.metrics.topic
+              value: {{ .Values.kafka.topic.metrics | quote }}
+            - name: com.redhat.bobbycar.streams.speedalert.threshold
+              value: {{ .Values.telemetryAggregator.config.speedAlert | quote }}
+            - name: com.redhat.bobbycar.streams.metrics.windowsize.minutes
+              value: {{ .Values.telemetryAggregator.config.windowsize | quote}}
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          imagePullPolicy: Always
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      dnsPolicy: ClusterFirst
+      securityContext: {}
+      schedulerName: default-scheduler
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 25%
+      maxSurge: 25%
+  revisionHistoryLimit: 10
+  progressDeadlineSeconds: 600

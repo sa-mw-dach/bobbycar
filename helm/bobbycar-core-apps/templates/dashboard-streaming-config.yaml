@@ -11,3 +11,7 @@ data:
   mp.messaging.incoming.bobbycar-metrics.topic: {{ .Values.kafka.topic.metrics }}
   mp.messaging.incoming.bobbycar-zonechange.broadcast: 'true'
   mp.messaging.incoming.bobbycar-zonechange.topic: {{ .Values.kafka.topic.zonechange }}
+  mp.messaging.incoming.bobbycar-metrics-aggregated.broadcast: 'true'
+  mp.messaging.incoming.bobbycar-metrics-aggregated.topic: {{ .Values.kafka.topic.metricsAggregated }}
+  mp.messaging.incoming.bobbycar-speed-alert.broadcast: 'true'
+  mp.messaging.incoming.bobbycar-speed-alert.topic: {{ .Values.kafka.topic.speedAlerts }}
