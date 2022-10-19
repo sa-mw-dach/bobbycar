@@ -1,34 +1,37 @@
 kind: Deployment
 apiVersion: apps/v1
 metadata:
-  name: dashboard-streaming
+  name: ota-server
   namespace: {{ .Values.namespace }}
   labels:
+    app: ota-server
+    app.kubernetes.io/component: ota-server
+    app.kubernetes.io/instance: ota-server
+    app.kubernetes.io/name: ota-server
     app.kubernetes.io/part-of: {{ .Values.appName }}
-    app: dashboard-streaming
-    app.kubernetes.io/component: dashboard-streaming
-    app.kubernetes.io/instance: dashboard-streaming
-    app.kubernetes.io/name: dashboard-streaming
-    app.openshift.io/runtime: quarkus
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: dashboard-streaming
+      app: ota-server
   template:
     metadata:
+      creationTimestamp: null
       labels:
-        app: dashboard-streaming
+        app: ota-server
+        deployment: ota-server
     spec:
       containers:
-        - name: dashboard-streaming
-          image: quay.io/bobbycar/dashboard-streaming:jvm-1.1.0
+        - name: ota-server
+          image: quay.io/bobbycar/ota-server:1.0-jvm
           ports:
             - containerPort: 8080
               protocol: TCP
-          envFrom:
-            - configMapRef:
-                name: dashboard-streaming-config
+            - containerPort: 8443
+              protocol: TCP
+          env:
+            - name: mqtt.paho.broker.uri
+              value: 'tcp://bobbycar-amq-mqtt-all-0-svc:61616'
           resources: {}
           terminationMessagePath: /dev/termination-log
           terminationMessagePolicy: File

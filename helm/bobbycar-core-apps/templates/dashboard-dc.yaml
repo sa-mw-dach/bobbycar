@@ -28,7 +28,7 @@ spec:
         deploymentconfig: dashboard
     spec:
       containers:
-      - image: quay.io/bobbycar/dashboard:1.0.1
+      - image: quay.io/bobbycar/dashboard:1.1.0
         imagePullPolicy: Always
         name: dashboard
         ports:

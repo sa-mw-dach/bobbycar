@@ -1,0 +1,16 @@
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  name: ota-server
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: ota-server
+spec:
+  host: ota-server-{{ .Values.namespace }}.{{ .Values.ocpDomain }}
+  to:
+    kind: Service
+    name: ota-server
+    weight: 100
+  port:
+    targetPort: 8080-tcp
+  wildcardPolicy: None

@@ -1,0 +1,15 @@
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  name: bc-telemetry-aggregator-jvm
+  labels:
+    app: bc-telemetry-aggregator-jvm
+spec:
+  host: bc-telemetry-aggregator-jvm-{{ .Values.namespace }}.{{ .Values.ocpDomain }}
+  to:
+    kind: Service
+    name: bc-telemetry-aggregator-jvm
+    weight: 100
+  port:
+    targetPort: 8080-tcp
+  wildcardPolicy: None

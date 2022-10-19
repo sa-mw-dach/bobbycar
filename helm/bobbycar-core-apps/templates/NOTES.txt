@@ -6,5 +6,7 @@ Bobbycar core application components:
 - Cache Service: Camel-K app
 - Kafka2Datagrid Service: Camel-K app
 - MQTT2Kafka Service: Camel-K app
+- Telemetry Aggregator: Kafka Streams app
+- OTA Update Server: Quarkus App
 - BobbycarZone CRD
 - 3 BobbycarZone CRs

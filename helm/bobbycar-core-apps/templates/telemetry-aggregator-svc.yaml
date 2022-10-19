@@ -1,0 +1,25 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: bc-telemetry-aggregator-jvm
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: bc-telemetry-aggregator-jvm
+spec:
+  ports:
+    - name: 8080-tcp
+      protocol: TCP
+      port: 8080
+      targetPort: 8080
+    - name: 8443-tcp
+      protocol: TCP
+      port: 8443
+      targetPort: 8443
+    - name: 8778-tcp
+      protocol: TCP
+      port: 8778
+      targetPort: 8778
+  sessionAffinity: None
+  type: ClusterIP
+  selector:
+    app: bc-telemetry-aggregator-jvm
