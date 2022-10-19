@@ -603,6 +603,7 @@ public class KafkaToDatagridRoute extends RouteBuilder {
 		var basicAuth = Base64.getEncoder().encodeToString(String.format("%s:%s", drogueCommandUser, drogueCommandToken).getBytes(StandardCharsets.UTF_8));
 		log.info("Sending zone change event to device");
 		from("kafka:{{com.redhat.bobbycar.camelk.kafka.topicZoneChange}}?brokers={{com.redhat.bobbycar.camelk.kafka.brokers}}")
+				.removeHeaders("*", "carid")
 				.setHeader("Authorization").constant("Basic " + basicAuth)
 				.setHeader(Exchange.HTTP_METHOD, constant("POST"))
 				.setHeader(Exchange.CONTENT_TYPE, constant("application/json"))
