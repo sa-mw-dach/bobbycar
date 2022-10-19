@@ -36,3 +36,13 @@ kafka:
       partitions: 1
       replicas: 1
       retention: 300000
+    metricsAggregated:
+      name: bobbycar-metrics-aggregated
+      partitions: 1
+      replicas: 1
+      retention: 60000
+    speedAlert:
+      name: bobbycar-speed-alert
+      partitions: 1
+      replicas: 1
+      retention: 300000

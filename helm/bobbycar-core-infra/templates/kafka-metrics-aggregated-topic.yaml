@@ -1,0 +1,14 @@
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: {{ .Values.kafka.topic.metricsAggregated.name }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    strimzi.io/cluster: bobbycar-cluster
+spec:
+  partitions: {{ .Values.kafka.topic.metricsAggregated.partitions }}
+  replicas: {{ .Values.kafka.topic.metricsAggregated.replicas }}
+  config:
+    retention.ms: {{ .Values.kafka.topic.metricsAggregated.retention }}
+    segment.bytes: 1073741824
+ 
