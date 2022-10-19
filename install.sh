@@ -76,7 +76,7 @@ oc apply -f config/keycloaks.k8s.keycloak.org-v1.yml
 fi ;
 
 log "Installing the infra Helm release: $HELM_INFRA_RELEASE_NAME"
-helm dependency update helm/bobbycar-core-infra
+helm dependency build helm/bobbycar-core-infra
 helm upgrade --install "$HELM_INFRA_RELEASE_NAME" \
   --set-string namespace="$NAMESPACE" --set-string ocpDomain="$APP_DOMAIN" \
   --set-string global.domain="-${NAMESPACE}.${APP_DOMAIN}" \
