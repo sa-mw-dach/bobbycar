@@ -38,43 +38,50 @@ public class MqttCommands implements Commands {
     Emitter<DeviceCommand<String>> ota;
 
     @Incoming("drogue-commands")
-    CompletionStage<Void> deviceCommands(Message<byte[]> message) {
+    CompletionStage<Void> deviceCommands(final Message<byte[]> message) {
 
         if (message instanceof MqttMessage) {
-            return handleCommand((MqttMessage<byte[]>) message)
-                    .thenCompose(x -> message.ack());
+            // we don't ack the message here, as we leave this to the final processor
+            return handleCommand((MqttMessage<byte[]>) message);
         } else {
             return message.ack();
         }
 
     }
 
-    private CompletionStage<Void> handleCommand(MqttMessage<byte[]> message) {
+    private CompletionStage<Void> handleCommand(final MqttMessage<byte[]> message) {
         var topic = message.getTopic();
         LOGGER.info("Device message - topic: {}", topic);
 
         return CommandMetadata.fromCommandTopic(topic)
-                .map(command -> handleDeviceCommand(command, message.getPayload()))
-                .orElseGet(() -> CompletableFuture.completedFuture(null));
+                .map(command -> handleDeviceCommand(message, command, message.getPayload()))
+                .orElseGet(message::ack);
     }
 
-    private CompletionStage<Void> handleDeviceCommand(CommandMetadata meta, byte[] payload) {
+    private CompletionStage<Void> handleDeviceCommand(final Message<?> message, final CommandMetadata meta, final byte[] payload) {
         if (LOGGER.isInfoEnabled()) {
             var p = payload == null ? null : new String(payload);
             LOGGER.info("Received command - {}, payload: {}", meta, p);
         }
+
         if (payload == null) {
-            return CompletableFuture.completedFuture(null);
+            // all our handlers require some form of payload
+            return message.ack();
         }
 
         switch (meta.getCommand()) {
         case "zonechange":
             var commandPayload = json.fromJson(new ByteArrayInputStream(payload), ZoneChangePayload.class);
-            return zonechange.send(new DeviceCommand<>(meta.getDevice(), commandPayload));
+            this.zonechange.send(message.withPayload(
+                    new DeviceCommand<>(meta.getDevice(), commandPayload))
+            );
         case "ota":
-            return ota.send(new DeviceCommand<>(meta.getDevice(), new String(payload)));
+            this.ota.send(message.withPayload(
+                    new DeviceCommand<>(meta.getDevice(), new String(payload)))
+            );
         default:
-            return CompletableFuture.completedFuture(null);
+            LOGGER.info("Unknown message received - command: {}", meta);
+            return message.ack();
         }
 
     }

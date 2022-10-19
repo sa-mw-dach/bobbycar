@@ -114,7 +114,7 @@ public class CarSimulatorApp {
 	private final Map<String, CompletableFuture<Void>> futures;
 	private WireMockServer wireMockServer;
 
-	public CarSimulatorApp() throws JAXBException {
+	public CarSimulatorApp() {
 		futures = new HashMap<>();
 	}
 	
@@ -134,7 +134,7 @@ public class CarSimulatorApp {
 		    	Car car = Car.builder().withModel("M3 Coupe").withManufacturer("BMW")
 						.withEngine(engine)
 						.withDriverId(id)
-						.withVin(id.toString())
+						.withVin(id)
 						.build();
 				otaConsumer.registerOTAListener(id, car);
 		    	engine.registerEventListener(e -> carMetricsPublisher.publish(CarMetricsEvent.create(car, e.getEngineData())));
