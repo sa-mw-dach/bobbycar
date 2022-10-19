@@ -1,0 +1,14 @@
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: {{ .Values.kafka.topic.speedAlert.name }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    strimzi.io/cluster: bobbycar-cluster
+spec:
+  partitions: {{ .Values.kafka.topic.speedAlert.partitions }}
+  replicas: {{ .Values.kafka.topic.speedAlert.replicas }}
+  config:
+    retention.ms: {{ .Values.kafka.topic.speedAlert.retention }}
+    segment.bytes: 1073741824
+ 
