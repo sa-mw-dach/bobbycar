@@ -128,7 +128,7 @@ spec:
               echo
 
               # get bearer token for admin
-              ADMIN_TOKEN="$(curl -sL -k -o - -X POST -H "Content-Type: application/x-www-form-urlencoded" -d "client_id=$DROGUE_CLIENT_ID" -d "client_secret=$DROGUE_CLIENT_SECRET" -d "username=$DROGUE_KEYCLOAK_ADMIN" -d "password=$DROGUE_KEYCLOAK_ADMIN_PASSWORD" -d "grant_type=password" ${ISSUER_URL}/protocol/openid-connect/token | jq -r .access_token)"
+              ADMIN_TOKEN="$(curl -sL -k -o - -X POST -H "Content-Type: application/x-www-form-urlencoded" -d "client_id=admin-cli" -d "username=$DROGUE_KEYCLOAK_ADMIN" -d "password=$DROGUE_KEYCLOAK_ADMIN_PASSWORD" -d "grant_type=password" ${ISSUER_URL}/protocol/openid-connect/token | jq -r .access_token)"
               echo
 
               # create Drogue Cloud access token
