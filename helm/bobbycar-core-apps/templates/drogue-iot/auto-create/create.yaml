@@ -93,7 +93,7 @@ spec:
               value: http://device-management-service:80
           command:
             - /bin/bash
-            er -exc
+            - -exc
             - |
               # get SSO endpoint
               ISSUER_URL="$(curl -svL ${DROGUE_CONSOLE_BACKEND}/.well-known/drogue-endpoints | jq -r .issuer_url )"
