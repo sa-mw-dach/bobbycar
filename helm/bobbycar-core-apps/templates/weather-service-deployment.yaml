@@ -1,0 +1,56 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: weather-service
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: weather-service
+    app.kubernetes.io/component: weather-service
+    app.kubernetes.io/instance: weather-service
+    app.kubernetes.io/name: weather-service
+    app.kubernetes.io/part-of: {{ .Values.appName }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: weather-service
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: weather-service
+        deployment: weather-service
+    spec:
+      containers:
+        - name: weather-service
+          image: quay.io/bobbycar/weather-service:1.0-jvm
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+            - containerPort: 8443
+              protocol: TCP
+          env:
+            - name: quarkus.rest-client.weather-api.url
+              value: 'https://api.openweathermap.org'
+            - name: open-weather-map.api.key
+              valueFrom:
+                secretKeyRef:
+                  name: weather-service-secret
+                  key: apiKey
+                  optional: false
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          imagePullPolicy: IfNotPresent
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      dnsPolicy: ClusterFirst
+      securityContext: {}
+      schedulerName: default-scheduler
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 25%
+      maxSurge: 25%
+  revisionHistoryLimit: 10
+  progressDeadlineSeconds: 600

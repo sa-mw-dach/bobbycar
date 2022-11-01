@@ -8,5 +8,6 @@ Bobbycar core application components:
 - MQTT2Kafka Service: Camel-K app
 - Telemetry Aggregator: Kafka Streams app
 - OTA Update Server: Quarkus App
+- Weather Service: Quarkus App using OpenWeatherMap API
 - BobbycarZone CRD
 - 3 BobbycarZone CRs
