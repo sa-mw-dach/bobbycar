@@ -6,7 +6,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 
 @Path("/api/ota")
-@RegisterRestClient
+@RegisterRestClient(configKey="ota-api")
 public interface OtaCampaignService {
 
     @GET
