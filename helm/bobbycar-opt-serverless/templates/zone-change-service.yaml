@@ -14,3 +14,6 @@ spec:
       containers:
         - image: quay.io/bobbycar/zone-change-service:1.0-jvm
         #- image: gcr.io/knative-releases/knative.dev/eventing/cmd/event_display
+          env:
+            - name: 'quarkus.rest-client.ota-api.url'
+              value: {{ .Values.otaServer.url | quote}}
