@@ -3,3 +3,6 @@ broker:
   name: bobbycar
 # The Kafka zone change topic
 kafkaTopic: bobbycar-zonechange
+
+otaServer:
+  url: 'http://<ota-server-domain>'
