@@ -1,0 +1,22 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: weather-service
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: weather-service
+spec:
+  ports:
+    - name: 8080-tcp
+      protocol: TCP
+      port: 8080
+      targetPort: 8080
+    - name: 8443-tcp
+      protocol: TCP
+      port: 8443
+      targetPort: 8443
+  type: ClusterIP
+  sessionAffinity: None
+  selector:
+    app: weather-service
+    deployment: weather-service

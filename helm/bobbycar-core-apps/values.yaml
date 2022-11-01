@@ -40,6 +40,10 @@ telemetryAggregator:
     speedAlert: 100
     windowsize: 2
 
+weatherService:
+  api:
+    key:
+
 carSimulator:
   name: car-simulator 
   replicas: 1
