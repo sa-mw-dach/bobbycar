@@ -31,7 +31,12 @@ export class CarDetailPage implements OnInit {
   sv = new google.maps.StreetViewService();
   streetName = '';
   showHUD = false;
+  showDriverMonitoring = false;
   carBg = 'S';
+  // infotainmentContent = 'https://www.youtube.com/embed/kFyxe_tCxto?autoplay=1&mute=1&controls=0&loop=1'
+  engineOverlayHidden: boolean = true;
+  engineData;
+  enableStreetView: boolean = true;
 
   constructor(
     private carEventsService: CarEventsService,
@@ -83,29 +88,34 @@ export class CarDetailPage implements OnInit {
     }
   }
 
-  async showConfig(){
-    let temp = await this.carService.getCarById(this.carId).subscribe((data) => {
-        this.presentConfig(JSON.stringify(data));
-    })
-  }
-
-  async presentConfig(data) {
-      const toast = await this.toastController.create({
-        message: "<h2>Current Engine configuration:</h2>" + data,
-        color: 'light',
-        position: 'top',
-        buttons: [
-                {
-                  text: 'Close',
-                  role: 'cancel',
-                  handler: () => {
-                    console.log('Cancel clicked');
-                  }
-                }
-              ]
-      });
-      toast.present();
+  toggleInfotainment(){
+      if(this.showDriverMonitoring) {
+        this.showDriverMonitoring = false;
+      } else {
+        this.showDriverMonitoring = true;
+      }
     }
+
+    toggleStreetView(){
+        if(this.enableStreetView) {
+          this.enableStreetView = false;
+        } else {
+          this.enableStreetView = true;
+        }
+      }
+
+  async showConfig(){
+    if(this.engineOverlayHidden) {
+        let temp = await this.carService.getCarById(this.carId).subscribe((data) => {
+            this.engineData = data;
+            this.engineOverlayHidden = false;
+            // this.presentConfig(JSON.stringify(data, null, 4));
+        })
+    } else {
+        this.engineOverlayHidden = true;
+    }
+
+  }
 
   async presentToast() {
     const toast = await this.toastController.create({
@@ -124,6 +134,8 @@ export class CarDetailPage implements OnInit {
     this.zoneChangeService.close();
   }
 
+
+
   createOrUpdateMarker(data){
     if(data.carid === this.carId){
       this.marker.setPosition(new google.maps.LatLng({ lat: data.lat, lng: data.long }));
@@ -134,7 +146,7 @@ export class CarDetailPage implements OnInit {
         radius: 50
     }, (result, status) => {
           // console.log(result);
-          if (status === google.maps.StreetViewStatus.OK) {
+          if (status === google.maps.StreetViewStatus.OK && this.enableStreetView) {
               this.panorama.setPosition({ lat: data.lat, lng: data.long });
               this.streetName = result.location.description;
               // const calcHeading = google.maps.geometry.spherical.computeHeading(result.location.latLng, result.location.latLng);
@@ -218,82 +230,5 @@ export class CarDetailPage implements OnInit {
     );
 
   }
-
-  /*
-
-  // tslint:disable-next-line:use-lifecycle-interface
-  ngAfterViewInit() {
-    this.zone.runOutsideAngular(() => {
-
-      const chart = am4core.create('chartdiv', am4charts.GaugeChart);
-
-      // Create axis
-      let axis = chart.xAxes.push(new am4charts.ValueAxis<am4charts.AxisRendererCircular>()); 
-      axis.min = 0;
-      axis.max = 100;
-      axis.strictMinMax = true;
-
-      // Set inner radius
-      chart.innerRadius = -20;
-
-      // Add ranges
-      let range = axis.axisRanges.create();
-      range.value = 0;
-      range.endValue = 70;
-      range.axisFill.fillOpacity = 1;
-      range.axisFill.fill = am4core.color("#88AB75");
-      range.axisFill.zIndex = - 1;
-
-      let range2 = axis.axisRanges.create();
-      range2.value = 70;
-      range2.endValue = 90;
-      range2.axisFill.fillOpacity = 1;
-      range2.axisFill.fill = am4core.color("#DBD56E");
-      range2.axisFill.zIndex = - 1;
-
-      let range3 = axis.axisRanges.create();
-      range3.value = 90;
-      range3.endValue = 100;
-      range3.axisFill.fillOpacity = 1;
-      range3.axisFill.fill = am4core.color("#DE8F6E");
-      range3.axisFill.zIndex = - 1;
-
-      // Add hand
-      let hand = chart.hands.push(new am4charts.ClockHand());
-      hand.value = 65;
-      hand.pin.disabled = true;
-      hand.fill = am4core.color("#2D93AD");
-      hand.stroke = am4core.color("#2D93AD");
-      hand.innerRadius = am4core.percent(50);
-      hand.radius = am4core.percent(80);
-      hand.startWidth = 15;
-
-      let hand2 = chart.hands.push(new am4charts.ClockHand());
-      hand2.value = 22;
-      hand2.pin.disabled = true;
-      hand2.fill = am4core.color("#7D7C84");
-      hand2.stroke = am4core.color("#7D7C84");
-      hand2.innerRadius = am4core.percent(50);
-      hand2.radius = am4core.percent(80);
-      hand2.startWidth = 15;
-
-      // Animate
-      setInterval(function() {
-        hand.showValue(Math.random() * 100, 1000, am4core.ease.cubicOut);
-        hand2.showValue(Math.random() * 100, 1000, am4core.ease.cubicOut);
-      }, 2000);
-
-    });
-  }
-
-  ngOnDestroy() {
-    this.zone.runOutsideAngular(() => {
-      if (this.chart) {
-        this.chart.dispose();
-      }
-    });
-  }
-
-  */
 
 }
