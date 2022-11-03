@@ -74,19 +74,21 @@ sleep 30
 
 log "Waiting for AMQ Broker pod"
 oc wait --for=condition=Ready pod/bobbycar-amq-mqtt-ss-0 --timeout 300s
-log "Waiting for Kafka Broker pod"
-oc wait --for=condition=Ready pod/bobbycar-cluster-kafka-0 --timeout 300s
 log "Waiting for Datagrid pod"
 oc wait --for=condition=Ready pod/bobbycar-dg-0 --timeout 300s
+log "Waiting for Kafka Broker pod"
+oc wait --for=condition=Ready pod/bobbycar-cluster-kafka-0 --timeout 300s
 log "Waiting for Kafka Bridge pod"
 oc wait --for=condition=Available deployment/bobbycar-bridge --timeout 300s
+
 
 log "Installing the apps Helm release: $HELM_APP_RELEASE_NAME"
 helm upgrade --install "$HELM_APP_RELEASE_NAME" helm/bobbycar-core-apps \
 --set-string ocpDomain="$APP_DOMAIN" \
 --set-string ocpApi="$API_DOMAIN" \
 --set-string namespace="$NAMESPACE" \
---set-string dashboard.config.googleApiKey="$GOOGLE_API_KEY"
+--set-string dashboard.config.googleApiKey="$GOOGLE_API_KEY" \
+--set-string weatherService.api.key="$WEATHER_API_KEY"
 
 sleep 30
 
