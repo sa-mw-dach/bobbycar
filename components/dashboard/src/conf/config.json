@@ -1,13 +1,14 @@
 {
-    "GOOGLE_API_KEY": "AIzaSyCH6fNIRY-3VeZ7eR3X1fu5UBCs5Ip-mbE",
-    "BOBBYCAR_API_KEY": "",
-    "SSE_ENDPOINT": "http://localhost:8080",
-    "CAR_EVENTS_ENDPOINT": "ws://dashboard-streaming-bobbycar.apps.ocp4.rhlab.de/api/carevents?sendToAll=true",
-    "CAR_METRICS_ENDPOINT": "ws://dashboard-streaming-bobbycar.apps.ocp4.rhlab.de/api/carmetrics?sendToAll=true",
-    "CAR_METRICS_AGGREGATED_ENDPOINT": "ws://dashboard-streaming-bobbycar.apps.ocp4.rhlab.de/api/carmetrics-aggregated?sendToAll=true",
-    "SPEED_ALERT_ENDPOINT": "ws://dashboard-streaming-bobbycar.apps.ocp4.rhlab.de/api/speed-alert?sendToAll=true",
-    "CAR_ZONECHANGE_ENDPOINT": "ws://dashboard-streaming-bobbycar.apps.ocp4.rhlab.de/api/zonechange?sendToAll=true",
-    "CACHE_ENDPOINT": "http://cache-service-bobbycar.apps.ocp4.rhlab.de",
-    "CAR_ENDPOINT": "http://car-simulator-bobbycar.apps.ocp4.rhlab.de",
-    "HDPP_ENDPOINT": "http://ntt-stream-hdpp.apps.ocp4.rhlab.de/playlist.m3u8"
+    "GOOGLE_API_KEY": "replaceme",
+    "BOBBYCAR_API_KEY": "replaceme",
+    "SSE_ENDPOINT": "",
+    "CAR_EVENTS_ENDPOINT": "ws://dashboard-streaming-bobbycar.apps.cluster-c4lhj.c4lhj.sandbox1290.opentlc.com/api/carevents?sendToAll=true",
+    "CAR_METRICS_ENDPOINT": "ws://dashboard-streaming-bobbycar.apps.cluster-c4lhj.c4lhj.sandbox1290.opentlc.com/api/carmetrics?sendToAll=true",
+    "CAR_METRICS_AGGREGATED_ENDPOINT": "ws://dashboard-streaming-bobbycar.apps.cluster-c4lhj.c4lhj.sandbox1290.opentlc.com/api/carmetrics-aggregated?sendToAll=true",
+    "SPEED_ALERT_ENDPOINT": "ws://dashboard-streaming-bobbycar.apps.cluster-c4lhj.c4lhj.sandbox1290.opentlc.com/api/speed-alert?sendToAll=true",
+    "CAR_ZONECHANGE_ENDPOINT": "ws://dashboard-streaming-bobbycar.apps.cluster-c4lhj.c4lhj.sandbox1290.opentlc.com/api/zonechange?sendToAll=true",
+    "CACHE_ENDPOINT": "http://cache-service-bobbycar.apps.cluster-c4lhj.c4lhj.sandbox1290.opentlc.com",
+    "CAR_ENDPOINT": "http://car-simulator-bobbycar.apps.cluster-c4lhj.c4lhj.sandbox1290.opentlc.com",
+    "HDPP_ENDPOINT": "http://ntt-stream-hdpp.apps.ansulliv.catchall.azure.devcluster.openshift.com/playlist.m3u8",
+    "INITIAL_MAP_POSITION": { "lat": 41.11804887672318, "lng": -73.7198836780401 }
 }
