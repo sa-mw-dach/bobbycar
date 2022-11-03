@@ -5,6 +5,17 @@
     width: 100%;
   }
 
+  .engine-data-overlay {
+    position: fixed;
+    width: 40%;
+    height: 100%;
+    background: rgba(0,0,0,0.9);
+    z-index: 20;
+    top: 0%;
+    left: 0%;
+    overflow:scroll;
+  }
+
   .image-box-vw {
     background: url("../../assets/vw.jpg") center center no-repeat;
     background-size: cover;
@@ -49,9 +60,21 @@
     height: 32%;
     border: 1px solid #000;
     border-radius: 5px;
-    background-color: #eee;
+    background-color: #000;
     opacity: 0.9;
  }
+
+ .infotainment {
+     position: absolute;
+     top: 39%;
+     left: 40%;
+     width: 25%;
+     height: 23%;
+     border: 0px solid #000;
+     border-radius: 10px;
+     background-color: #CC0000;
+     opacity: 0.95;
+  }
 
  .instruments {
     position: absolute;
@@ -59,9 +82,9 @@
     left: 0%;
     //border: 1px solid #444;
     //border-radius: 5px;
-    //background-color: #eee;
+    background-color: #000;
     //color: #000;
-    opacity: 0.7;
+    opacity: 0.9;
     padding: 0px;
     width: 80%;
     height: 33%;
@@ -96,7 +119,7 @@
 .menu-s {
   position: absolute;
   top: 68%;
-  left: 48%;
+  left: 46%;
 }
 
 .menu-skoda {
