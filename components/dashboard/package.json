@@ -16,7 +16,7 @@
   "dependencies": {
     "@amcharts/amcharts4": "^4.10.28",
     "@angular/common": "~9.1.6",
-    "@angular/core": "~11.0.5",
+    "@angular/core": "~9.1.6",
     "@angular/forms": "~9.1.6",
     "@angular/platform-browser": "~9.1.6",
     "@angular/platform-browser-dynamic": "~9.1.6",
@@ -34,7 +34,7 @@
     "zone.js": "~0.10.2"
   },
   "devDependencies": {
-    "@angular-devkit/build-angular": "~14.2.2",
+    "@angular-devkit/build-angular": "~0.901.5",
     "@angular/cli": "~9.1.5",
     "@angular/compiler": "~9.1.6",
     "@angular/compiler-cli": "~9.1.6",
