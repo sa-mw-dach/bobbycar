@@ -18,7 +18,8 @@ export class MapPage implements OnInit {
     map: google.maps.Map;
     marker: google.maps.Marker;
     infowindow: google.maps.InfoWindow;
-    initialPosition = { lat: 50.1146997, lng: 8.6185411 };
+    initialPosition;
+    // initialPosition = { lat: 50.1146997, lng: 8.6185411 };
     bobbycars = new Map();
     zones = [];
     searchArea: google.maps.Circle;
@@ -33,8 +34,11 @@ export class MapPage implements OnInit {
         private cacheService: CacheService,
         private metricsAggregatedService: CarMetricsAggregatedService,
         private speedAlertService: SpeedAlertService,
+        private configService: ConfigService,
         private router: Router
-        ) {}
+        ) {
+            this.initialPosition = configService.INITIAL_MAP_POSITION;
+        }
 
     initializeMap() {
         setTimeout(() => {
@@ -46,6 +50,17 @@ export class MapPage implements OnInit {
             this.infowindow = new google.maps.InfoWindow({
                 content: ''
             });
+            const icon = {
+                url: "https://cdn-icons-png.flaticon.com/512/882/882829.png", // url
+                scaledSize: new google.maps.Size(50, 50), // scaled size
+            };
+
+            const marker = new google.maps.Marker({
+                        position: new google.maps.LatLng({ lat: 41.10847153962609, lng: -73.72042478641728 }),
+                        // label: 'IBM HQ Armonk',
+                        icon: icon,
+                        map: this.map
+                    });
         }, 10);
     }
 
@@ -128,7 +143,7 @@ export class MapPage implements OnInit {
                             <h4>Bobbycar Id:</h4>
                             <p>`+content.carid+`<br/>
                             <h4>Zone:</h4>`+content?.zone?.spec.name+`</p><br/>
-                            <ion-button href="/car-detail/`+content.carid+`">Car Detail</ion-button>
+                            <ion-button color="danger" href="/car-detail/`+content.carid+`">Car Detail</ion-button>
                         </span>`);
                     infowindow.open(this.map, marker);
                 }
@@ -279,31 +294,5 @@ export class MapPage implements OnInit {
             err => console.error(err), // Called if at any point WebSocket API signals some kind of error.
             () => console.log('complete') // Called when connection is closed (for whatever reason).
         );
-
-        if(!navigator.geolocation) {
-            console.log('Geolocation is not supported by your browser');
-          } else {
-              const options = {
-                enableHighAccuracy: true,
-                maximumAge: 30000,
-                timeout: 27000
-              };
-
-            navigator.geolocation.getCurrentPosition(position => {
-                const pos = {
-                lat: position.coords.latitude,
-                lng: position.coords.longitude,
-                }
-                console.log(pos);
-                const marker = new google.maps.Marker({
-                    position: new google.maps.LatLng({ lat: pos.lat, lng: pos.lng }),
-                    label: 'THATs ME',
-                    map: this.map
-                });
-            }, null, options);
-        }
-
-    }
-
 
 }
