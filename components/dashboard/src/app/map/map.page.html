@@ -94,7 +94,7 @@
     </ion-item>
     <div *ngFor="let mapEntry of speedAlerts | keyvalue">
       <ion-item>
-        <span style="width: 400px;"><ion-button>{{mapEntry.value.vin}}</ion-button></span>
+        <span style="width: 400px;"><ion-button color="danger">{{mapEntry.value.vin}}</ion-button></span>
         <span style="width: 100px;">{{mapEntry.value.speedAvg}}</span>
         <span style="width: 100px;">{{mapEntry.value.rpmAvg}}</span>
         <span style="width: 100px;">{{mapEntry.value.co2Avg}}</span>
