@@ -18,6 +18,7 @@ export class ConfigService {
     CAR_ENDPOINT;
     CAR_METRICS_AGGREGATED_ENDPOINT;
     SPEED_ALERT_ENDPOINT;
+    INITIAL_MAP_POSITION;
 
     constructor(public http: HttpClient) {}
 
@@ -39,6 +40,7 @@ export class ConfigService {
         this.CAR_ENDPOINT = data.CAR_ENDPOINT;
         this.CAR_METRICS_AGGREGATED_ENDPOINT = data.CAR_METRICS_AGGREGATED_ENDPOINT;
         this.SPEED_ALERT_ENDPOINT = data.SPEED_ALERT_ENDPOINT;
+        this.INITIAL_MAP_POSITION = data.INITIAL_MAP_POSITION;
     }
 
 }
