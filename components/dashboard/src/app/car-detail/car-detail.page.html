@@ -9,8 +9,9 @@
 
   <div class="engine-data-overlay" padding [hidden]="engineOverlayHidden">
     <div style="padding: 20px;">
-      <h2>Current Engine Configuration:</h2>
+      <h2>Current Weather:</h2>
       <pre><p>{{ engineData | json }}</p></pre>
+      <pre><p>{{ weatherData | json }}</p></pre>
     </div>
   </div>
 
@@ -83,6 +84,9 @@
       <ion-button (click)="toggleStreetView()" color="danger">
         <ion-icon name="eye-outline" *ngIf="enableStreetView"></ion-icon>
         <ion-icon name="eye-off-outline" *ngIf="!enableStreetView"></ion-icon>
+      </ion-button>
+      <ion-button (click)="getWeatherData()" color="danger">
+        <ion-icon name="cloud"></ion-icon>
       </ion-button>
     </div>
     <!--<div id="chartdiv" style="width: 20%; height: 200px; top: 17%; left: 32%; position: absolute;"></div>-->
