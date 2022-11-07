@@ -5,6 +5,7 @@ import { CarMetricsService } from '../providers/carmetrics.service';
 import { ZoneChangeService } from '../providers/zonechange.service';
 import { CacheService } from '../providers/cache.service';
 import { CarService } from '../providers/car.service';
+import { WeatherService } from '../providers/weather.service';
 import { ToastController } from '@ionic/angular';
 import { map, tap, delay, retryWhen, delayWhen } from 'rxjs/operators';
 
@@ -24,6 +25,7 @@ export class CarDetailPage implements OnInit {
   private chart: am4charts.XYChart;
   map: google.maps.Map;
   initialPosition = { lat: 50.1146997, lng: 8.6185411 };
+  currentPosition = { lat: 0, lon: 0 };
   carId = '';
   carMetric = { driverId: '', manufacturer: '', model: '', co2: '', fuel: '', gear: '', rpm: '', speed: '', zone: 'Default Zone', vin: '' };
   marker: google.maps.Marker;
@@ -36,6 +38,7 @@ export class CarDetailPage implements OnInit {
   // infotainmentContent = 'https://www.youtube.com/embed/kFyxe_tCxto?autoplay=1&mute=1&controls=0&loop=1'
   engineOverlayHidden: boolean = true;
   engineData;
+  weatherData;
   enableStreetView: boolean = true;
 
   constructor(
@@ -46,6 +49,7 @@ export class CarDetailPage implements OnInit {
     private zoneChangeService: ZoneChangeService,
     private route: ActivatedRoute,
     public toastController: ToastController,
+    private weatherService: WeatherService,
     private zone: NgZone,
     ) {}
 
@@ -104,6 +108,18 @@ export class CarDetailPage implements OnInit {
         }
       }
 
+  async getWeatherData(){
+    if(this.engineOverlayHidden) {
+        this.weatherService.getCurrentWeather(this.currentPosition.lat, this.currentPosition.lon).subscribe((data) => {
+            this.weatherData = data;
+            this.engineOverlayHidden = false;
+        });
+    } else {
+        this.engineOverlayHidden = true;
+        this.weatherData = undefined;
+    }
+  }
+
   async showConfig(){
     if(this.engineOverlayHidden) {
         let temp = await this.carService.getCarById(this.carId).subscribe((data) => {
@@ -113,6 +129,7 @@ export class CarDetailPage implements OnInit {
         })
     } else {
         this.engineOverlayHidden = true;
+        this.engineData = undefined;
     }
 
   }
@@ -140,6 +157,9 @@ export class CarDetailPage implements OnInit {
     if(data.carid === this.carId){
       this.marker.setPosition(new google.maps.LatLng({ lat: data.lat, lng: data.long }));
       this.map.setCenter({ lat: data.lat, lng: data.long });
+
+      this.currentPosition.lat = data.lat;
+      this.currentPosition.lon = data.long;
 
       this.sv.getPanorama({
         location: { lat: data.lat, lng: data.long },
