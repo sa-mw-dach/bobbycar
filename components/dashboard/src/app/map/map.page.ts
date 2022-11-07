@@ -18,13 +18,14 @@ export class MapPage implements OnInit {
     map: google.maps.Map;
     marker: google.maps.Marker;
     infowindow: google.maps.InfoWindow;
-    initialPosition;
-    // initialPosition = { lat: 50.1146997, lng: 8.6185411 };
-    bobbycars = new Map();
-    zones = [];
     searchArea: google.maps.Circle;
+    initialPosition: any;
+
     isQuery = false;
     showSpeedAlerts = false;
+
+    zones = [];
+    bobbycars = new Map();
     metricsAggregated = new Map();
     speedAlerts = new Map();
 
@@ -295,4 +296,5 @@ export class MapPage implements OnInit {
             () => console.log('complete') // Called when connection is closed (for whatever reason).
         );
 
+    }
 }
