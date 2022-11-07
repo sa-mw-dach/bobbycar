@@ -63,6 +63,13 @@ public class DatagridToRestRoute extends RouteBuilder {
 		 	.setHeader(InfinispanConstants.OPERATION).constant(InfinispanOperation.GET)
 		 	.setHeader(InfinispanConstants.KEY).expression(simple("${headers[zoneid]}"))
 		 	.to("infinispan://{{com.redhat.bobbycar.camelk.dg.zone.cacheName}}?cacheContainerConfiguration=#cacheContainerConfiguration");
+		from("rest:get:clearCache").routeId("clearCacheEndpoint")
+			.setHeader("Access-Control-Allow-Origin",constant("*"))
+			.process(ex -> {
+				zonesCache.clear();
+				carsCache.clear();
+			})
+			.log("Cleared all caches");
 	}
 
 	private void initRemoteCache(Configuration cacheConfig) {
