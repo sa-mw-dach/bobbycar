@@ -28,6 +28,11 @@ export class AppComponent {
       title: 'Driver Monitoring',
       url: '/hddp',
       icon: 'speedometer-outline'
+    },
+    {
+      title: 'Settings',
+      url: '/admin',
+      icon: 'keypad-outline'
     }
   ];
 

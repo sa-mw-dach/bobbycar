@@ -1,5 +1,5 @@
 {
-    "GOOGLE_API_KEY": "***REMOVED***",
+    "GOOGLE_API_KEY": "",
     "BOBBYCAR_API_KEY": "replaceme",
     "SSE_ENDPOINT": "",
     "CAR_EVENTS_ENDPOINT": "ws://dashboard-streaming-bobbycar.apps.ansulliv.catchall.azure.devcluster.openshift.com/api/carevents?sendToAll=true",

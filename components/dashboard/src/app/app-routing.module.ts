@@ -22,6 +22,10 @@ const routes: Routes = [
   {
     path: 'hddp',
     loadChildren: () => import('./hddp/hddp.module').then( m => m.HddpPageModule)
+  },
+  {
+   path: 'admin',
+   loadChildren: () => import('./admin/admin.module').then( m => m.AdminPageModule)
   }
 ];
 

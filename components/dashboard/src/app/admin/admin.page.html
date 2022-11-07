@@ -1,0 +1,98 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>
+      Red Hat Connected Vehicle Architecture - Settings
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content color="light">
+    <ion-card class="welcome-card">
+
+      <ion-card-header>
+        <ion-card-title>
+          <ion-label>Cache Service</ion-label>
+        </ion-card-title>
+      </ion-card-header>
+
+      <ion-card-content>
+        <ion-button (click)="getZonesFromCache()" color="danger">
+          List Zones
+        </ion-button>
+        <ion-button (click)="getCarsFromCache()" color="danger">
+          List Cars
+        </ion-button>
+        <ion-button (click)="clearCache()" color="danger">
+          Clear Cache
+        </ion-button>
+        <pre><p style="color: #fff;">{{ bobbycarZones | json }}</p></pre>
+        <pre><p style="color: #fff;">{{ bobbycars | json }}</p></pre>
+      </ion-card-content>
+    </ion-card>
+
+  <ion-card class="welcome-card">
+
+    <ion-card-header>
+      <ion-card-title>
+        <ion-label>Car Service</ion-label>
+      </ion-card-title>
+    </ion-card-header>
+
+    <ion-card-content>
+      <form (ngSubmit)="getEngineDataByCarId()">
+        <ion-item>
+          <ion-label>Car ID: </ion-label>
+          <ion-input type="text" [(ngModel)]="engineDataSearch.carId" name="engineData"></ion-input>
+        </ion-item>
+        <ion-button type="submit" color="danger">Get Engine Data</ion-button>
+      </form>
+      <pre><p style="color: #fff;">{{ carData | json }}</p></pre>
+    </ion-card-content>
+  </ion-card>
+
+  <ion-card class="welcome-card">
+
+    <ion-card-header>
+      <ion-card-title>
+        <ion-label>Weather Service</ion-label>
+      </ion-card-title>
+    </ion-card-header>
+
+    <ion-card-content>
+      <form>
+        <ion-item>
+          <ion-label>Latitude: </ion-label>
+          <ion-input id="lat" type="text" [(ngModel)]="latitudeSearch" name="Latitude"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label>Longitude: </ion-label>
+          <ion-input id="lon" type="text" [(ngModel)]="longitudeSearch" name="Longitude"></ion-input>
+        </ion-item>
+        <ion-button (click)="getWeatherData('weather')" color="danger">Get Current Weather</ion-button>
+        <ion-button (click)="getWeatherData('pollution')" color="danger">Get Air Pollution</ion-button>
+      </form>
+      <pre><p style="color: #fff;">{{ weatherData | json }}</p></pre>
+    </ion-card-content>
+  </ion-card>
+
+
+  <ion-card class="welcome-card">
+    <ion-list lines="none">
+      <ion-list-header>
+        <ion-label>Resources</ion-label>
+      </ion-list-header>
+      <ion-item href="https://github.com/sa-mw-dach/bobbycar">
+        <ion-icon slot="start" color="medium" name="car"></ion-icon>
+        <ion-label>Bobbycar - GitHub Repository</ion-label>
+      </ion-item>
+      <ion-item href="https://www.opensourcerers.org/2021/06/28/bobbycar-part-1-building-a-cloud-native-iot-architecture-with-modern-red-hat-technologies/">
+        <ion-icon slot="start" color="medium" name="book"></ion-icon>
+        <ion-label>Bobbycar - Building a cloud-native IoT Architecture</ion-label>
+      </ion-item>
+    </ion-list>
+  </ion-card>
+
+</ion-content>
