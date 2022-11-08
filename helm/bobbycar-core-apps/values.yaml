@@ -33,7 +33,7 @@ dashboard:
   config:
     googleApiKey:
     threeScaleApiKey: replaceme
-    hdppEndpoint: http://localhost/playlist.m3u8
+    hdppEndpoint: "http://localhost/playlist.m3u8"
 
 telemetryAggregator:
   config:
