@@ -1,0 +1,12 @@
+apiVersion: bobbycar.redhat.com/v1alpha1
+kind: BobbycarZone
+metadata:
+  name: us-zone-3
+spec:
+  name: "IBM HQ"
+  type: "circle"
+  priority: 20
+  position:
+    lat: 41.10619393597256
+    lng: -73.72888791972393
+  radius: 500

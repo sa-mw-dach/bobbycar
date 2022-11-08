@@ -32,6 +32,8 @@ spec:
           env:
             - name: quarkus.rest-client.weather-api.url
               value: 'https://api.openweathermap.org'
+            - name: quarkus.http.cors
+              value: 'false'
             - name: open-weather-map.api.key
               valueFrom:
                 secretKeyRef:

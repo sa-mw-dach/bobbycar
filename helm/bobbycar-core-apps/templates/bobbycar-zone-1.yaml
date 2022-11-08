@@ -1,12 +1,12 @@
 apiVersion: bobbycar.redhat.com/v1alpha1
 kind: BobbycarZone
 metadata:
-  name: bobbycar-ffm
+  name: us-zone-1
 spec:
-  name: "Frankfurt Environmental Zone"
+  name: "Thornwood"
   type: "circle"
   priority: 10
   position:
-    lat: 50.1146997
-    lng: 8.6185411
-  radius: 5000  
+    lat: 41.120930211091604
+    lng: -73.77512939476505
+  radius: 1000

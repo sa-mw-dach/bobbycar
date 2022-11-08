@@ -31,7 +31,7 @@ spec:
       volumes:
         - name: config
           configMap:
-            name: {{ .Values.carSimulator.name }}-config
+            name: car-simulator-us-routes-config
             defaultMode: 420
       containers:
       - name: {{ .Values.carSimulator.name }}
@@ -90,7 +90,7 @@ spec:
             protocol: TCP
         envFrom:
           - configMapRef: 
-              name: {{ .Values.carSimulator.name }}-config
+              name: car-simulator-us-routes-config
         resources: {}
         terminationMessagePath: /dev/termination-log
         terminationMessagePolicy: File
