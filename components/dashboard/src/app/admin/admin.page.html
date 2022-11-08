@@ -48,8 +48,10 @@
           <ion-input type="text" [(ngModel)]="engineDataSearch.carId" name="engineData"></ion-input>
         </ion-item>
         <ion-button type="submit" color="danger">Get Engine Data</ion-button>
+        <ion-button (click)="getCarMetrics()" color="danger">Metrics</ion-button>
       </form>
       <pre><p style="color: #fff;">{{ carData | json }}</p></pre>
+      <pre><p style="color: #fff;">{{ carMetrics | json }}</p></pre>
     </ion-card-content>
   </ion-card>
 
@@ -75,6 +77,30 @@
         <ion-button (click)="getWeatherData('pollution')" color="danger">Get Air Pollution</ion-button>
       </form>
       <pre><p style="color: #fff;">{{ weatherData | json }}</p></pre>
+    </ion-card-content>
+  </ion-card>
+
+  <ion-card class="welcome-card">
+
+    <ion-card-header>
+      <ion-card-title>
+        <ion-label>OTA Server API</ion-label>
+      </ion-card-title>
+    </ion-card-header>
+
+    <ion-card-content>
+      <form>
+        <ion-item>
+          <ion-label>Campaign ID: </ion-label>
+          <ion-input type="text" [(ngModel)]="otaCampaignIdSearch" name="otaCampaignIdSearch"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label>Campaign Payload: </ion-label>
+          <ion-textarea rows="10" cols="20" [(ngModel)]="otaPayloadInput" name="otaPayloadInput"></ion-textarea>
+        </ion-item>
+        <ion-button (click)="getOTAPayload()" color="danger">Get Payload</ion-button>
+        <ion-button (click)="createOTAPayload()" color="danger">Create Payload</ion-button>
+      </form>
     </ion-card-content>
   </ion-card>
 

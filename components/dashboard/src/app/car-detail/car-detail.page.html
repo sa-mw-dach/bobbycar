@@ -9,9 +9,27 @@
 
   <div class="engine-data-overlay" padding [hidden]="engineOverlayHidden">
     <div style="padding: 20px;">
-      <h2>Current Weather:</h2>
-      <pre><p>{{ engineData | json }}</p></pre>
-      <pre><p>{{ weatherData | json }}</p></pre>
+
+      <span *ngIf="weatherData != undefined">
+      <div style ="background-color: #333 ; border: 2px solid; border-radius: 5px; padding: 5px;">
+        <h2 >Predictive Road Conditions Status:</h2>
+        Based on the current conditions it is recommended to enable the Driver Monitoring assistance system:
+        <ion-button (click)="toggleInfotainment()" color="danger">
+          <ion-icon name="videocam"></ion-icon> &nbsp;Enable
+        </ion-button>
+      </div>
+        <h4>Road Classification Result:</h4>
+        <pre><p>{{ roadClassificationResult | json }}</p></pre>
+        <h4>Current Weather Data:</h4>
+        <pre><p>{{ weatherData | json }}</p></pre>
+
+      </span>
+
+      <span *ngIf="engineData != undefined">
+        <h2 >Current Engine Configuration:</h2>
+        <pre><p>{{ engineData | json }}</p></pre>
+      </span>
+
     </div>
   </div>
 

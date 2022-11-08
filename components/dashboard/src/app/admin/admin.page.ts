@@ -2,7 +2,8 @@ import { Component } from '@angular/core';
 import { ToastController } from '@ionic/angular';
 import { CacheService } from '../providers/cache.service';
 import { CarService } from '../providers/car.service';
-import { WeatherService } from '../providers/weather.service';
+import { PredictiveService } from '../providers/predictive.service';
+import { OTAService } from '../providers/ota.service';
 
 @Component({
   selector: 'app-admin',
@@ -14,15 +15,20 @@ export class AdminPage {
   bobbycarZones: any = undefined;
   bobbycars: any = undefined;
   carData: any = undefined;
+  carMetrics: any = undefined;
   weatherData: any = undefined;
+  otaPayloadData: any = undefined;
+  otaPayloadInput: any = undefined;
   engineDataSearch = { carId: "" };
+  otaCampaignIdSearch = 1;
   latitudeSearch = 41.11804887672318;
   longitudeSearch = -73.7198836780401;
 
   constructor(
     private cacheService: CacheService,
     private carService: CarService,
-    private weatherService: WeatherService,
+    private predictiveService: PredictiveService,
+    private otaService: OTAService,
     private toastController: ToastController,
     ) {}
 
@@ -35,6 +41,26 @@ export class AdminPage {
         });
         toast.present();
     }
+
+    async getOTAPayload(){
+        if(this.otaPayloadInput === undefined) {
+            this.otaService.getPayloadForCampaign(this.otaCampaignIdSearch).subscribe((data) => {
+                this.otaPayloadInput = JSON.stringify(data, null, 4);
+            });
+        } else {
+            this.otaPayloadInput = undefined;
+        }
+    }
+
+    async createOTAPayload(){
+        if(this.otaPayloadInput !== undefined && this.otaCampaignIdSearch) {
+            this.otaService.createPayloadForCampaign(this.otaCampaignIdSearch, this.otaPayloadInput).subscribe((data) => {
+                this.otaPayloadInput = undefined;
+                this.presentToast("You have successfully updated the payload for the campaign: "+this.otaCampaignIdSearch, 3000);
+            });
+        }
+    }
+
 
     async getZonesFromCache(){
         if(this.bobbycarZones === undefined) {
@@ -74,15 +100,25 @@ export class AdminPage {
         }
     }
 
+    async getCarMetrics(){
+        if(this.carMetrics === undefined) {
+            this.carService.getMetrics().subscribe((data) => {
+                this.carMetrics = data;
+            });
+        } else {
+            this.carMetrics = undefined;
+        }
+    }
+
     async getWeatherData(type){
         if(this.weatherData === undefined) {
             if(type === 'weather'){
-                this.weatherService.getCurrentWeather(this.latitudeSearch, this.longitudeSearch).subscribe((data) => {
+                this.predictiveService.getCurrentWeather(this.latitudeSearch, this.longitudeSearch).subscribe((data) => {
                     console.log(data);
                     this.weatherData = data;
                 });
             } else if (type === 'pollution'){
-                this.weatherService.getAirPollution(this.latitudeSearch, this.longitudeSearch).subscribe((data) => {
+                this.predictiveService.getAirPollution(this.latitudeSearch, this.longitudeSearch).subscribe((data) => {
                     console.log(data);
                     this.weatherData = data;
                 });
