@@ -5,7 +5,7 @@ import { CarMetricsService } from '../providers/carmetrics.service';
 import { ZoneChangeService } from '../providers/zonechange.service';
 import { CacheService } from '../providers/cache.service';
 import { CarService } from '../providers/car.service';
-import { WeatherService } from '../providers/weather.service';
+import { PredictiveService } from '../providers/predictive.service';
 import { ToastController } from '@ionic/angular';
 import { map, tap, delay, retryWhen, delayWhen } from 'rxjs/operators';
 
@@ -35,10 +35,15 @@ export class CarDetailPage implements OnInit {
   showHUD = false;
   showDriverMonitoring = false;
   carBg = 'S';
-  // infotainmentContent = 'https://www.youtube.com/embed/kFyxe_tCxto?autoplay=1&mute=1&controls=0&loop=1'
   engineOverlayHidden: boolean = true;
   engineData;
   weatherData;
+  roadClassificationResult = {
+                                 "prediction": {
+                                   "Road Condition": "Great",
+                                   "Vehicle Config": "166Y.2"
+                                 }
+                               };
   enableStreetView: boolean = true;
 
   constructor(
@@ -49,7 +54,7 @@ export class CarDetailPage implements OnInit {
     private zoneChangeService: ZoneChangeService,
     private route: ActivatedRoute,
     public toastController: ToastController,
-    private weatherService: WeatherService,
+    private predictiveService: PredictiveService,
     private zone: NgZone,
     ) {}
 
@@ -110,19 +115,26 @@ export class CarDetailPage implements OnInit {
 
   async getWeatherData(){
     if(this.engineOverlayHidden) {
-        this.weatherService.getCurrentWeather(this.currentPosition.lat, this.currentPosition.lon).subscribe((data) => {
+        this.predictiveService.getCurrentWeather(this.currentPosition.lat, this.currentPosition.lon).subscribe((data) => {
             this.weatherData = data;
             this.engineOverlayHidden = false;
         });
+        this.predictiveService.getRoadClassification([0.36, 0.20, 9.79, 0.009, -0.13, -0.02, 0.14]).subscribe((data) => {
+            this.roadClassificationResult = data;
+            console.log(data);
+        },
+        err => console.error(err));
     } else {
         this.engineOverlayHidden = true;
         this.weatherData = undefined;
+        this.roadClassificationResult = undefined;
     }
   }
 
   async showConfig(){
     if(this.engineOverlayHidden) {
         let temp = await this.carService.getCarById(this.carId).subscribe((data) => {
+            console.log(data);
             this.engineData = data;
             this.engineOverlayHidden = false;
             // this.presentConfig(JSON.stringify(data, null, 4));
