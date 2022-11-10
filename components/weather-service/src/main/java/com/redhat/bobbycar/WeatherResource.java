@@ -1,14 +1,12 @@
 package com.redhat.bobbycar;
 
+import com.redhat.bobbycar.restClient.IBMWeatherService;
 import com.redhat.bobbycar.restClient.OpenWeatherMapService;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.jboss.logging.Logger;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -20,8 +18,14 @@ public class WeatherResource {
     @ConfigProperty(name = "open-weather-map.api.key")
     String apiKey;
 
+    @ConfigProperty(name = "ibm-weather.api.key")
+    String ibmApiKey;
+
     @RestClient
     OpenWeatherMapService weatherMapService;
+
+    @RestClient
+    IBMWeatherService ibmWeatherService;
 
     @GET
     @Produces(MediaType.TEXT_PLAIN)
@@ -39,10 +43,22 @@ public class WeatherResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/current/lat/{lat}/lon/{lon}")
-    public Response getCurrentWeather(@PathParam("lat") double lat, @PathParam("lon") double lon) {
-        Response response = weatherMapService.getCurrentWeather(lat, lon, apiKey);
-        log.info(response);
-        return response;
+    public Response getCurrentWeather(
+            @PathParam("lat") double lat,
+            @PathParam("lon") double lon,
+            @DefaultValue("owm")
+            @QueryParam("provider") String provider) {
+
+        if(provider.equalsIgnoreCase("ibm")){
+            Response response = ibmWeatherService.getCurrentWeather(lat, lon, "en-US", "e", ibmApiKey);
+            log.info(response);
+            return response;
+        } else {
+            Response response = weatherMapService.getCurrentWeather(lat, lon, apiKey);
+            log.info(response);
+            return response;
+        }
+
     }
 
 
