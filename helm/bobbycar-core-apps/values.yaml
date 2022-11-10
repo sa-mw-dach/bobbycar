@@ -41,8 +41,12 @@ telemetryAggregator:
     windowsize: 2
 
 weatherService:
-  api:
-    key:
+  owm:
+    api:
+      key:
+  ibm:
+    api:
+      key:
 
 carSimulator:
   name: car-simulator 
