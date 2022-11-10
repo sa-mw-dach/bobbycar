@@ -10,7 +10,7 @@
     "CACHE_ENDPOINT": "http://cache-service-bobbycar.apps.cluster-c4lhj.c4lhj.sandbox1290.opentlc.com",
     "CAR_ENDPOINT": "http://car-simulator-bobbycar.apps.cluster-c4lhj.c4lhj.sandbox1290.opentlc.com",
     "HDPP_ENDPOINT": "http://ntt-stream-hdpp.apps.ansulliv.catchall.azure.devcluster.openshift.com/playlist.m3u8",
-    "OPEN_WEATHERMAP_API_ENDPOINT": "http://weather-service-bobbycar.apps.cluster-c4lhj.c4lhj.sandbox1290.opentlc.com",
+    "WEATHER_API_ENDPOINT": "http://weather-service-bobbycar.apps.cluster-c4lhj.c4lhj.sandbox1290.opentlc.com",
     "OTA_SERVER_ENDPOINT": "http://ota-server-bobbycar.apps.cluster-c4lhj.c4lhj.sandbox1290.opentlc.com",
     "ROAD_CLASSIFICATION_ENDPOINT": "https://road-roughness-condition-git-roadconditions.apps.cluster-c4lhj.c4lhj.sandbox1290.opentlc.com",
     "INITIAL_MAP_POSITION": { "lat": 41.11804887672318, "lng": -73.7198836780401 }

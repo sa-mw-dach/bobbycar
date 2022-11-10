@@ -5,6 +5,18 @@
     width: 100%;
   }
 
+  h2, h3, h4 {
+    color: #CC0000;
+  }
+
+.ibm_logo {
+    width: 100px;
+    height: 100px;
+    object-fit: contain;
+    opacity: 0.9;
+    background-color: #000;
+  }
+
   .engine-data-overlay {
     position: fixed;
     width: 40%;
@@ -65,9 +77,6 @@
  }
 
  .infotainment {
-     position: absolute;
-     top: 39%;
-     left: 40%;
      width: 25%;
      height: 23%;
      border: 0px solid #000;
@@ -75,6 +84,26 @@
      background-color: #CC0000;
      opacity: 0.95;
   }
+ .it-s {
+     position: absolute;
+     top: 39%;
+     left: 40%;
+ }
+ .it-bmw {
+     position: absolute;
+     top: 39%;
+     left: 58%;
+ }
+ .it-skoda {
+      position: absolute;
+      top: 33%;
+      left: 65%;
+ }
+ .it-vw {
+      position: absolute;
+      top: 35%;
+      left: 40%;
+ }
 
  .instruments {
     position: absolute;
@@ -102,28 +131,4 @@
   padding-left: 10px;
   font-weight: bold;
   font-size: large;
-}
-
- .menu {
-  position: absolute;
-  top: 57%;
-  left: 49%;
-}
-
-.menu-bmw {
-  position: absolute;
-  top: 56%;
-  left: 66%;
-}
-
-.menu-s {
-  position: absolute;
-  top: 68%;
-  left: 43%;
-}
-
-.menu-skoda {
-  position: absolute;
-  top: 48%;
-  left: 73%;
 }

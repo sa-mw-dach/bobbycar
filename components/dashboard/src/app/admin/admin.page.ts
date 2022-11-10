@@ -113,7 +113,7 @@ export class AdminPage {
     async getWeatherData(type){
         if(this.weatherData === undefined) {
             if(type === 'weather'){
-                this.predictiveService.getCurrentWeather(this.latitudeSearch, this.longitudeSearch).subscribe((data) => {
+                this.predictiveService.getCurrentWeather(this.latitudeSearch, this.longitudeSearch, 'owm').subscribe((data) => {
                     console.log(data);
                     this.weatherData = data;
                 });
@@ -123,6 +123,17 @@ export class AdminPage {
                     this.weatherData = data;
                 });
             }
+        } else {
+            this.weatherData = undefined;
+        }
+    }
+
+    async getWeatherObservationData(type){
+        if(this.weatherData === undefined) {
+            this.predictiveService.getCurrentWeather(this.latitudeSearch, this.longitudeSearch, 'ibm').subscribe((data) => {
+                console.log(data);
+                this.weatherData = data;
+            });
         } else {
             this.weatherData = undefined;
         }
