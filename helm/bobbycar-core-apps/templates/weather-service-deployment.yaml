@@ -23,7 +23,7 @@ spec:
     spec:
       containers:
         - name: weather-service
-          image: quay.io/bobbycar/weather-service:1.0-jvm
+          image: quay.io/bobbycar/weather-service:1.1-jvm
           ports:
             - containerPort: 8080
               protocol: TCP
@@ -32,6 +32,8 @@ spec:
           env:
             - name: quarkus.rest-client.weather-api.url
               value: 'https://api.openweathermap.org'
+            - name: quarkus.rest-client.ibm-weather-api.url
+              value: 'https://api.weather.com'
             - name: quarkus.http.cors
               value: 'false'
             - name: open-weather-map.api.key
@@ -39,6 +41,12 @@ spec:
                 secretKeyRef:
                   name: weather-service-secret
                   key: apiKey
+                  optional: false
+            - name: ibm-weather.api.key
+              valueFrom:
+                secretKeyRef:
+                  name: weather-service-secret
+                  key: ibmApiKey
                   optional: false
           resources: {}
           terminationMessagePath: /dev/termination-log

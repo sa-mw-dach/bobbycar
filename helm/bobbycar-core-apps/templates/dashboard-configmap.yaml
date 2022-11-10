@@ -17,7 +17,7 @@ data:
         "CACHE_ENDPOINT": "http://cache-service-{{ .Values.namespace }}.{{ .Values.ocpDomain }}",
         "CAR_ENDPOINT": "http://car-simulator-{{ .Values.namespace }}.{{ .Values.ocpDomain }}",
         "HDPP_ENDPOINT": "{{ .Values.dashboard.config.hdppEndpoint }}",
-        "OPEN_WEATHERMAP_API_ENDPOINT": "http://weather-service-{{ .Values.namespace }}.{{ .Values.ocpDomain }}",
+        "WEATHER_API_ENDPOINT": "http://weather-service-{{ .Values.namespace }}.{{ .Values.ocpDomain }}",
         "OTA_SERVER_ENDPOINT": "http://ota-server-{{ .Values.namespace }}.{{ .Values.ocpDomain }}",
         "ROAD_CLASSIFICATION_ENDPOINT": "https://road-roughness-condition-git-roadconditions.{{ .Values.ocpDomain }}",
         "INITIAL_MAP_POSITION": { "lat": 41.11804887672318, "lng": -73.7198836780401 }
