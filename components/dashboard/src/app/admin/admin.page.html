@@ -73,8 +73,9 @@
           <ion-label>Longitude: </ion-label>
           <ion-input id="lon" type="text" [(ngModel)]="longitudeSearch" name="Longitude"></ion-input>
         </ion-item>
-        <ion-button (click)="getWeatherData('weather')" color="danger">Get Current Weather</ion-button>
-        <ion-button (click)="getWeatherData('pollution')" color="danger">Get Air Pollution</ion-button>
+        <ion-button (click)="getWeatherObservationData('weather')" >Current Weather (IBM)</ion-button>
+        <ion-button (click)="getWeatherData('weather')" color="danger">Current Weather (OWM)</ion-button>
+        <ion-button (click)="getWeatherData('pollution')" color="danger">Air Pollution (OWM)</ion-button>
       </form>
       <pre><p style="color: #fff;">{{ weatherData | json }}</p></pre>
     </ion-card-content>

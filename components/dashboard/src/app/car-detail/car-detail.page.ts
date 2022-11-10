@@ -89,6 +89,16 @@ export class CarDetailPage implements OnInit {
     }, 10);
   }
 
+  async scheduleMaintenance(){
+    let toast = await this.toastController.create({
+          message: 'You have scheduled a maintenance appointment. The collection of telemetry data has been enabled and will be forwarded to your car repair shop.',
+          duration: 5000,
+          color: 'danger',
+          position: 'top'
+        });
+        toast.present();
+  }
+
   toggleHUD(){
     if(this.showHUD) {
       this.showHUD = false;
@@ -115,7 +125,7 @@ export class CarDetailPage implements OnInit {
 
   async getWeatherData(){
     if(this.engineOverlayHidden) {
-        this.predictiveService.getCurrentWeather(this.currentPosition.lat, this.currentPosition.lon).subscribe((data) => {
+        this.predictiveService.getCurrentWeather(this.currentPosition.lat, this.currentPosition.lon, 'ibm').subscribe((data) => {
             this.weatherData = data;
             this.engineOverlayHidden = false;
         });
