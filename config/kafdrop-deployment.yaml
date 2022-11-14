@@ -1,0 +1,89 @@
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: kafdrop
+  namespace: bobbycar
+  labels:
+    app: kafdrop
+    app.kubernetes.io/component: kafdrop
+    app.kubernetes.io/instance: kafdrop
+    app.kubernetes.io/name: kafdrop
+    app.kubernetes.io/part-of: strimzi-bobbycar-cluster
+    app.openshift.io/runtime-namespace: bobbycar
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kafdrop
+  template:
+    metadata:
+      labels:
+        app: kafdrop
+        deploymentconfig: kafdrop
+    spec:
+      containers:
+        - name: kafdrop
+          image: 'obsidiandynamics/kafdrop'
+          ports:
+            - containerPort: 9000
+              protocol: TCP
+          env:
+            - name: SERVER_SERVLET_CONTEXTPATH
+              value: /
+            - name: JVM_OPTS
+              value: '-Xms32M -Xmx64M'
+            - name: KAFKA_BROKERCONNECT
+              value: 'bobbycar-cluster-kafka-bootstrap.bobbycar.svc.cluster.local:9092'
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          imagePullPolicy: Always
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      dnsPolicy: ClusterFirst
+      securityContext: {}
+      schedulerName: default-scheduler
+      imagePullSecrets: []
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+  revisionHistoryLimit: 10
+  progressDeadlineSeconds: 600
+  paused: false
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: kafdrop
+  namespace: bobbycar
+spec:
+  ports:
+    - name: 9000-tcp
+      protocol: TCP
+      port: 9000
+      targetPort: 9000
+  type: ClusterIP
+  selector:
+    app: kafdrop
+    deploymentconfig: kafdrop
+---
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  name: kafdrop
+  namespace: bobbycar
+spec:
+  to:
+    kind: Service
+    name: kafdrop
+    weight: 100
+  port:
+    targetPort: 9000-tcp
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
+  wildcardPolicy: None
+---
