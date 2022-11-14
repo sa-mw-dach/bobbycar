@@ -88,7 +88,8 @@ helm upgrade --install "$HELM_APP_RELEASE_NAME" helm/bobbycar-core-apps \
 --set-string ocpApi="$API_DOMAIN" \
 --set-string namespace="$NAMESPACE" \
 --set-string dashboard.config.googleApiKey="$GOOGLE_API_KEY" \
---set-string weatherService.api.key="$WEATHER_API_KEY"
+--set-string weatherService.owm.api.key="$OWM_WEATHER_API_KEY" \
+--set-string weatherService.ibm.api.key="$IBM_WEATHER_API_KEY"
 
 sleep 30
 
