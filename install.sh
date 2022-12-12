@@ -122,7 +122,7 @@ helm upgrade --install "$HELM_APP_RELEASE_NAME" helm/bobbycar-core-apps \
 sleep 30
 
 log "Waiting for Bobbycar pod"
-oc wait --for=condition=Available dc/car-simulator --timeout 300s
+oc wait --for=condition=Available deployment/car-simulator --timeout 300s
 log "Waiting for Bobbycar Dashboard pod"
 oc wait --for=condition=Available dc/dashboard --timeout 300s
 log "Waiting for Dashboard Streaming service pod"

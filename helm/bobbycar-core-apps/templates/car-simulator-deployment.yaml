@@ -1,5 +1,5 @@
-apiVersion: apps.openshift.io/v1
-kind: DeploymentConfig
+apiVersion: apps/v1
+kind: Deployment
 metadata:
   labels:
     app: {{ .Values.carSimulator.name }}
@@ -9,20 +9,10 @@ spec:
   replicas: {{ .Values.carSimulator.replicas }}
   revisionHistoryLimit: 10
   selector:
-    deploymentConfig: {{ .Values.carSimulator.name }}
-  strategy:
-    activeDeadlineSeconds: 21600
-    resources: {}
-    type: Rolling
-    rollingParams:
-      updatePeriodSeconds: 1
-      intervalSeconds: 1
-      timeoutSeconds: 600
-      maxUnavailable: 25%
-      maxSurge: 25%
+    matchLabels:
+      deploymentConfig: {{ .Values.carSimulator.name }}
   template:
     metadata:
-      creationTimestamp: null
       labels:
         app: {{ .Values.carSimulator.name }}
         deploymentConfig: {{ .Values.carSimulator.name }}
@@ -36,7 +26,7 @@ spec:
       containers:
       - name: {{ .Values.carSimulator.name }}
         # FIXME: revert before merge
-        image: quay.io/ctron/car-simulator:latest
+        image: quay.io/ctrontesting/car-simulator:latest
         imagePullPolicy: Always
         volumeMounts:
             - name: config
@@ -100,6 +90,3 @@ spec:
       schedulerName: default-scheduler
       securityContext: {}
       terminationGracePeriodSeconds: 30
-  test: false
-  triggers:
-    - type: ConfigChange
