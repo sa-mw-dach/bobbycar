@@ -38,7 +38,7 @@ class DriverTest {
 		TimedEngine engine = TimedEngine.builder().withSpeedVariationInKmH(5).withStartingPoint(route.getPoints().findFirst().orElse(null))
 				.withConfig(new JsonEngineConfiguration()).build();
 		Car car = Car.builder().withModel("M3 Coupe").withManufacturer("BMW")
-				.withEngine(engine).withDriverId(UUID.randomUUID()).build();
+				.withEngine(engine).withDriverId(UUID.randomUUID().toString()).build();
 		DrivingStrategy strategy = TimedDrivingStrategy.builder().withCar(car).build();
 		Driver driver = Driver.builder().withRoute(route).withDrivingStrategy(strategy).build();
 		driver.registerCarEventListener(evt -> {

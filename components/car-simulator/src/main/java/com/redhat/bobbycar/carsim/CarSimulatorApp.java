@@ -118,7 +118,7 @@ public class CarSimulatorApp {
 	
 	// Attributes
     private RouteSelectionStrategy routeSelectionStrategy;
-	private final Map<UUID, CompletableFuture<Void>> futures;
+	private final Map<String, CompletableFuture<Void>> futures;
 	private WireMockServer wireMockServer;
 
 	public CarSimulatorApp() throws JAXBException {
@@ -133,7 +133,7 @@ public class CarSimulatorApp {
         LOGGER.info("Reading routes from {}", pathToRoutes);
         LongStream.range(0, cars).forEach(c -> {
         	try {
-	        	UUID id = UUID.randomUUID();
+	        	String id = UUID.randomUUID().toString();
 		    	Route route = getRouteSelectionStrategy().selectRoute();
 		    	EngineMetrics engineMetrics = new EngineMetrics(registry, id, route.getName());
 		    	TimedEngine engine = TimedEngine.builder().withSpeedVariationInKmH(5).withStartingPoint(route.getPoints().findFirst().orElse(null))
@@ -141,9 +141,9 @@ public class CarSimulatorApp {
 		    	Car car = Car.builder().withModel("M3 Coupe").withManufacturer("BMW")
 						.withEngine(engine)
 						.withDriverId(id)
-						.withVin(id.toString())
+						.withVin(id)
 						.build();
-				otaConsumer.registerOTAListener(id.toString(), car);
+				otaConsumer.registerOTAListener(id, car);
 		    	engine.registerEventListener(e -> carMetricsPublisher.publish(CarMetricsEvent.create(car, e.getEngineData())));
 				zoneChangeConsumer.registerZoneChangeListener(onZoneChange(id));
 				TimedDrivingStrategy strategy = TimedDrivingStrategy.builder()
@@ -212,9 +212,9 @@ public class CarSimulatorApp {
 		
 	}
 
-	private ZoneChangeListener onZoneChange(UUID driverId) {
+	private ZoneChangeListener onZoneChange(String driverId) {
 		return evt -> {
-			if (driverId.toString().equals(evt.getCarId())) {
+			if (driverId.equals(evt.getCarId())) {
 				retrieveZoneData(evt.getNextZoneId());
 			}
 		};
