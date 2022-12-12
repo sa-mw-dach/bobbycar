@@ -26,4 +26,10 @@ if [[ "$DELETE_CRD" == true ]]; then
   oc delete crd bobbycarzones.bobbycar.redhat.com || true
 fi;
 
+if [[ "$DELETE_CRD" == true && "$DROGUE_IOT" == true ]]; then
+  log "Deleting Custom Resource Definition Keycloak"
+  oc delete -f config/keycloakrealmimports.k8s.keycloak.org-v1.yml || true
+  oc delete -f config/keycloaks.k8s.keycloak.org-v1.yml || true
+fi
+
 log "Uninstallation complete!!!"

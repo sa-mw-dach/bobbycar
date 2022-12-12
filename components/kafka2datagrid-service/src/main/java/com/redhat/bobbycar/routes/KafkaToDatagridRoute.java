@@ -5,12 +5,14 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.util.Base64;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -20,6 +22,7 @@ import java.util.stream.Stream;
 import javax.net.ssl.X509TrustManager;
 
 import org.apache.camel.Exchange;
+import org.apache.camel.LoggingLevel;
 import org.apache.camel.PropertyInject;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.infinispan.InfinispanConstants;
@@ -33,6 +36,8 @@ import org.apache.camel.support.jsse.FilterParameters;
 import org.apache.camel.support.jsse.SSLContextClientParameters;
 import org.apache.camel.support.jsse.SSLContextParameters;
 import org.apache.camel.support.jsse.TrustManagersParameters;
+import org.apache.camel.util.json.JsonObject;
+import org.apache.camel.util.json.Jsoner;
 import org.infinispan.client.hotrod.RemoteCache;
 import org.infinispan.client.hotrod.RemoteCacheManager;
 import org.infinispan.client.hotrod.configuration.ClientIntelligence;
@@ -78,6 +83,19 @@ public class KafkaToDatagridRoute extends RouteBuilder {
 	private String ocpAPIHost;
 	@PropertyInject(value = "com.redhat.bobbycar.camelk.dg.namespace")
 	private String namespace;
+
+	@PropertyInject(value = "com.redhat.bobbycar.camelk.drogue.endpoint")
+	private String drogueCommandEndpoint;
+
+	@PropertyInject(value = "com.redhat.bobbycar.camelk.drogue.user")
+	private String drogueCommandUser;
+
+	@PropertyInject(value = "com.redhat.bobbycar.camelk.drogue.token")
+	private String drogueCommandToken;
+
+	// This is also the trigger to enable Drogue IoT specific processing.
+	@PropertyInject(value = "com.redhat.bobbycar.camelk.drogue.application")
+	private String drogueApplication;
 
 	private RemoteCacheManager cacheManager;
 	private RemoteCache<String, String> zonesCache;
@@ -378,7 +396,11 @@ public class KafkaToDatagridRoute extends RouteBuilder {
 					priority, radius, type);
 		}
 	}
-	
+
+	boolean isDrogue() {
+		return !this.drogueApplication.isEmpty();
+	}
+
 	@Override
 	public void configure() throws Exception {
 		Configuration cacheConfig = createCacheConfig();
@@ -394,6 +416,9 @@ public class KafkaToDatagridRoute extends RouteBuilder {
 
 		storeZonesInCacheRoute();
 		storeCarEventsInCacheRoute();
+		if (isDrogue()) {
+			notifyZoneChangeEventRoute();
+		}
 		clearCacheEndpoint();
 
 		if (aggregationInterval > 0) {
@@ -413,10 +438,10 @@ public class KafkaToDatagridRoute extends RouteBuilder {
 	}
 
 	private void storeAggregatedSnaphotOfCarEventsInCacheRouteJson() {
-		from("kafka:{{com.redhat.bobbycar.camelk.kafka.topic}}?clientId=kafkaToDatagridAggregatorCamelClient&brokers={{com.redhat.bobbycar.camelk.kafka.brokers}}").routeId("storeAggregatedSnaphotOfCarEventsInCacheRouteJson")
-			//.unmarshal().json(JsonLibrary.Jackson, CarEvent.class)
-			.process(ex -> 
-				ex.getIn().setBody(mapper.readValue(ex.getIn().getBody(String.class), CarEvent.class))
+
+		from("direct:aggregateSnapshotOfCarEventsInCache")
+			.process(ex ->
+					ex.getIn().setBody(mapper.readValue(ex.getIn().getBody(String.class), CarEvent.class))
 			)
 			.aggregate(simple("true"), new GroupedBodyAggregationStrategy())
 			.completionInterval(aggregationInterval).id("myAggregator")
@@ -436,18 +461,26 @@ public class KafkaToDatagridRoute extends RouteBuilder {
 								LOGGER.error("Error writing json as string", e);
 								return null;
 							}
-					}).collect(Collectors.joining(",")) + "]");
+						}).collect(Collectors.joining(",")) + "]");
 			})
 			.log("Aggregated for the given interval: ${body}")
 			.setHeader(InfinispanConstants.OPERATION).constant(InfinispanOperation.PUT)
 			.setHeader(InfinispanConstants.KEY).expression(simple("aggregated"))
-		    .setHeader(InfinispanConstants.VALUE).expression(simple("${body}"))
+			.setHeader(InfinispanConstants.VALUE).expression(simple("${body}"))
 			.to("infinispan://{{com.redhat.bobbycar.camelk.dg.car.snapshot.cacheName}}?cacheContainerConfiguration=#cacheContainerConfiguration");
+
+		from("kafka:{{com.redhat.bobbycar.camelk.kafka.topic}}?clientId=kafkaToDatagridAggregatorCamelClient&brokers={{com.redhat.bobbycar.camelk.kafka.brokers}}").routeId("storeAggregatedSnaphotOfCarEventsInCacheRouteJson")
+			//.unmarshal().json(JsonLibrary.Jackson, CarEvent.class)
+			// FIXME: drogue
+			.process(KafkaToDatagridRoute::processCloudEvent)
+			.filter(simple("${header[ce_subject]} == 'car'"))
+				.to("direct:aggregateSnapshotOfCarEventsInCache");
+
 	}
 	
-	private void storeZonesInCacheRoute() throws IOException {
+	private void storeZonesInCacheRoute() throws Exception {
 		// restConfiguration().component("netty-http").host("https://"+ocpAPIHost).port(6443).bindingMode(RestBindingMode.json);
-		bindToRegistry("sslConfiguration", configureSslForApiAccess());
+		bindToRegistry("sslConfiguration", configureSslForApiAccess(ocpAPIHost));
 		String token = retrieveServiceAccountToken();
 		from("scheduler://foo?delay={{com.redhat.bobbycar.camelk.dg.refresh.interval}}").routeId("storeZonesInCache")
 			.process(ex -> {
@@ -478,38 +511,104 @@ public class KafkaToDatagridRoute extends RouteBuilder {
 		return new String(Files.readAllBytes(filePath));
 	}
 
+	/**
+	 * Process Cloud Events.
+	 * <p>
+	 * This is a very basic processing of Cloud Events. It simply normalizes the events on the binary encoding. We need to do this since:
+	 * a) Camel doesn't haven good support for Cloud Events so far and b) the sender may choose the format (binary, structured) and we need to
+	 * handle either of them.
+	 * <p>
+	 * So this method will normalize on the binary encoding, so that functionality following this call can always expect the same format.
+	 */
+	private static void processCloudEvent(Exchange ex) throws Exception {
+		var contentType = ex.getIn().getHeader("content-type", String.class);
+		if (contentType != null && contentType.startsWith("application/cloudevents+json")) {
+			// structured mode
+			var value = Jsoner.deserialize(ex.getIn(String.class));
+			if ( !(value instanceof JsonObject )) {
+				return;
+			}
+			var json = (JsonObject)value;
+
+			for (var entry : json.entrySet()) {
+				switch (entry.getKey()) {
+				case "datacontenttype":
+					ex.getIn().setHeader("content-type", entry.getValue());
+					break;
+				case "data":
+					ex.getIn().setBody(Jsoner.serialize(entry.getValue()));
+					break;
+				case "data_base64":
+					if(entry.getValue() != null) {
+						var data = Base64.getDecoder().decode(entry.getValue().toString());
+						ex.getIn().setBody(data);
+					}
+					break;
+				default:
+					ex.getIn().setHeader("ce_" + entry.getKey(), entry.getValue());
+					break;
+				}
+
+			}
+		} else {
+			// binary mode
+			// nothing to do
+		}
+	}
+
 	private void storeCarEventsInCacheRoute() {
 		// clear the cars cache before starting the route
 		carsCache.clear();
 
-		from("kafka:{{com.redhat.bobbycar.camelk.kafka.topic}}?clientId=kafkaToDatagridCamelClient&brokers={{com.redhat.bobbycar.camelk.kafka.brokers}}").routeId("storeCarEventsInCache")
-			.log("Received ${body} from Kafka")
+		from("direct:storeCarEvent")
 			.setHeader(InfinispanConstants.OPERATION).constant(InfinispanOperation.PUT)
 			.setHeader(InfinispanConstants.KEY).expression(jsonpath("$.carid"))
 			//.unmarshal().json(JsonLibrary.Jackson, CarEvent.class)
-			.process(ex -> 
-				ex.getIn().setBody(mapper.readValue(ex.getIn().getBody(String.class), CarEvent.class))
+			.process(ex ->
+					ex.getIn().setBody(mapper.readValue(ex.getIn().getBody(String.class), CarEvent.class))
 			)
 			.log("Received ${body} from  ${body.class}")
-		    .process(this::processZoneData)
-		    //.marshal().json(JsonLibrary.Jackson, String.class)
-		    .process(ex -> 
-				ex.getIn().setBody(mapper.writeValueAsString(ex.getIn().getBody(CarEvent.class)))
+			.process(this::processZoneData)
+			//.marshal().json(JsonLibrary.Jackson, String.class)
+			.process(ex ->
+					ex.getIn().setBody(mapper.writeValueAsString(ex.getIn().getBody(CarEvent.class)))
 			)
-		    .setHeader(InfinispanConstants.VALUE).expression(simple("${body}"))
-		    .setHeader(InfinispanConstants.RESULT_HEADER).expression(simple("dummyAvoidOverwritingBody"))
-		    .log("Saving data to cache with key: ${headers[CamelInfinispanKey]} and value: ${body} of type  ${body.class}")
+			.setHeader(InfinispanConstants.VALUE).expression(simple("${body}"))
+			.setHeader(InfinispanConstants.RESULT_HEADER).expression(simple("dummyAvoidOverwritingBody"))
+			.log("Saving data to cache with key: ${headers[CamelInfinispanKey]} and value: ${body} of type  ${body.class}")
 			.to("infinispan://{{com.redhat.bobbycar.camelk.dg.car.cacheName}}?cacheContainerConfiguration=#cacheContainerConfiguration")
 			.choice()
-				.when(header(ZONE_CHANGE_HEADER).isEqualTo(true))
-				.process(this::transformToZoneChangeEvent)
-				//.marshal().json(JsonLibrary.Jackson, String.class)
-				.process(ex -> 
+			.when(header(ZONE_CHANGE_HEADER).isEqualTo(true))
+			.process(this::transformToZoneChangeEvent)
+			//.marshal().json(JsonLibrary.Jackson, String.class)
+			.process(ex ->
 					ex.getIn().setBody(mapper.writeValueAsString(ex.getIn().getBody(ZoneChangeEvent.class)))
-				)
-				.log("Publishing ${body} to mqtt")
-				.to("paho:{{com.redhat.bobbycar.camelk.mqtt.topic}}?brokerUrl={{com.redhat.bobbycar.camelk.mqtt.brokerUrl}}")
-			;
+			)
+			.log("Publishing zone change ${body} to kafka")
+			.to("direct:deliverZoneChange");
+
+		if (isDrogue()) {
+			from("kafka:{{com.redhat.bobbycar.camelk.kafka.topic}}?clientId=kafkaToDatagridCamelClient&brokers={{com.redhat.bobbycar.camelk.kafka.brokers}}").routeId("storeCarEventsInCache")
+					.log(LoggingLevel.DEBUG, "Received ${body} from Kafka")
+					.process(KafkaToDatagridRoute::processCloudEvent)
+					.log(LoggingLevel.DEBUG, "Post CE processing: ${body}")
+					.filter(simple("${header[ce_subject]} == 'car'"))
+					.to("direct:storeCarEvent")
+					.end(); // ce_type == 'car'
+
+			from("direct:deliverZoneChange")
+					.log("Publishing zone change ${body} to kafka")
+					.to("kafka:{{com.redhat.bobbycar.camelk.kafka.topicZoneChange}}?brokers={{com.redhat.bobbycar.camelk.kafka.brokers}}");
+
+		} else {
+			from("kafka:{{com.redhat.bobbycar.camelk.kafka.topic}}?clientId=kafkaToDatagridCamelClient&brokers={{com.redhat.bobbycar.camelk.kafka.brokers}}").routeId("storeCarEventsInCache")
+					.to("direct:storeCarEvent");
+
+			from("direct:deliverZoneChange")
+					.log("Publishing ${body} to mqtt")
+					.to("paho:{{com.redhat.bobbycar.camelk.mqtt.topic}}?brokerUrl={{com.redhat.bobbycar.camelk.mqtt.brokerUrl}}");
+		}
+
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -520,6 +619,22 @@ public class KafkaToDatagridRoute extends RouteBuilder {
 		String vin = (String) ex.getIn().getHeader(VIN_HEADER);
 		ex.getIn().setBody(new ZoneChangeEvent(previousZone.map(z -> z.getMetadata().getName()).orElse(null), 
 				nextZone.map(z -> z.getMetadata().getName()).orElse(null), carId, vin));
+	}
+
+	private void notifyZoneChangeEventRoute() throws Exception {
+		bindToRegistry("sslConfiguration", configureSslForApiAccess(this.drogueCommandEndpoint));
+		var basicAuth = Base64.getEncoder().encodeToString(String.format("%s:%s", drogueCommandUser, drogueCommandToken).getBytes(StandardCharsets.UTF_8));
+		log.info("Sending zone change event to device");
+		from("kafka:{{com.redhat.bobbycar.camelk.kafka.topicZoneChange}}?brokers={{com.redhat.bobbycar.camelk.kafka.brokers}}")
+				.removeHeaders("*", "carid")
+				.setHeader("Authorization").constant("Basic " + basicAuth)
+				.setHeader(Exchange.HTTP_METHOD, constant("POST"))
+				.setHeader(Exchange.CONTENT_TYPE, constant("application/json"))
+				.toD("netty-http:" + drogueCommandEndpoint
+						+ "/api/command/v1alpha1/apps/"
+						+ this.drogueApplication
+						+ "/devices/${header.carid}?command=zonechange&sslContextParameters=#sslConfiguration")
+				.end();
 	}
 
 	private void processZoneData(Exchange ex) {
@@ -593,11 +708,11 @@ public class KafkaToDatagridRoute extends RouteBuilder {
         .build();
 	}
 	
-	private SSLContextParameters configureSslForApiAccess() {
+	private SSLContextParameters configureSslForApiAccess(String host) {
 		SSLContextParameters params = new SSLContextParameters();
 		params.setCamelContext(getContext());
 		SSLContextClientParameters clientParameters = new SSLContextClientParameters();
-		clientParameters.setSniHostName(ocpAPIHost);
+		clientParameters.setSniHostName(host);
 		FilterParameters cipherSuitesFilter = new FilterParameters();
 		cipherSuitesFilter.getInclude().add(".*");
 		clientParameters.setCipherSuitesFilter(cipherSuitesFilter);

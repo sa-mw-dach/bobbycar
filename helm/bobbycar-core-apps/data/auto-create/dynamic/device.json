@@ -1,0 +1,13 @@
+{
+  "metadata": {
+    "application": {{ .Values.drogue.application | quote }},
+    "name": {{ .device | quote }}
+  },
+  "spec": {
+    "gatewaySelector": {
+      "matchNames": [
+        {{ .Values.drogue.gateway.name | quote }}
+      ]
+    }
+  }
+}

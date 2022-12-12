@@ -9,9 +9,26 @@ spec:
     - type: secret
       value: kafka2datagrid
   profile: OpenShift
+  dependencies:
+    - camel:netty-http
   sources:
     - content: {{ .Files.Get "data/java/KafkaToDatagridRoute.java" | quote }}
       name: KafkaToDatagridRoute.java
+  template:
+    spec:
+      containers:
+        - name: integration
+          env:
+            - name: DROGUE_USER
+              valueFrom:
+                secretKeyRef:
+                  name: drogue-iot-commands
+                  key: user
+            - name: DROGUE_ACCESS_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: drogue-iot-commands
+                  key: token
   traits:
     service:
       configuration:
