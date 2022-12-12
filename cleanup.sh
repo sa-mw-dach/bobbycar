@@ -8,6 +8,7 @@ log() {
 }
 
 source install_cleanup_vars.sh
+test -f .env && source .env
 
 log "Uninstalling Helm app release: $HELM_APP_RELEASE_NAME"
 # shellcheck disable=SC2015

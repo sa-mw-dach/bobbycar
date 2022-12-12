@@ -45,6 +45,7 @@ wait_for_operator() {
 }
 
 source install_cleanup_vars.sh
+test -f .env && source .env
 
 if [[ "$INSTALL_OPERATORS" == true ]]; then
 log "Creating namespace $NAMESPACE for Bobbycar demo"
