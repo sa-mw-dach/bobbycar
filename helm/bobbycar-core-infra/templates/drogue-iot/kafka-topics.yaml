@@ -1,0 +1,26 @@
+{{- if .Values.drogueIoT -}}
+---
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: iot-commands
+  labels:
+    strimzi.io/cluster: bobbycar-cluster
+spec:
+  config: {}
+  partitions: 3
+  replicas: 1
+  topicName: iot-commands
+---
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: registry
+  labels:
+    strimzi.io/cluster: bobbycar-cluster
+spec:
+  config: {}
+  partitions: 3
+  replicas: 1
+  topicName: registry
+{{- end }}

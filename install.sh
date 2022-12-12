@@ -95,8 +95,10 @@ helm upgrade --install "$HELM_INFRA_RELEASE_NAME" helm/bobbycar-core-infra/ \
 
 #sleep 30
 
+if [[ "$DROGUE_IOT" != true ]]; then
 log "Waiting for AMQ Broker pod"
 oc wait --for=condition=Ready pod/bobbycar-amq-mqtt-ss-0 --timeout 300s
+fi
 log "Waiting for Datagrid pod"
 oc wait --for=condition=Ready pod/bobbycar-dg-0 --timeout 300s
 log "Waiting for Kafka Broker pod"
