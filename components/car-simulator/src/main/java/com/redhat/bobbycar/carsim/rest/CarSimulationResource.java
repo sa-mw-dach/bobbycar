@@ -39,7 +39,7 @@ public class CarSimulationResource {
 	@Path("/{id}/route")
 	@Produces(MediaType.SERVER_SENT_EVENTS)
 	@SseElementType(MediaType.APPLICATION_JSON)
-	public Multi<CarEventDto> getRoute(@PathParam("id") UUID id) {
+	public Multi<CarEventDto> getRoute(@PathParam("id") String id) {
 		return Multi.createFrom().emitter(em -> 
 			driverDao.getById(id).ifPresent(d -> d.registerCarEventListener(evt -> em.emit(new CarEventDto(evt))))
 		);

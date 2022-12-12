@@ -31,18 +31,18 @@ public class CarResource {
     }
 
     @GET
-    @Path("/{uuid}")
+    @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getByUUID(@PathParam("uuid") UUID uuid) {
-        Optional<Car> car = carDao.getById(uuid);
+    public Response getByID(@PathParam("id") String id) {
+        Optional<Car> car = carDao.getById(id);
         return Response.ok(car).build();
     }
 
     @POST
-    @Path("/{uuid}/vin/{vin}")
+    @Path("/{id}/vin/{vin}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response assignVin(@PathParam("uuid") UUID uuid, @PathParam("vin") String vin) {
-        Optional<Car> car = carDao.getById(uuid);
+    public Response assignVin(@PathParam("id") String id, @PathParam("vin") String vin) {
+        Optional<Car> car = carDao.getById(id);
         car.ifPresent(c -> {
             c.assignVin(vin);
         });
