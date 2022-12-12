@@ -1,0 +1,13 @@
+{
+  "metadata": {
+    "application": {{ .Values.drogue.application | quote }},
+    "name": {{ .Values.drogue.gateway.name | quote }}
+  },
+  "spec": {
+    "authentication": {
+      "credentials": [
+        { "pass": {{ .Values.drogue.gateway.password | quote }} }
+      ]
+    }
+  }
+}

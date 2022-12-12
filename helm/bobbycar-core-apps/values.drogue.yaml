@@ -1,0 +1,11 @@
+# Add on values file when using the Drogue IoT option
+
+drogue:
+  application: bobbycar
+  endpoints:
+    mqtt:
+      # host: <override mqtt endpoint host>
+      port: 1883
+  gateway:
+    name: car-gw
+    password: car123456

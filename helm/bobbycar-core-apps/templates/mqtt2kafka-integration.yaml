@@ -1,3 +1,4 @@
+{{ if not .Values.drogueIoT }}
 apiVersion: camel.apache.org/v1
 kind: Integration
 metadata:
@@ -14,3 +15,4 @@ spec:
     service:
       configuration:
         enabled: false
+{{ end }}
