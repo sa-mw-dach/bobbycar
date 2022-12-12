@@ -8,7 +8,7 @@ spec:
       value: mqtt2kafka
   profile: OpenShift
   sources:
-    - content: {{`"package com.redhat.bobbycar.routes;\n\nimport java.nio.charset.Charset;\nimport java.util.stream.Collectors;\n\nimport org.apache.camel.PropertyInject;\nimport org.apache.camel.builder.RouteBuilder;\nimport org.apache.camel.component.kafka.KafkaConstants;\n\npublic class MqttToKafka extends RouteBuilder {\n\t\n\t@Override\n\tpublic void configure() throws Exception {\n\n\t\tfrom(\"paho:{{com.redhat.bobbycar.camelk.mqtt.topic}}?brokerUrl={{com.redhat.bobbycar.camelk.mqtt.brokerUrl}}\")\n\t\t\t.log(\"Publishing engine metric ${body} to Kafka\")\n\t\t\t.setHeader(KafkaConstants.KEY).expression(jsonpath(\"$.driverId\"))\n\t\t\t.setHeader(\"content-type\").expression(constant(\"application/json\"))\n\t\t\t//.log(\"Publishing engine metric ${headers} to Kafka\")\n\t\t.to(\"kafka:{{com.redhat.bobbycar.camelk.kafka.topic}}?clientId=mqtt2kafkaClientEM&brokers={{com.redhat.bobbycar.camelk.kafka.brokers}}\");\n\n\t\tfrom(\"paho:{{com.redhat.bobbycar.camelk.mqtt.topicZoneChange}}?brokerUrl={{com.redhat.bobbycar.camelk.mqtt.brokerUrl}}\")\n\t\t\t.log(\"Publishing zone change ${body} to Kafka\")\n\t\t\t.setHeader(\"content-type\").expression(constant(\"application/json\"))\n\t\t.to(\"kafka:{{com.redhat.bobbycar.camelk.kafka.topicZoneChange}}?clientId=mqtt2kafkaClientZC&brokers={{com.redhat.bobbycar.camelk.kafka.brokers}}\");\n\t\n\t}\t\n\t\n}\n"`}}
+    - content: {{ .Files.Get "data/java/MqttToKafka.java" | quote }}
       name: MqttToKafka.java
   traits:
     service:
