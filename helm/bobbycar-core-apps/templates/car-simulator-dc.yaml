@@ -35,7 +35,8 @@ spec:
             defaultMode: 420
       containers:
       - name: {{ .Values.carSimulator.name }}
-        image: quay.io/bobbycar/car-simulator:1.1.1
+        # FIXME: revert before merge
+        image: quay.io/ctron/car-simulator:latest
         imagePullPolicy: Always
         volumeMounts:
             - name: config
