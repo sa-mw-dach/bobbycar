@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -622,7 +623,8 @@ public class KafkaToDatagridRoute extends RouteBuilder {
 	}
 
 	private void notifyZoneChangeEventRoute() throws Exception {
-		bindToRegistry("sslConfiguration", configureSslForApiAccess(this.drogueCommandEndpoint));
+		URL url = new URL(this.drogueCommandEndpoint);
+		bindToRegistry("sslConfiguration", configureSslForApiAccess(url.getHost()));
 		var basicAuth = Base64.getEncoder().encodeToString(String.format("%s:%s", drogueCommandUser, drogueCommandToken).getBytes(StandardCharsets.UTF_8));
 		log.info("Sending zone change event to device");
 		from("kafka:{{com.redhat.bobbycar.camelk.kafka.topicZoneChange}}?brokers={{com.redhat.bobbycar.camelk.kafka.brokers}}")

@@ -14,6 +14,7 @@ spec:
   sources:
     - content: {{ .Files.Get "data/java/KafkaToDatagridRoute.java" | quote }}
       name: KafkaToDatagridRoute.java
+{{ if .Values.drogueIoT }}
   template:
     spec:
       containers:
@@ -29,6 +30,7 @@ spec:
                 secretKeyRef:
                   name: drogue-iot-commands
                   key: token
+{{ end }}
   traits:
     service:
       configuration:
