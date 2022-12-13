@@ -3,6 +3,8 @@ apiVersion: apps/v1
 metadata:
   name: dashboard-streaming
   namespace: {{ .Values.namespace }}
+  annotations:
+    checksum/config: {{ include (print $.Template.BasePath "/dashboard-streaming-config.yaml") . | sha256sum }}
   labels:
     app.kubernetes.io/part-of: {{ .Values.appName }}
     app: dashboard-streaming
