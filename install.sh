@@ -47,11 +47,6 @@ wait_for_operator() {
 source install_cleanup_vars.sh
 test -f .env && source .env
 
-if [[ "$DROGUE_IOT" == true ]]; then
-  log "Install KeycloakX CRDs"
-  oc apply -f config/crds
-fi
-
 if [[ "$INSTALL_OPERATORS" == true ]]; then
 log "Creating namespace $NAMESPACE for Bobbycar demo"
 oc new-project "$NAMESPACE" || true
