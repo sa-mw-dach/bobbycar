@@ -9,6 +9,7 @@ import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.MoreObjects;
 import com.redhat.bobbycar.carsim.CarEvent;
 import com.redhat.bobbycar.carsim.CarEventListener;
 import com.redhat.bobbycar.carsim.routes.Route;
@@ -155,6 +156,20 @@ public class Driver implements Runnable{
 		public Driver build() {
 			return new Driver(this);
 		}
+	}
+
+	@Override
+	public String toString() {
+		return MoreObjects.toStringHelper(this)
+				.add("lastPoint", lastPoint)
+				.add("drivingStrategy", drivingStrategy)
+				.add("id", id)
+				.add("routeName", routeName)
+				.add("repeat", repeat)
+				.add("startDelay", startDelay)
+				.add("start", start)
+				.add("end", end)
+				.toString();
 	}
 
 }

@@ -3,6 +3,8 @@ appName: Bobbycar
 ocpDomain:
 ocpApi:
 
+drogueIoT: false
+
 mqtt:
   topic:
     mqttZoneChangeTopic: bobbycar/zonechange

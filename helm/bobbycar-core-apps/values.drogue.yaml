@@ -1,5 +1,11 @@
 # Add on values file when using the Drogue IoT option
 
+drogueIoT: true
+
+kafka:
+  topic:
+    drogueEvents: events-bobbycar
+
 drogue:
   application: bobbycar
   endpoints:
@@ -7,5 +13,4 @@ drogue:
       # host: <override mqtt endpoint host>
       port: 1883
   gateway:
-    name: car-gw
     password: car123456

@@ -42,7 +42,7 @@ maintainers:
 
 dependencies:
   - name: drogue-cloud-core
-    version: 0.7.3
+    version: 0.7.4
     alias: drogueCloudCore
     condition: drogueIoT
     repository: https://drogue-iot.github.io/drogue-cloud-helm-charts/
