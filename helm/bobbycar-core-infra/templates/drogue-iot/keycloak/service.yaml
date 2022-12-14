@@ -1,0 +1,19 @@
+{{ if .Values.drogueIoT }}
+kind: Service
+apiVersion: v1
+metadata:
+  name: sso-service
+  labels:
+    app.kubernetes.io/component: bobbycar
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/name: sso-service
+spec:
+  ports:
+    - port: 8080
+      protocol: TCP
+      targetPort: 8080
+  selector:
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/name: sso
+  type: ClusterIP
+{{ end }}

@@ -73,6 +73,10 @@ drogueCloudCore:
     topicOperator:
       type: admin
 
+  keycloak:
+    deployment:
+      enabled: false
+
   kafka:
     external:
       enabled: true

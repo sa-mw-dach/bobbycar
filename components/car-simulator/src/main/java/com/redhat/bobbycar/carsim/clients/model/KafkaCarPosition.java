@@ -32,6 +32,17 @@ public class KafkaCarPosition {
 		this.carId = carId;
 		this.vin = vin;
 	}
+
+	public KafkaCarPosition(double latitude, double longitude, double elevation, String carId, long time, String vin) {
+		super();
+		this.latitude = latitude;
+		this.longitude = longitude;
+		this.elevation = elevation;
+		this.eventTime = time;
+		this.carId = carId;
+		this.vin = vin;
+	}
+
 	public double getLatitude() {
 		return latitude;
 	}

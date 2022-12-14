@@ -42,11 +42,18 @@ RUN microdnf install curl ca-certificates ${JAVA_PACKAGE} \
 
 # Configure the JAVA_OPTIONS, you can add -XshowSettings:vm to also display the heap size.
 ENV JAVA_OPTIONS="-Dquarkus.http.host=0.0.0.0 -Djava.util.logging.manager=org.jboss.logmanager.LogManager"
+
 # We make four distinct layers so if there are application changes the library layers can be re-used
-COPY --chown=1001 target/quarkus-app/lib/ /deployments/lib/
-COPY --chown=1001 target/quarkus-app/*.jar /deployments/
-COPY --chown=1001 target/quarkus-app/app/ /deployments/app/
-COPY --chown=1001 target/quarkus-app/quarkus/ /deployments/quarkus/
+# As we must use different build profiles, we also have different applications. Still, we want to have a single
+# container.
+COPY --chown=185 target/direct-quarkus-app/lib/ /deployments/direct/lib/
+COPY --chown=185 target/drogue-quarkus-app/lib/ /deployments/drogue/lib/
+COPY --chown=185 target/direct-quarkus-app/*.jar /deployments/direct/
+COPY --chown=185 target/drogue-quarkus-app/*.jar /deployments/drogue/
+COPY --chown=185 target/direct-quarkus-app/app/ /deployments/direct/app/
+COPY --chown=185 target/drogue-quarkus-app/app/ /deployments/drogue/app/
+COPY --chown=185 target/direct-quarkus-app/quarkus/ /deployments/direct/quarkus/
+COPY --chown=185 target/drogue-quarkus-app/quarkus/ /deployments/drogue/quarkus/
 
 EXPOSE 8080
 USER 1001

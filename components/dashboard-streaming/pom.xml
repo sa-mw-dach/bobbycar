@@ -14,7 +14,7 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <quarkus.platform.artifact-id>quarkus-bom</quarkus.platform.artifact-id>
     <quarkus.platform.group-id>io.quarkus.platform</quarkus.platform.group-id>
-    <quarkus.platform.version>2.6.3.Final</quarkus.platform.version>
+    <quarkus.platform.version>2.13.1.Final</quarkus.platform.version>
     <surefire-plugin.version>3.0.0-M5</surefire-plugin.version>
   </properties>
   <dependencyManagement>
@@ -49,6 +49,18 @@
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-openshift</artifactId>
     </dependency>
+
+    <dependency>
+      <groupId>io.cloudevents</groupId>
+      <artifactId>cloudevents-kafka</artifactId>
+      <version>2.4.0</version>
+    </dependency>
+    <dependency>
+      <groupId>io.cloudevents</groupId>
+      <artifactId>cloudevents-json-jackson</artifactId>
+      <version>2.4.0</version>
+    </dependency>
+
     <dependency>
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-junit5</artifactId>
@@ -69,11 +81,34 @@
         <extensions>true</extensions>
         <executions>
           <execution>
+            <id>drogue</id>
             <goals>
               <goal>build</goal>
               <goal>generate-code</goal>
               <goal>generate-code-tests</goal>
             </goals>
+            <configuration>
+              <properties>
+                <quarkus.profile>drogue</quarkus.profile>
+                <quarkus.config.profile.parent>prod</quarkus.config.profile.parent>
+                <quarkus.package.output-directory>drogue-quarkus-app</quarkus.package.output-directory>
+              </properties>
+            </configuration>
+          </execution>
+          <execution>
+            <id>direct</id>
+            <goals>
+              <goal>build</goal>
+              <goal>generate-code</goal>
+              <goal>generate-code-tests</goal>
+            </goals>
+            <configuration>
+              <properties>
+                <quarkus.profile>direct</quarkus.profile>
+                <quarkus.config.profile.parent>prod</quarkus.config.profile.parent>
+                <quarkus.package.output-directory>direct-quarkus-app</quarkus.package.output-directory>
+              </properties>
+            </configuration>
           </execution>
         </executions>
       </plugin>

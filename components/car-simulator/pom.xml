@@ -14,7 +14,7 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <quarkus.platform.artifact-id>quarkus-bom</quarkus.platform.artifact-id>
     <quarkus.platform.group-id>io.quarkus.platform</quarkus.platform.group-id>
-    <quarkus.platform.version>2.12.3.Final</quarkus.platform.version>
+    <quarkus.platform.version>2.14.3.Final</quarkus.platform.version>
     <surefire-plugin.version>3.0.0-M7</surefire-plugin.version>
   </properties>
   <dependencyManagement>
@@ -31,11 +31,12 @@
   <dependencies>
     <dependency>
       <groupId>io.quarkus</groupId>
-      <artifactId>quarkus-resteasy</artifactId>
+      <artifactId>quarkus-junit5</artifactId>
+      <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>io.quarkus</groupId>
-      <artifactId>quarkus-junit5</artifactId>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-params</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -45,11 +46,7 @@
     </dependency>
     <dependency>
       <groupId>io.quarkus</groupId>
-      <artifactId>quarkus-rest-client</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>io.quarkus</groupId>
-      <artifactId>quarkus-resteasy-mutiny</artifactId>
+      <artifactId>quarkus-rest-client-reactive-jackson</artifactId>
     </dependency>
     <dependency>
       <groupId>io.quarkus</groupId>
@@ -61,11 +58,19 @@
     </dependency>
     <dependency>
       <groupId>io.quarkus</groupId>
-      <artifactId>quarkus-resteasy-jaxb</artifactId>
+      <artifactId>quarkus-resteasy-reactive</artifactId>
     </dependency>
     <dependency>
       <groupId>io.quarkus</groupId>
-      <artifactId>quarkus-resteasy-jsonb</artifactId>
+      <artifactId>quarkus-resteasy-reactive-jsonb</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-oidc-client-reactive-filter</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-jaxb</artifactId>
     </dependency>
     <dependency>
       <groupId>io.quarkus</groupId>
@@ -86,6 +91,16 @@
 	  <version>2.0.3</version>
 	  <scope>test</scope>
 	</dependency>
+    <dependency>
+      <groupId>io.cloudevents</groupId>
+      <artifactId>cloudevents-kafka</artifactId>
+      <version>2.4.0</version>
+    </dependency>
+    <dependency>
+      <groupId>io.cloudevents</groupId>
+      <artifactId>cloudevents-json-jackson</artifactId>
+      <version>2.4.0</version>
+    </dependency>
 	<dependency>
 	    <groupId>com.github.tomakehurst</groupId>
 	    <artifactId>wiremock</artifactId>
@@ -138,11 +153,34 @@
         <version>${quarkus.platform.version}</version>
         <executions>
           <execution>
+            <id>drogue</id>
             <goals>
               <goal>build</goal>
               <goal>generate-code</goal>
               <goal>generate-code-tests</goal>
             </goals>
+            <configuration>
+              <properties>
+                <quarkus.profile>drogue</quarkus.profile>
+                <quarkus.config.profile.parent>prod</quarkus.config.profile.parent>
+                <quarkus.package.output-directory>drogue-quarkus-app</quarkus.package.output-directory>
+              </properties>
+            </configuration>
+          </execution>
+          <execution>
+            <id>direct</id>
+            <goals>
+              <goal>build</goal>
+              <goal>generate-code</goal>
+              <goal>generate-code-tests</goal>
+            </goals>
+            <configuration>
+              <properties>
+                <quarkus.profile>direct</quarkus.profile>
+                <quarkus.config.profile.parent>prod</quarkus.config.profile.parent>
+                <quarkus.package.output-directory>direct-quarkus-app</quarkus.package.output-directory>
+              </properties>
+            </configuration>
           </execution>
         </executions>
       </plugin>
