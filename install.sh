@@ -56,6 +56,7 @@ if [[ "$DROGUE_IOT" != true ]]; then
   log "Installing the AMQ Broker operator"
   sed "s:{{NAMESPACE}}:$NAMESPACE:g" config/operators/amq-operator-subscription.yaml | oc apply -f -
 fi
+# FIXME: take back in before merging
 #log "Installing the AMQ Streams operator"
 #sed "s:{{NAMESPACE}}:$NAMESPACE:g" config/operators/amq-streams-operator-subscription.yaml | oc apply -f -
 log "Installing the Datagrid operator"
@@ -68,6 +69,7 @@ sed "s:{{NAMESPACE}}:$NAMESPACE:g" config/operators/camel-k-operator-subscriptio
 if [[ "$DROGUE_IOT" != true ]]; then
   wait_for_operator "AMQ Broker" amq-broker-rhel8
 fi
+# FIXME: take back in before merging
 #wait_for_operator "AMQ Streams" amq-streams
 wait_for_operator "Datagrid" datagrid
 wait_for_operator "Camel-K" red-hat-camel-k
