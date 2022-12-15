@@ -1,6 +1,6 @@
 dependencies:
 - name: drogue-cloud-core
   repository: https://drogue-iot.github.io/drogue-cloud-helm-charts/
-  version: 0.7.4
-digest: sha256:787815dcdae0bcd16cdb1096344acb8107185ae604f11c2446369fda6971a467
-generated: "2022-12-12T17:38:26.46800787+01:00"
+  version: 0.7.10
+digest: sha256:bf7db955d07d66d579babd83a841b77ccb4b41e7a5bb3196a41f6287f461ba3b
+generated: "2022-12-15T11:09:21.209948289+01:00"

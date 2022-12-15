@@ -8,11 +8,12 @@ import org.eclipse.microprofile.reactive.messaging.Incoming;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.redhat.bobbycar.carsim.cloud.Commands;
+import com.redhat.bobbycar.carsim.InternalChannels;
 import com.redhat.bobbycar.carsim.cloud.drogue.DeviceCommand;
 import com.redhat.bobbycar.carsim.consumer.model.ZoneChangeEvent;
 import com.redhat.bobbycar.carsim.consumer.model.ZoneChangePayload;
 
+import io.smallrye.common.annotation.Blocking;
 import io.vertx.core.impl.ConcurrentHashSet;
 
 @ApplicationScoped
@@ -25,10 +26,11 @@ public class ZoneChangeConsumer {
 		LOGGER.info("Listening for zonechange events");
 	}
 
-	@Incoming(Commands.CHANNEL_ZONECHANGE)
-	public void consume(DeviceCommand<ZoneChangePayload> command) {
+	@Incoming(InternalChannels.ZONECHANGE)
+	@Blocking
+	public void consume(ZoneChangeEvent event) {
 		LOGGER.info("ZoneChange");
-		notifyZoneChangeListeners(new ZoneChangeEvent(command.getDevice(), command.getPayload()));
+		notifyZoneChangeListeners(event);
 	}
 
 	private void notifyZoneChangeListeners(ZoneChangeEvent event) {

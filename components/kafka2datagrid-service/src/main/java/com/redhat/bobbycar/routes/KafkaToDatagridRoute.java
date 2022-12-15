@@ -55,7 +55,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class KafkaToDatagridRoute extends RouteBuilder {
-	
+
 	private static final String ZONE_CHANGE_HEADER = "zoneChange";
 	private static final String ZONE_PREV_HEADER = "previousZone";
 	private static final String ZONE_NXT_HEADER = "nextZone";
@@ -65,15 +65,15 @@ public class KafkaToDatagridRoute extends RouteBuilder {
 	private static final String PATH_TO_SERVICE_CA = "/var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt";
 	private static final Logger LOGGER = LoggerFactory.getLogger(KafkaToDatagridRoute.class);
 	@PropertyInject("com.redhat.bobbycar.camelk.dg.host")
-    private String datagridHost;
+	private String datagridHost;
 	@PropertyInject(value = "com.redhat.bobbycar.camelk.dg.user", defaultValue = "developer")
-    private String datagridUsername;
+	private String datagridUsername;
 	@PropertyInject("com.redhat.bobbycar.camelk.dg.password")
-    private String datagridPassword;
+	private String datagridPassword;
 	@PropertyInject(value = "com.redhat.bobbycar.camelk.dg.aggregationInterval", defaultValue = "60000")
 	private long aggregationInterval;
 	@PropertyInject(value = "com.redhat.bobbycar.camelk.dg.aggregationDistinct", defaultValue = "true")
-    private boolean aggregationDistinct;
+	private boolean aggregationDistinct;
 	@PropertyInject(value = "com.redhat.bobbycar.camelk.dg.car.cacheName")
 	private String carsCacheName;
 	@PropertyInject(value = "com.redhat.bobbycar.camelk.dg.car.snapshot.cacheName")
@@ -101,15 +101,15 @@ public class KafkaToDatagridRoute extends RouteBuilder {
 	private RemoteCacheManager cacheManager;
 	private RemoteCache<String, String> zonesCache;
 	private RemoteCache<String, String> carsCache;
-	private RemoteCache<String, String> carsnapshotsCache; 
+	private RemoteCache<String, String> carsnapshotsCache;
 	private ObjectMapper mapper = new ObjectMapper();
-	
+
 	public static class ZoneChangeEvent {
 		private final String previousZoneId;
 		private final String nextZoneId;
 		private final String carId;
 		private final String vin;
-		
+
 		public ZoneChangeEvent(String previousZoneId, String nextZoneId, String carId, String vin) {
 			super();
 			this.previousZoneId = previousZoneId;
@@ -130,7 +130,7 @@ public class KafkaToDatagridRoute extends RouteBuilder {
 			return vin;
 		}
 	}
-	
+
 	public static class CarEvent implements Comparable<CarEvent>{
 		@JsonProperty("lat")
 		private double latitude;
@@ -144,7 +144,7 @@ public class KafkaToDatagridRoute extends RouteBuilder {
 		private String vin;
 		private long eventTime;
 		private Zone zone;
-		
+
 		public double getLatitude() {
 			return latitude;
 		}
@@ -216,7 +216,7 @@ public class KafkaToDatagridRoute extends RouteBuilder {
 					latitude, longitude, elevation, carId, eventTime, zone, vin);
 		}
 	}
-	
+
 	public static class Position {
 		private double lat;
 		private double lng;
@@ -233,7 +233,7 @@ public class KafkaToDatagridRoute extends RouteBuilder {
 			this.lng = lng;
 		}
 	}
-	
+
 	@JsonIgnoreProperties(ignoreUnknown = true)
 	public static class Metadata {
 		private String name;
@@ -270,7 +270,7 @@ public class KafkaToDatagridRoute extends RouteBuilder {
 			return String.format("Metadata [name=%s, resourceVersion=%s]", name, resourceVersion);
 		}
 	}
-	
+
 	@JsonIgnoreProperties(ignoreUnknown = true)
 	public static class Zone implements Comparable<Zone>{
 		private Metadata metadata;
@@ -287,17 +287,17 @@ public class KafkaToDatagridRoute extends RouteBuilder {
 		public void setSpec(ZoneSpec spec) {
 			this.spec = spec;
 		}
-		
+
 		public boolean isInside(double longitude, double latitude) {
 			return distanceTo(longitude, latitude) <= spec.getRadius();
 		}
-		
+
 		private double distanceTo(double longitude, double latitude) {
 			double lat1 = spec.getPosition().getLat();
 			double lon1 = spec.getPosition().getLng();
 			double lat2 = latitude;
-			double lon2 = longitude;			
-			
+			double lon2 = longitude;
+
 			int R = 6371000; // metres
 			double phi1 = lat1 * Math.PI/180; // φ, λ in radians
 			double phi2 = lat2 * Math.PI/180;
@@ -305,12 +305,12 @@ public class KafkaToDatagridRoute extends RouteBuilder {
 			double deltaLambda = (lon2-lon1) * Math.PI/180;
 
 			double a = Math.sin(deltaPhi/2) * Math.sin(deltaPhi/2) +
-			          Math.cos(phi1) * Math.cos(phi2) *
-			          Math.sin(deltaLambda/2) * Math.sin(deltaLambda/2);
+					Math.cos(phi1) * Math.cos(phi2) *
+							Math.sin(deltaLambda/2) * Math.sin(deltaLambda/2);
 			double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
 
 			return R * c; // in metres
-			
+
 		}
 		@Override
 		public int compareTo(Zone o) {
@@ -336,7 +336,7 @@ public class KafkaToDatagridRoute extends RouteBuilder {
 			return String.format("Zone [metadata=%s, spec=%s]", metadata, spec);
 		}
 	}
-	
+
 	@JsonIgnoreProperties(ignoreUnknown = true)
 	public static class ZoneSpec {
 		private String name;
@@ -344,7 +344,7 @@ public class KafkaToDatagridRoute extends RouteBuilder {
 		private int priority;
 		private int radius;
 		private String type;
-		
+
 		public String getName() {
 			return name;
 		}
@@ -478,7 +478,7 @@ public class KafkaToDatagridRoute extends RouteBuilder {
 				.to("direct:aggregateSnapshotOfCarEventsInCache");
 
 	}
-	
+
 	private void storeZonesInCacheRoute() throws Exception {
 		// restConfiguration().component("netty-http").host("https://"+ocpAPIHost).port(6443).bindingMode(RestBindingMode.json);
 		bindToRegistry("sslConfiguration", configureSslForApiAccess(ocpAPIHost));
@@ -588,9 +588,11 @@ public class KafkaToDatagridRoute extends RouteBuilder {
 			.log("Publishing zone change ${body} to kafka")
 			.to("direct:deliverZoneChange");
 
+		var from = from("kafka:{{com.redhat.bobbycar.camelk.kafka.topic}}?clientId=kafkaToDatagridCamelClient&brokers={{com.redhat.bobbycar.camelk.kafka.brokers}}").routeId("storeCarEventsInCache")
+				.log(LoggingLevel.DEBUG, "Received ${body} from Kafka");
+
 		if (isDrogue()) {
-			from("kafka:{{com.redhat.bobbycar.camelk.kafka.topic}}?clientId=kafkaToDatagridCamelClient&brokers={{com.redhat.bobbycar.camelk.kafka.brokers}}").routeId("storeCarEventsInCache")
-					.log(LoggingLevel.DEBUG, "Received ${body} from Kafka")
+			from
 					.process(KafkaToDatagridRoute::processCloudEvent)
 					.log(LoggingLevel.DEBUG, "Post CE processing: ${body}")
 					.filter(simple("${header[ce_subject]} == 'car'"))
@@ -602,7 +604,7 @@ public class KafkaToDatagridRoute extends RouteBuilder {
 					.to("kafka:{{com.redhat.bobbycar.camelk.kafka.topicZoneChange}}?brokers={{com.redhat.bobbycar.camelk.kafka.brokers}}");
 
 		} else {
-			from("kafka:{{com.redhat.bobbycar.camelk.kafka.topic}}?clientId=kafkaToDatagridCamelClient&brokers={{com.redhat.bobbycar.camelk.kafka.brokers}}").routeId("storeCarEventsInCache")
+			from
 					.to("direct:storeCarEvent");
 
 			from("direct:deliverZoneChange")
@@ -611,14 +613,14 @@ public class KafkaToDatagridRoute extends RouteBuilder {
 		}
 
 	}
-	
+
 	@SuppressWarnings("unchecked")
-	private void transformToZoneChangeEvent(Exchange ex) {	
+	private void transformToZoneChangeEvent(Exchange ex) {
 		Optional<Zone> previousZone = (Optional<Zone>) ex.getIn().getHeader(ZONE_PREV_HEADER);
 		Optional<Zone> nextZone = (Optional<Zone>) ex.getIn().getHeader(ZONE_NXT_HEADER);
 		String carId = (String) ex.getIn().getHeader(CAR_ID_HEADER);
 		String vin = (String) ex.getIn().getHeader(VIN_HEADER);
-		ex.getIn().setBody(new ZoneChangeEvent(previousZone.map(z -> z.getMetadata().getName()).orElse(null), 
+		ex.getIn().setBody(new ZoneChangeEvent(previousZone.map(z -> z.getMetadata().getName()).orElse(null),
 				nextZone.map(z -> z.getMetadata().getName()).orElse(null), carId, vin));
 	}
 
@@ -627,7 +629,7 @@ public class KafkaToDatagridRoute extends RouteBuilder {
 		bindToRegistry("sslConfiguration", configureSslForApiAccess(url.getHost()));
 		var basicAuth = Base64.getEncoder().encodeToString(String.format("%s:%s", drogueCommandUser, drogueCommandToken).getBytes(StandardCharsets.UTF_8));
 		log.info("Sending zone change event to device");
-		from("kafka:{{com.redhat.bobbycar.camelk.kafka.topicZoneChange}}?brokers={{com.redhat.bobbycar.camelk.kafka.brokers}}")
+		from("kafka:{{com.redhat.bobbycar.camelk.kafka.topicZoneChange}}?brokers={{com.redhat.bobbycar.camelk.kafka.brokers}}&groupId=commandConsumer")
 				.removeHeaders("*", "carid")
 				.setHeader("Authorization").constant("Basic " + basicAuth)
 				.setHeader(Exchange.HTTP_METHOD, constant("POST"))
@@ -666,7 +668,7 @@ public class KafkaToDatagridRoute extends RouteBuilder {
 		}
 		car.setZone(matchingZone.orElse(null));
 	}
-	
+
 	private Optional<Zone> getPreviousZoneFromCache(String carId) {
 		try {
 			if (carsCache.containsKey(carId)) {
@@ -689,27 +691,27 @@ public class KafkaToDatagridRoute extends RouteBuilder {
 		carsCache = cacheManager.administration().getOrCreateCache(carsCacheName, CACHE_TEMPLATE);
 		carsnapshotsCache = cacheManager.administration().getOrCreateCache(carsnapshotCacheName, CACHE_TEMPLATE);
 	}
-	
+
 	private Configuration createCacheConfig() {
 		ConfigurationBuilder hotRodBuilder = new ConfigurationBuilder();
 		return hotRodBuilder.addServer()
-	        .host(datagridHost).port(11222)
-	        	.marshaller(new StringMarshaller(Charset.defaultCharset()))
-	        .clientIntelligence(ClientIntelligence.HASH_DISTRIBUTION_AWARE)
-	        	.security()
-	        		//.authentication().enable()
-	        		//.username(datagridUsername)
-	        		//.password(datagridPassword)
-	        		//.serverName("infinispan")
-	        		//.saslQop(SaslQop.AUTH)
-	        		//.saslMechanism("DIGEST-MD5")
+				.host(datagridHost).port(11222)
+				.marshaller(new StringMarshaller(Charset.defaultCharset()))
+				.clientIntelligence(ClientIntelligence.HASH_DISTRIBUTION_AWARE)
+				.security()
+				//.authentication().enable()
+				//.username(datagridUsername)
+				//.password(datagridPassword)
+				//.serverName("infinispan")
+				//.saslQop(SaslQop.AUTH)
+				//.saslMechanism("DIGEST-MD5")
 				.ssl()
-					.sniHostName(datagridHost)
-					.trustStoreFileName(PATH_TO_SERVICE_CA)
-					.trustStoreType("pem")
-        .build();
+				.sniHostName(datagridHost)
+				.trustStoreFileName(PATH_TO_SERVICE_CA)
+				.trustStoreType("pem")
+				.build();
 	}
-	
+
 	private SSLContextParameters configureSslForApiAccess(String host) {
 		SSLContextParameters params = new SSLContextParameters();
 		params.setCamelContext(getContext());
@@ -721,7 +723,7 @@ public class KafkaToDatagridRoute extends RouteBuilder {
 		params.setClientParameters(clientParameters);
 		TrustManagersParameters trustManagers = new TrustManagersParameters();
 		trustManagers.setTrustManager(new X509TrustManager() {
-			
+
 			private X509Certificate apiServerCert;
 			{
 				CertificateFactory fact;
@@ -733,18 +735,18 @@ public class KafkaToDatagridRoute extends RouteBuilder {
 					LOGGER.error("Error loading certificate", e);
 				}
 			}
-			
+
 			@Override
 			public X509Certificate[] getAcceptedIssuers() {
 				// Allow all certs
 				return new X509Certificate[0];
 			}
-			
+
 			@Override
 			public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
 				// Allow all certs
 			}
-			
+
 			@Override
 			public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
 				// Allow all certs
@@ -753,7 +755,7 @@ public class KafkaToDatagridRoute extends RouteBuilder {
 		params.setTrustManagers(trustManagers);
 		return params;
 	}
-	
+
 	@Override
 	public OnCompletionDefinition onCompletion() {
 		cacheManager.close();

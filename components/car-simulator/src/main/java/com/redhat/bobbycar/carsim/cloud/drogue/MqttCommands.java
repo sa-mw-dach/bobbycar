@@ -15,11 +15,12 @@ import org.eclipse.microprofile.reactive.messaging.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.redhat.bobbycar.carsim.InternalChannels;
 import com.redhat.bobbycar.carsim.Profiles;
 import com.redhat.bobbycar.carsim.cloud.Commands;
+import com.redhat.bobbycar.carsim.consumer.model.ZoneChangeEvent;
 import com.redhat.bobbycar.carsim.consumer.model.ZoneChangePayload;
 
-import io.quarkus.arc.lookup.LookupIfProperty;
 import io.quarkus.arc.profile.IfBuildProfile;
 import io.quarkus.runtime.Startup;
 import io.smallrye.reactive.messaging.mqtt.MqttMessage;
@@ -34,11 +35,11 @@ public class MqttCommands implements Commands {
     private final Jsonb json = JsonbBuilder.create();
 
     @Inject
-    @Channel(CHANNEL_ZONECHANGE)
-    Emitter<DeviceCommand<ZoneChangePayload>> zonechange;
+    @Channel(InternalChannels.ZONECHANGE)
+    Emitter<ZoneChangeEvent> zonechange;
 
     @Inject
-    @Channel(CHANNEL_OTA_UPDATE)
+    @Channel(InternalChannels.OTA_UPDATE)
     Emitter<DeviceCommand<String>> ota;
 
     @Incoming("drogue-commands")
@@ -71,7 +72,8 @@ public class MqttCommands implements Commands {
             var commandPayload = this.json.fromJson(
                     new ByteArrayInputStream(payload), ZoneChangePayload.class
             );
-            return this.zonechange.send(new DeviceCommand<>(meta.getDevice(), commandPayload));
+            var event = new ZoneChangeEvent(meta.getDevice(), commandPayload);
+            return this.zonechange.send(event);
         case "ota":
             return this.ota.send(new DeviceCommand<>(meta.getDevice(), new String(payload)));
         default:

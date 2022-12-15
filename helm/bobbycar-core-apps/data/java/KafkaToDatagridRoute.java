@@ -588,9 +588,11 @@ public class KafkaToDatagridRoute extends RouteBuilder {
 				.log("Publishing zone change ${body} to kafka")
 				.to("direct:deliverZoneChange");
 
+		var from = from("kafka:{{com.redhat.bobbycar.camelk.kafka.topic}}?clientId=kafkaToDatagridCamelClient&brokers={{com.redhat.bobbycar.camelk.kafka.brokers}}").routeId("storeCarEventsInCache")
+				.log(LoggingLevel.DEBUG, "Received ${body} from Kafka");
+
 		if (isDrogue()) {
-			from("kafka:{{com.redhat.bobbycar.camelk.kafka.topic}}?clientId=kafkaToDatagridCamelClient&brokers={{com.redhat.bobbycar.camelk.kafka.brokers}}").routeId("storeCarEventsInCache")
-					.log(LoggingLevel.DEBUG, "Received ${body} from Kafka")
+			from
 					.process(KafkaToDatagridRoute::processCloudEvent)
 					.log(LoggingLevel.DEBUG, "Post CE processing: ${body}")
 					.filter(simple("${header[ce_subject]} == 'car'"))
@@ -602,7 +604,7 @@ public class KafkaToDatagridRoute extends RouteBuilder {
 					.to("kafka:{{com.redhat.bobbycar.camelk.kafka.topicZoneChange}}?brokers={{com.redhat.bobbycar.camelk.kafka.brokers}}");
 
 		} else {
-			from("kafka:{{com.redhat.bobbycar.camelk.kafka.topic}}?clientId=kafkaToDatagridCamelClient&brokers={{com.redhat.bobbycar.camelk.kafka.brokers}}").routeId("storeCarEventsInCache")
+			from
 					.to("direct:storeCarEvent");
 
 			from("direct:deliverZoneChange")
@@ -627,7 +629,7 @@ public class KafkaToDatagridRoute extends RouteBuilder {
 		bindToRegistry("sslConfiguration", configureSslForApiAccess(url.getHost()));
 		var basicAuth = Base64.getEncoder().encodeToString(String.format("%s:%s", drogueCommandUser, drogueCommandToken).getBytes(StandardCharsets.UTF_8));
 		log.info("Sending zone change event to device");
-		from("kafka:{{com.redhat.bobbycar.camelk.kafka.topicZoneChange}}?brokers={{com.redhat.bobbycar.camelk.kafka.brokers}}")
+		from("kafka:{{com.redhat.bobbycar.camelk.kafka.topicZoneChange}}?brokers={{com.redhat.bobbycar.camelk.kafka.brokers}}&groupId=commandConsumer")
 				.removeHeaders("*", "carid")
 				.setHeader("Authorization").constant("Basic " + basicAuth)
 				.setHeader(Exchange.HTTP_METHOD, constant("POST"))
