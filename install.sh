@@ -101,7 +101,7 @@ oc wait --for=condition=Ready pod/bobbycar-dg-0 --timeout 300s
 log "Waiting for Kafka Broker pod"
 oc wait --for=condition=Ready pod/bobbycar-cluster-kafka-0 --timeout 300s
 log "Waiting for Kafka Bridge pod"
-oc wait --for=condition=Available deployment/bobbycar-bridge --timeout 300s
+[[ "$DROGUE_IOT" != true ]] && oc wait --for=condition=Available deployment/bobbycar-bridge --timeout 300s
 
 log "Installing the apps Helm release: $HELM_APP_RELEASE_NAME"
 APPS_OPTS=("-f" "helm/bobbycar-core-apps/values.yaml")
