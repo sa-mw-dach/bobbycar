@@ -44,7 +44,7 @@ public class DirectCommands {
         return zoneChangeEvent;
     }
 
-    @Incoming("ota-update")
+    @Incoming("ota-updates")
     @Outgoing(InternalChannels.OTA_UPDATE)
     public DeviceCommand<String> consume(MqttMessage<String> message) {
         LOGGER.debug("Consuming MQTT over-the-air update event");
