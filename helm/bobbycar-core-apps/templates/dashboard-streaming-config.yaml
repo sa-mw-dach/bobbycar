@@ -13,8 +13,10 @@ data:
   mp.messaging.incoming.drogue-events.cloud-events: 'false'
   quarkus.reactive-messaging.kafka.serializer-generation.enabled: 'false'
 {{ else }}
+  mp.messaging.incoming.bobbycar-gps.connector: smallrye-kafka
   mp.messaging.incoming.bobbycar-gps.broadcast: 'true'
   mp.messaging.incoming.bobbycar-gps.topic: {{ .Values.kafka.topic.gps }}
+  mp.messaging.incoming.bobbycar-metrics.connector: smallrye-kafka
   mp.messaging.incoming.bobbycar-metrics.broadcast: 'true'
   mp.messaging.incoming.bobbycar-metrics.topic: {{ .Values.kafka.topic.metrics }}
 {{ end }}
