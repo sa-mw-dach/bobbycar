@@ -4,17 +4,24 @@ import java.time.ZonedDateTime;
 
 import javax.json.bind.annotation.JsonbProperty;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class KafkaCarPosition {
 	
 	@JsonbProperty("lat")
+	@JsonProperty("lat")
 	private double latitude;
 	@JsonbProperty("long")
+	@JsonProperty("long")
 	private double longitude;
 	@JsonbProperty("elev")
+	@JsonProperty("elev")
 	private double elevation;
 	@JsonbProperty("carid")
+	@JsonProperty("carid")
 	private String carId;
 	@JsonbProperty("vin")
+	@JsonProperty("vin")
 	private String vin;
 	
 	private long eventTime;
