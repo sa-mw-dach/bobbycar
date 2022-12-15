@@ -58,5 +58,7 @@ COPY --chown=185 target/drogue-quarkus-app/quarkus/ /deployments/drogue/quarkus/
 EXPOSE 8080
 USER 1001
 
+ENV JAVA_APP_JAR="/deployments/direct/quarkus-run.jar"
+
 ENTRYPOINT [ "/deployments/run-java.sh" ]
 
