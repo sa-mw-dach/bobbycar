@@ -30,8 +30,10 @@ spec:
             - containerPort: 8080
               protocol: TCP
           env:
+{{ if .Values.drogueIoT }}
             - name: JAVA_APP_JAR
               value: /deployments/drogue/quarkus-run.jar
+{{ end }}
           envFrom:
             - configMapRef:
                 name: dashboard-streaming-config
