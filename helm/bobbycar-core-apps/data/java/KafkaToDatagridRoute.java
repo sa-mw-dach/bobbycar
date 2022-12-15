@@ -94,9 +94,11 @@ public class KafkaToDatagridRoute extends RouteBuilder {
 	@PropertyInject(value = "com.redhat.bobbycar.camelk.drogue.token")
 	private String drogueCommandToken;
 
-	// This is also the trigger to enable Drogue IoT specific processing.
 	@PropertyInject(value = "com.redhat.bobbycar.camelk.drogue.application")
 	private String drogueApplication;
+
+	@PropertyInject(value = "com.redhat.bobbycar.camelk.mode", defaultValue = "direct")
+	private String applicationMode;
 
 	private RemoteCacheManager cacheManager;
 	private RemoteCache<String, String> zonesCache;
@@ -399,7 +401,7 @@ public class KafkaToDatagridRoute extends RouteBuilder {
 	}
 
 	boolean isDrogue() {
-		return !this.drogueApplication.isEmpty();
+		return "drogue".equals(this.applicationMode);
 	}
 
 	@Override
