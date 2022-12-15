@@ -76,6 +76,11 @@ drogueCloudCore:
   keycloak:
     deployment:
       enabled: false
+    postInstall:
+      resourceOwnerPasswordFlow: true
+    clients:
+      direct:
+        clientSecret: "7OspbWaVYXo5CpfctEKpDQzLFq5HWLXS"
 
   kafka:
     external:

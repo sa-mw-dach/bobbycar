@@ -11,7 +11,7 @@ import java.util.concurrent.CompletionStage;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.stream.Collectors;
 
-import com.redhat.bobbycar.carsim.cloud.Commands;
+import com.redhat.bobbycar.carsim.InternalChannels;
 import com.redhat.bobbycar.carsim.cloud.drogue.DeviceCommand;
 
 @ApplicationScoped
@@ -24,7 +24,7 @@ public class OTAConsumer {
         LOGGER.info("Creating OTAConsumer. Listening for over-the-air update events");
     }
 
-    @Incoming(Commands.CHANNEL_OTA_UPDATE)
+    @Incoming(InternalChannels.OTA_UPDATE)
     public CompletionStage<Void> consume(Message<DeviceCommand<String>> message) {
         LOGGER.debug("Consuming MQTT over-the-air update event");
 

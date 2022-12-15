@@ -4,6 +4,8 @@ metadata:
   name: kafka2datagrid
   labels:
     app.kubernetes.io/part-of: {{ .Values.appName }}
+  annotations:
+    checksum/config: {{ include (print $.Template.BasePath "/kafka2datagrid-secret.yaml") . | sha256sum }}
 spec:
   configuration:
     - type: secret
@@ -35,3 +37,7 @@ spec:
     service:
       configuration:
         enabled: false
+    owner:
+      configuration:
+        transfer-annotation:
+          - "checksum/config"
