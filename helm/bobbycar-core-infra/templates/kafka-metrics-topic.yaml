@@ -1,3 +1,4 @@
+{{ if not .Values.drogueIoT }}
 apiVersion: kafka.strimzi.io/v1beta2
 kind: KafkaTopic
 metadata:
@@ -11,4 +12,4 @@ spec:
   config:
     retention.ms: {{ .Values.kafka.topic.metrics.retention }}
     segment.bytes: 1073741824
- 
+{{ end }}
