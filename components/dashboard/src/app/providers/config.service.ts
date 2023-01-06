@@ -22,6 +22,8 @@ export class ConfigService {
     OTA_SERVER_ENDPOINT;
     ROAD_CLASSIFICATION_ENDPOINT;
     INITIAL_MAP_POSITION;
+    OCP_API_SERVER;
+    OCP_TOKEN;
 
     constructor(public http: HttpClient) {}
 
@@ -47,6 +49,8 @@ export class ConfigService {
         this.OTA_SERVER_ENDPOINT = data.OTA_SERVER_ENDPOINT;
         this.ROAD_CLASSIFICATION_ENDPOINT = data.ROAD_CLASSIFICATION_ENDPOINT;
         this.INITIAL_MAP_POSITION = data.INITIAL_MAP_POSITION;
+        this.OCP_API_SERVER = data.OCP_API_SERVER;
+        this.OCP_TOKEN = data.OCP_TOKEN;
     }
 
 }
