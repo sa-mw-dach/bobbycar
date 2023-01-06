@@ -1,0 +1,42 @@
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaMirrorMaker2
+metadata:
+  name: bobbycar-mm2-cluster
+  namespace: bobbycar
+spec:
+  mirrors:
+    - checkpointConnector:
+        config:
+          checkpoints.topic.replication.factor: 1
+      heartbeatConnector:
+        config:
+          heartbeats.topic.replication.factor: 1
+      sourceConnector:
+        config:
+          replication.factor: 1
+          offset-syncs.topic.replication.factor: 1
+          sync.topic.acls.enabled: 'false'
+      sourceCluster: bobbycar-cluster-source
+      targetCluster: bobbycar-managed-cluster-target
+      topicsPattern: .*
+      groupsPattern: .*
+  clusters:
+    - alias: bobbycar-cluster-source
+      bootstrapServers: 'bobbycar-cluster-kafka-bootstrap.bobbycar.svc.cluster.local:9092'
+    - alias: bobbycar-managed-cluster-target
+      config:
+        config.storage.replication.factor: 1
+        offset.storage.replication.factor: 1
+        status.storage.replication.factor: 1
+      authentication:
+        passwordSecret:
+          password: client-secret
+          secretName: bobbycar-mm2
+        type: plain
+        username: 'b9c53bc2-a033-43fb-9c2e-7de94538401c'
+      bootstrapServers: 'bobbycar-c-ceqlngh-ghn--ramvf-g.bf2.kafka.rhcloud.com:443'
+      tls:
+        trustedCertificates: []
+  version: 3.2.3
+  replicas: 1
+  connectCluster: bobbycar-managed-cluster-target
