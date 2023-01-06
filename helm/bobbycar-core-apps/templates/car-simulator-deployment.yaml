@@ -1,31 +1,25 @@
-apiVersion: apps.openshift.io/v1
-kind: DeploymentConfig
+apiVersion: apps/v1
+kind: Deployment
 metadata:
   labels:
     app: {{ .Values.carSimulator.name }}
     app.kubernetes.io/part-of: {{ .Values.appName }}
   name: {{ .Values.carSimulator.name }}
+  namespace: {{ .Values.namespace }}
 spec:
   replicas: {{ .Values.carSimulator.replicas }}
-  revisionHistoryLimit: 10
   selector:
-    deploymentConfig: {{ .Values.carSimulator.name }}
+    matchLabels:
+      app: {{ .Values.carSimulator.name }}
   strategy:
-    activeDeadlineSeconds: 21600
-    resources: {}
-    type: Rolling
-    rollingParams:
-      updatePeriodSeconds: 1
-      intervalSeconds: 1
-      timeoutSeconds: 600
+    type: RollingUpdate
+    rollingUpdate:
       maxUnavailable: 25%
       maxSurge: 25%
   template:
     metadata:
-      creationTimestamp: null
       labels:
         app: {{ .Values.carSimulator.name }}
-        deploymentConfig: {{ .Values.carSimulator.name }}
       name: {{ .Values.carSimulator.name }}
     spec:
       volumes:
@@ -99,6 +93,3 @@ spec:
       schedulerName: default-scheduler
       securityContext: {}
       terminationGracePeriodSeconds: 30
-  test: false
-  triggers:
-    - type: ConfigChange
