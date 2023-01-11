@@ -34,13 +34,24 @@
     </div>
   </div>
 
-  <div style="" class="infotainment" [ngClass]="{'it-s': carBg === 'S', 'it-vw': carBg === 'VW', 'it-bmw': carBg === 'BMW', 'it-skoda': carBg === 'SK'}">
-    <div style="background-color: #CC0000; color:#fff;">Red Hat In-Vehicle OS<br/> Version: 9.54.123</div>
-    <span *ngIf="!showDriverMonitoring"><object data="https://www.youtube.com/embed/oKnZvNF3FB4?autoplay=0&mute=1&controls=0&loop=1" width="100%" height="90%" style="border-radius: 5px;">
-    </object></span>
+  <div class="infotainment" [ngClass]="{'it-s': carBg === 'S', 'it-vw': carBg === 'VW', 'it-bmw': carBg === 'BMW', 'it-skoda': carBg === 'SK'}">
+
+    <div style="background-color: #fff; color:#000; text-align: center; padding: 10px;">
+      <img style="" src="assets/rh-logo.png" alt="" width="70px"/><br/>
+      <b>Red Hat In-Vehicle Operating System</b><br/>
+      <span style="font-size: 11px; text-align: right;">
+        v5.19.8-300 - aarch64
+      </span>
+    </div>
+
+    <span *ngIf="!showDriverMonitoring">
+      <object data="https://www.youtube.com/embed/oKnZvNF3FB4?autoplay=0&mute=1&controls=0&loop=1" width="100%" height="90%">
+      </object>
+    </span>
     <span *ngIf="showDriverMonitoring">
       <app-vjs-player [options]="{ fluid: true, autoplay: true, controls: true}"></app-vjs-player>
     </span>
+
     <div>
       <ion-button  (click)="toggleHUD()" color="danger">
         <ion-icon name="navigate"></ion-icon>
@@ -58,10 +69,8 @@
       <ion-button (click)="getWeatherData()" color="danger">
         <ion-icon name="cloud"></ion-icon>
       </ion-button>
-      <ion-button (click)="scheduleMaintenance()" color="danger">
-        <ion-icon name="calendar"></ion-icon>
-      </ion-button>
     </div>
+
   </div>
 
   <div [ngClass]="{'image-box-s': carBg === 'S', 'image-box-vw': carBg === 'VW', 'image-box-bmw': carBg === 'BMW', 'image-box-skoda': carBg === 'SK'}">
