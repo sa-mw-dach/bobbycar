@@ -1,28 +1,60 @@
 <ion-header>
   <ion-toolbar>
-    <ion-buttons slot="start">
-      <ion-menu-button></ion-menu-button>
-    </ion-buttons>
     <ion-title>
       Red Hat Connected Vehicle Architecture - Dashboard
     </ion-title>
   </ion-toolbar>
+  <ion-toolbar>
+    <ion-button (click)="toggleArchitecture()" small fill="outline" color="primary">
+      <ion-icon name="code"></ion-icon>&nbsp;
+      Architecture Diagram
+    </ion-button>
+    <ion-button fill="outline" href="{{ ocpConsole }}" target="_blank" small color="danger">
+      <ion-icon name="cube"></ion-icon>&nbsp;
+      OpenShift Console
+    </ion-button>
+    <ion-button fill="outline" href="https://console.redhat.com/application-services/streams/kafkas" target="_blank" small color="danger">
+      <img style="" src="assets/rh-logo.png" alt="" width="30px"/>&nbsp;
+      Hybrid Cloud Console
+    </ion-button>
+    <ion-button fill="outline" href="https://github.com/sa-mw-dach/bobbycar" target="_blank" small color="dark">
+      <ion-icon name="logo-github"></ion-icon>&nbsp;
+    </ion-button>
+  </ion-toolbar>
 </ion-header>
 
-<ion-content color="light">
-    <ion-card class="welcome-card">
-      <img src="./assets/cv.jpg" alt=""/>
+<ion-content color="" style="background-color: #efefef;">
+
+    <ion-card class="welcome-card" *ngIf="!showArch">
       <ion-card-header>
-        <ion-card-subtitle>Get Started with Red Hat Hybrid Cloud!</ion-card-subtitle>
         <ion-card-title style="font-size: 36px; color: #CC0000;">Welcome to the Red Hat Connected Vehicle Architecture</ion-card-title>
       </ion-card-header>
       <ion-card-content>
-        <p style="font-size: 20px;">Bobbycar is a Red Hat solution pattern for simulating connected vehicles traveling through configuration zones.
+        <p style="font-size: 20px;  color: #fff;">
+          <img src="./assets/cv.jpg" alt="" width=""/>
+          <br/>
+          Bobbycar is a Red Hat solution pattern for simulating connected vehicles traveling through configuration zones.
           <br/>This architecture can serve as a foundation for automotive hybrid cloud and OTA deployments.
           <br/>Each time a simulated vehicle enters a new zone, it receives configuration and service information via an OTA update.</p>
       </ion-card-content>
     </ion-card>
-    
+
+    <ion-card class="welcome-card" *ngIf="showArch">
+      <ion-card-header>
+        <ion-card-title style="font-size: 36px; color: #CC0000;">High Level Architecture</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <p style="font-size: 20px; color: #fff;">
+          This solution pattern aims to showcase an end-to-end workflow,
+          from connecting vehicles and in-vehicle platform components to the cloud backend,
+          processing telemetry data in batch or as stream,
+          training AI/ML models and deploying containers through a DevSecOps pipeline and by leveraging GitOps to the edge.
+          <br/><br/>
+          <img src="./assets/bc-arch.svg" alt="" width="100%"/>
+        </p>
+      </ion-card-content>
+    </ion-card>
+
     <!--
     <ion-list lines="none">
       <ion-list-header>
