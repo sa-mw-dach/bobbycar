@@ -76,12 +76,20 @@ export class CarDetailPage implements OnInit {
                 zoom: 13,
                 disableDefaultUI: true,
                 mapTypeControl: false,
+                mapTypeId: 'terrain'
             });
+
+            const icon = {
+                // BMW: https://assets.stickpng.com/images/580b57fcd9996e24bc43c46e.png
+                url: "https://cdn1.iconfinder.com/data/icons/cars-5/512/mercedes-pointer-point-car-auto-poi-map-place-geo-512.png", // url
+                scaledSize: new google.maps.Size(40, 40), // scaled size
+            };
 
             this.marker = new google.maps.Marker({
                 position: new google.maps.LatLng(this.initialPosition),
                 title: 'Car Detail',
                 map: this.map,
+                icon: icon,
                 draggable: false
             });
 

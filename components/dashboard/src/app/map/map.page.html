@@ -65,10 +65,10 @@
       </ion-list-header>
       <ion-item>
         <span style="width: 400px; font-weight: bold; color: #CC0000;">VIN</span>
-        <span style="width: 100px; font-weight: bold; color: #CC0000;">Speed</span>
-        <span style="width: 100px; font-weight: bold; color: #CC0000;">RPM</span>
-        <span style="width: 100px; font-weight: bold; color: #CC0000;">CO2</span>
-        <span style="width: 100px; font-weight: bold; color: #CC0000;">Fuel</span>
+        <span style="width: 100px; font-weight: bold; color: #CC0000;">Speed<br/>(km/h)</span>
+        <span style="width: 100px; font-weight: bold; color: #CC0000;">RPM<br/>(rpm)</span>
+        <span style="width: 100px; font-weight: bold; color: #CC0000;">CO<sub>2</sub><br/>(g/km)</span>
+        <span style="width: 100px; font-weight: bold; color: #CC0000;">Fuel<br/>(l/100km)</span>
       </ion-item>
       <div *ngFor="let mapEntry of metricsAggregated | keyvalue">
         <ion-item>
@@ -87,14 +87,14 @@
     </ion-list-header>
     <ion-item>
       <span style="width: 400px; font-weight: bold; color: #CC0000;">VIN</span>
-      <span style="width: 100px; font-weight: bold; color: #CC0000;">Speed</span>
-      <span style="width: 100px; font-weight: bold; color: #CC0000;">RPM</span>
-      <span style="width: 100px; font-weight: bold; color: #CC0000;">CO2</span>
-      <span style="width: 100px; font-weight: bold; color: #CC0000;">Fuel</span>
+      <span style="width: 100px; font-weight: bold; color: #CC0000;">Speed<br/>(km/h)</span>
+      <span style="width: 100px; font-weight: bold; color: #CC0000;">RPM<br/>(rpm)</span>
+      <span style="width: 100px; font-weight: bold; color: #CC0000;">CO<sub>2</sub><br/>(g/km)</span>
+      <span style="width: 100px; font-weight: bold; color: #CC0000;">Fuel<br/>(l/100km)</span>
     </ion-item>
     <div *ngFor="let mapEntry of speedAlerts | keyvalue">
       <ion-item>
-        <span style="width: 400px;"><ion-button color="danger">{{mapEntry.value.vin}}</ion-button></span>
+        <span style="width: 400px;"><ion-button color="danger" href="/car-detail/"+{{mapEntry.value.vin}}>{{mapEntry.value.vin}}</ion-button></span>
         <span style="width: 100px;">{{mapEntry.value.speedAvg}}</span>
         <span style="width: 100px;">{{mapEntry.value.rpmAvg}}</span>
         <span style="width: 100px;">{{mapEntry.value.co2Avg}}</span>

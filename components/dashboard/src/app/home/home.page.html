@@ -5,19 +5,19 @@
     </ion-title>
   </ion-toolbar>
   <ion-toolbar>
-    <ion-button (click)="toggleArchitecture()" small fill="outline" color="primary">
+    <ion-button (click)="toggleArchitecture()"  fill="outline" color="primary">
       <ion-icon name="code"></ion-icon>&nbsp;
       Architecture Diagram
     </ion-button>
-    <ion-button fill="outline" href="{{ ocpConsole }}" target="_blank" small color="danger">
+    <ion-button fill="outline" href="{{ ocpConsole }}" target="_blank"  color="danger">
       <ion-icon name="cube"></ion-icon>&nbsp;
       OpenShift Console
     </ion-button>
-    <ion-button fill="outline" href="https://console.redhat.com/application-services/streams/kafkas" target="_blank" small color="danger">
+    <ion-button fill="outline" href="https://console.redhat.com/application-services/streams/kafkas" target="_blank"  color="danger">
       <img style="" src="assets/rh-logo.png" alt="" width="30px"/>&nbsp;
       Hybrid Cloud Console
     </ion-button>
-    <ion-button fill="outline" href="https://github.com/sa-mw-dach/bobbycar" target="_blank" small color="dark">
+    <ion-button fill="outline" href="https://github.com/sa-mw-dach/bobbycar" target="_blank"  color="dark">
       <ion-icon name="logo-github"></ion-icon>&nbsp;
     </ion-button>
   </ion-toolbar>
@@ -55,27 +55,115 @@
       </ion-card-content>
     </ion-card>
 
-    <!--
-    <ion-list lines="none">
-      <ion-list-header>
-        <ion-label>Resources</ion-label>
-      </ion-list-header>
-      <ion-item href="https://ionicframework.com/docs/">
-        <ion-icon slot="start" color="medium" name="book"></ion-icon>
-        <ion-label>Ionic Documentation</ion-label>
-      </ion-item>
-      <ion-item href="https://ionicframework.com/docs/building/scaffolding">
-        <ion-icon slot="start" color="medium" name="build"></ion-icon>
-        <ion-label>Scaffold Out Your App</ion-label>
-      </ion-item>
-      <ion-item href="https://ionicframework.com/docs/layout/structure">
-        <ion-icon slot="start" color="medium" name="grid"></ion-icon>
-        <ion-label>Change Your App Layout</ion-label>
-      </ion-item>
-      <ion-item href="https://ionicframework.com/docs/theming/basics">
-        <ion-icon slot="start" color="medium" name="color-fill"></ion-icon>
-        <ion-label>Theme Your App</ion-label>
-      </ion-item>
-    </ion-list>
-    -->
+    <ion-grid>
+      <ion-row>
+        <ion-col>
+          <ion-card class="welcome-card">
+            <ion-card-header>
+              <ion-card-title style="font-size: 36px; color: #CC0000;">Volkswagen Group</ion-card-title>
+            </ion-card-header>
+            <ion-card-content>
+              <object data="https://www.youtube.com/embed/oKnZvNF3FB4?autoplay=0&mute=0&controls=1&loop=1" width="100%" height="300px">
+              </object>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+        <ion-col>
+          <ion-card class="welcome-card">
+            <ion-card-header>
+              <ion-card-title style="font-size: 36px; color: #CC0000;">Red Hat and General Motors</ion-card-title>
+            </ion-card-header>
+            <ion-card-content>
+              <object data="https://www.youtube.com/embed/T8HKts1BrKo?autoplay=0&mute=0&controls=1&loop=1" width="100%" height="300px">
+              </object>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col>
+          <ion-card class="welcome-card">
+            <ion-card-header>
+              <ion-card-title style="font-size: 36px; color: #CC0000;">Vision for Software Defined Vehicle</ion-card-title>
+            </ion-card-header>
+            <ion-card-content>
+              <object data="https://www.youtube.com/embed/etskDTfzA9g?autoplay=0&mute=0&controls=1&loop=1" width="100%" height="300px">
+              </object>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+        <ion-col>
+          <ion-card class="welcome-card">
+            <ion-card-header>
+              <ion-card-title style="font-size: 36px; color: #CC0000;">CentOS AutoSD + Autoware AD Kit</ion-card-title>
+            </ion-card-header>
+            <ion-card-content>
+              <object data="https://www.youtube.com/embed/2we4MAYd9x0?autoplay=0&mute=0&controls=1&loop=1" width="100%" height="300px">
+              </object>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col>
+          <ion-card class="welcome-card">
+            <ion-card-header>
+              <ion-card-title style="font-size: 36px; color: #CC0000;">Red Hat helps major German car manufacturer pave the way for the future of driving</ion-card-title>
+            </ion-card-header>
+            <ion-card-content>
+              <object data="https://www.youtube.com/embed/iMVqsirda_8?autoplay=0&mute=0&controls=1&loop=1" width="100%" height="300px">
+              </object>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+        <ion-col>
+          <ion-card class="welcome-card">
+            <ion-card-header>
+              <ion-card-title style="font-size: 36px; color: #CC0000;">BMW’s Self Driving Car And Red Hat Technologies</ion-card-title>
+            </ion-card-header>
+            <ion-card-content>
+              <object data="https://www.youtube.com/embed/6FFw7LmkKzM?autoplay=0&mute=0&controls=1&loop=1" width="100%" height="300px">
+              </object>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+
+    <ion-card class="welcome-card">
+      <ion-card-header>
+        <ion-card-title style="font-size: 36px; color: #CC0000;">Resources</ion-card-title>
+      </ion-card-header>
+      <ion-list lines="none">
+        <ion-item href="https://github.com/sa-mw-dach/bobbycar" target="_blank">
+          <ion-icon slot="start" color="medium" name="logo-github"></ion-icon>
+          <ion-label>Bobbycar - Upstream GitHub Repository</ion-label>
+        </ion-item>
+        <ion-item target="_blank" href="https://www.opensourcerers.org/2021/06/28/bobbycar-part-1-building-a-cloud-native-iot-architecture-with-modern-red-hat-technologies/">
+          <ion-icon slot="start" color="medium" name="book"></ion-icon>
+          <ion-label>Bobbycar - Building a cloud-native IoT Architecture</ion-label>
+        </ion-item>
+        <ion-item target="_blank" href="https://www.redhat.com/en/resources/excelfore-standardize-automotive-ota-updates-overview">
+          <ion-icon slot="start" color="medium" name="book"></ion-icon>
+          <ion-label>Excelfore and Red Hat standardize automotive OTA updates</ion-label>
+        </ion-item>
+        <ion-item target="_blank" href="https://www.redhat.com/en/about/press-releases/red-hat-and-general-motors-collaborate-trailblaze-future-software-defined-vehicles">
+          <ion-icon slot="start" color="medium" name="book"></ion-icon>
+          <ion-label>Red Hat and General Motors Collaborate to Trailblaze the Future of Software-Defined Vehicles</ion-label>
+        </ion-item>
+        <ion-item target="_blank" href="https://www.redhat.com/en/success-stories/bmwgroup">
+          <ion-icon slot="start" color="medium" name="book"></ion-icon>
+          <ion-label>Global automotive group races to automated driving with data platform</ion-label>
+        </ion-item>
+        <ion-item target="_blank" href="https://www.redhat.com/en/resources/edge-to-cloud-automotive-overview">
+          <ion-icon slot="start" color="medium" name="book"></ion-icon>
+          <ion-label>Edge to cloud: Implementing human-centric data in automotive</ion-label>
+        </ion-item>
+        <ion-item target="_blank" href="https://www.redhat.com/en/resources/sdv-open-source-accelerates-innovation-whitepaper">
+          <ion-icon slot="start" color="medium" name="book"></ion-icon>
+          <ion-label>Software-defined vehicles: How open source fuels innovation</ion-label>
+        </ion-item>
+      </ion-list>
+    </ion-card>
+
 </ion-content>

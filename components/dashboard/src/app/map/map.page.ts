@@ -45,7 +45,8 @@ export class MapPage implements OnInit {
         setTimeout(() => {
             this.map = new google.maps.Map(document.getElementById('map'), {
                 center: this.initialPosition,
-                zoom: 11,
+                zoom: 12,
+                mapTypeId: 'terrain'
                 // mapTypeId: google.maps.MapTypeId.HYBRID,
             });
             this.infowindow = new google.maps.InfoWindow({
@@ -127,10 +128,18 @@ export class MapPage implements OnInit {
             this.bobbycars.get(data.carid).setPosition(new google.maps.LatLng({ lat: data.lat, lng: data.long }));
         } else {
             console.debug('create marker for carid: ' + data.carid);
+
+            const icon = {
+                // BMW: https://assets.stickpng.com/images/580b57fcd9996e24bc43c46e.png
+                url: "https://cdn1.iconfinder.com/data/icons/cars-5/512/mercedes-pointer-point-car-auto-poi-map-place-geo-512.png", // url
+                scaledSize: new google.maps.Size(40, 40), // scaled size
+            };
+
             const marker = new google.maps.Marker({
                 position: new google.maps.LatLng({ lat: data.lat, lng: data.long }),
                 title: data.carid,
                 map: this.map,
+                icon: icon,
                 animation: google.maps.Animation.DROP,
                 // label: data.carid,
                 draggable: false
