@@ -29,7 +29,7 @@
           </ion-range>
         </ion-item>
         <ion-button (click)="scaleCarSim()" color="danger" fill="outline">
-          <ion-icon name="sync"></ion-icon>
+          <ion-icon name="sync"></ion-icon>&nbsp;
           Scale
         </ion-button>
       </form>
@@ -46,15 +46,15 @@
 
       <ion-card-content>
         <ion-button (click)="getZonesFromCache()" color="danger" fill="outline">
-          <ion-icon name="albums"></ion-icon>
+          <ion-icon name="albums"></ion-icon>&nbsp;
           List Zones
         </ion-button>
         <ion-button (click)="getCarsFromCache()" color="danger" fill="outline">
-          <ion-icon name="car"></ion-icon>
+          <ion-icon name="car"></ion-icon>&nbsp;
           List Cars
         </ion-button>
         <ion-button (click)="clearCache()" color="danger" fill="outline">
-          <ion-icon name="refresh"></ion-icon>
+          <ion-icon name="refresh"></ion-icon>&nbsp;
           Clear Cache
         </ion-button>
         <pre><p style="color: #fff;">{{ bobbycarZones | json }}</p></pre>
@@ -77,11 +77,11 @@
           <ion-input type="text" [(ngModel)]="engineDataSearch.carId" name="engineData"></ion-input>
         </ion-item>
         <ion-button type="submit" color="danger" fill="outline">
-          <ion-icon name="build"></ion-icon>
+          <ion-icon name="build"></ion-icon>&nbsp;
           Get Engine Data
         </ion-button>
         <ion-button (click)="getCarMetrics()" color="danger" fill="outline">
-          <ion-icon name="analytics"></ion-icon>
+          <ion-icon name="analytics"></ion-icon>&nbsp;
           Metrics
         </ion-button>
       </form>
@@ -108,9 +108,9 @@
           <ion-label>Longitude: </ion-label>
           <ion-input id="lon" type="text" [(ngModel)]="longitudeSearch" name="Longitude"></ion-input>
         </ion-item>
-        <ion-button (click)="getWeatherObservationData('weather')" fill="outline"><ion-icon name="cloud"></ion-icon>Current Weather (IBM)</ion-button>
-        <ion-button (click)="getWeatherData('weather')" color="danger" fill="outline"><ion-icon name="cloud"></ion-icon>Current Weather (OWM)</ion-button>
-        <ion-button (click)="getWeatherData('pollution')" color="danger" fill="outline"><ion-icon name="cloud-circle"></ion-icon>Air Pollution (OWM)</ion-button>
+        <ion-button (click)="getWeatherObservationData('weather')" fill="outline"><ion-icon name="cloud"></ion-icon>&nbsp;Current Weather (IBM)</ion-button>
+        <ion-button (click)="getWeatherData('weather')" color="danger" fill="outline"><ion-icon name="cloud"></ion-icon>&nbsp;Current Weather (OWM)</ion-button>
+        <ion-button (click)="getWeatherData('pollution')" color="danger" fill="outline"><ion-icon name="cloud-circle"></ion-icon>&nbsp;Air Pollution (OWM)</ion-button>
       </form>
       <pre><p style="color: #fff;">{{ weatherData | json }}</p></pre>
     </ion-card-content>
@@ -134,26 +134,10 @@
           <ion-label>Campaign Payload: </ion-label>
           <ion-textarea rows="10" cols="20" [(ngModel)]="otaPayloadInput" name="otaPayloadInput"></ion-textarea>
         </ion-item>
-        <ion-button (click)="getOTAPayload()" color="danger" fill="outline"><ion-icon name="list"></ion-icon>Get Payload</ion-button>
-        <ion-button (click)="createOTAPayload()" color="danger" fill="outline"><ion-icon name="add"></ion-icon>Create Payload</ion-button>
+        <ion-button (click)="getOTAPayload()" color="danger" fill="outline"><ion-icon name="list"></ion-icon>&nbsp;Get Payload</ion-button>
+        <ion-button (click)="createOTAPayload()" color="danger" fill="outline"><ion-icon name="add"></ion-icon>&nbsp;Create Payload</ion-button>
       </form>
     </ion-card-content>
-  </ion-card>
-
-  <ion-card class="welcome-card">
-    <ion-list lines="none">
-      <ion-list-header>
-        <ion-label>Resources</ion-label>
-      </ion-list-header>
-      <ion-item href="https://github.com/sa-mw-dach/bobbycar">
-        <ion-icon slot="start" color="medium" name="car"></ion-icon>
-        <ion-label>Bobbycar - GitHub Repository</ion-label>
-      </ion-item>
-      <ion-item href="https://www.opensourcerers.org/2021/06/28/bobbycar-part-1-building-a-cloud-native-iot-architecture-with-modern-red-hat-technologies/">
-        <ion-icon slot="start" color="medium" name="book"></ion-icon>
-        <ion-label>Bobbycar - Building a cloud-native IoT Architecture</ion-label>
-      </ion-item>
-    </ion-list>
   </ion-card>
 
 </ion-content>
