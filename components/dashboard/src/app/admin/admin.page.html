@@ -1,5 +1,5 @@
 <ion-header>
-  <ion-toolbar>
+  <ion-toolbar color="light">
     <ion-buttons slot="start">
       <ion-menu-button></ion-menu-button>
     </ion-buttons>
@@ -57,8 +57,8 @@
           <ion-icon name="refresh"></ion-icon>&nbsp;
           Clear Cache
         </ion-button>
-        <pre><p style="color: #fff;">{{ bobbycarZones | json }}</p></pre>
-        <pre><p style="color: #fff;">{{ bobbycars | json }}</p></pre>
+        <pre><p>{{ bobbycarZones | json }}</p></pre>
+        <pre><p>{{ bobbycars | json }}</p></pre>
       </ion-card-content>
     </ion-card>
 
@@ -85,8 +85,8 @@
           Metrics
         </ion-button>
       </form>
-      <pre><p style="color: #fff;">{{ carData | json }}</p></pre>
-      <pre><p style="color: #fff;">{{ carMetrics | json }}</p></pre>
+      <pre><p>{{ carData | json }}</p></pre>
+      <pre><p>{{ carMetrics | json }}</p></pre>
     </ion-card-content>
   </ion-card>
 
@@ -112,7 +112,7 @@
         <ion-button (click)="getWeatherData('weather')" color="danger" fill="outline"><ion-icon name="cloud"></ion-icon>&nbsp;Current Weather (OWM)</ion-button>
         <ion-button (click)="getWeatherData('pollution')" color="danger" fill="outline"><ion-icon name="cloud-circle"></ion-icon>&nbsp;Air Pollution (OWM)</ion-button>
       </form>
-      <pre><p style="color: #fff;">{{ weatherData | json }}</p></pre>
+      <pre><p>{{ weatherData | json }}</p></pre>
     </ion-card-content>
   </ion-card>
 

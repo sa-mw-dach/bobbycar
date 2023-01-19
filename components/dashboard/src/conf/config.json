@@ -1,5 +1,5 @@
 {
-    "GOOGLE_API_KEY": "",
+    "GOOGLE_API_KEY": "replaceme",
     "BOBBYCAR_API_KEY": "replaceme",
     "SSE_ENDPOINT": "",
     "CAR_EVENTS_ENDPOINT": "ws://dashboard-streaming-bobbycar.apps.cluster-zxf6m.zxf6m.sandbox1856.opentlc.com/api/carevents?sendToAll=true",
@@ -16,5 +16,6 @@
     "ROAD_CLASSIFICATION_ENABLE": "false",
     "INITIAL_MAP_POSITION": { "lat": 41.11804887672318, "lng": -73.7198836780401 },
     "OCP_API_SERVER": "https://api.cluster-zxf6m.zxf6m.sandbox1856.opentlc.com:6443",
-    "OCP_TOKEN": ""
+    "OCP_TOKEN": "token",
+    "DEFAULT_CAR_BRAND": "P"
 }

@@ -1,5 +1,5 @@
 <ion-header>
-  <ion-toolbar>
+  <ion-toolbar color="light">
     <ion-title>
       Red Hat Connected Vehicle Architecture - Dashboard
     </ion-title>
@@ -19,18 +19,19 @@
     </ion-button>
     <ion-button fill="outline" href="https://github.com/sa-mw-dach/bobbycar" target="_blank"  color="dark">
       <ion-icon name="logo-github"></ion-icon>&nbsp;
+      Github
     </ion-button>
   </ion-toolbar>
 </ion-header>
 
-<ion-content color="" style="background-color: #efefef;">
+<ion-content color="light">
 
     <ion-card class="welcome-card" *ngIf="!showArch">
       <ion-card-header>
         <ion-card-title style="font-size: 36px; color: #CC0000;">Welcome to the Red Hat Connected Vehicle Architecture</ion-card-title>
       </ion-card-header>
       <ion-card-content>
-        <p style="font-size: 20px;  color: #fff;">
+        <p style="font-size: 20px;">
           <img src="./assets/cv.jpg" alt="" width=""/>
           <br/>
           Bobbycar is a Red Hat solution pattern for simulating connected vehicles traveling through configuration zones.
@@ -44,7 +45,7 @@
         <ion-card-title style="font-size: 36px; color: #CC0000;">High Level Architecture</ion-card-title>
       </ion-card-header>
       <ion-card-content>
-        <p style="font-size: 20px; color: #fff;">
+        <p style="font-size: 20px;">
           This solution pattern aims to showcase an end-to-end workflow,
           from connecting vehicles and in-vehicle platform components to the cloud backend,
           processing telemetry data in batch or as stream,

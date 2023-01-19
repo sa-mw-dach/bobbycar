@@ -21,11 +21,19 @@
     position: fixed;
     width: 40%;
     height: 100%;
-    background: rgba(0,0,0,0.9);
+    background: var(--color-engine-overlay-bg);
+    // background: rgba(0,0,0,0.9);
     z-index: 20;
     top: 0%;
     left: 0%;
     overflow:scroll;
+  }
+
+  .rd-conditions{
+    background-color: var(--color-rd-conditions-bg);
+    border: 2px solid;
+    border-radius: 5px;
+    padding: 5px;
   }
 
   .image-box-vw {
@@ -34,7 +42,13 @@
     min-height: 100vh;
  }
 
-   .image-box-s {
+   .image-box-ford {
+     background: url("../../assets/ford-cockpit.jpg") center center no-repeat;
+     background-size: cover;
+     min-height: 100vh;
+  }
+
+   .image-box-mb {
      background: url("../../assets/cockpit_s.jpg") center center no-repeat;
      background-size: cover;
      min-height: 100vh;
@@ -46,8 +60,8 @@
        min-height: 100vh;
     }
 
- .image-box-skoda {
-        background: url("../../assets/skoda.jpg") center center no-repeat;
+ .image-box-porsche {
+        background: url("../../assets/porsche-cockpit.jpg") center center no-repeat;
         background-size: cover;
         min-height: 100vh;
      }
@@ -84,7 +98,7 @@
      //background-color: #CC0000;
      opacity: 0.95;
   }
- .it-s {
+ .it-mb {
      position: absolute;
      top: 40%;
      left: 40%;
@@ -94,16 +108,21 @@
      top: 40%;
      left: 59%;
  }
- .it-skoda {
+ .it-porsche {
       position: absolute;
-      top: 33%;
+      top: 43%;
       left: 66%;
  }
  .it-vw {
       position: absolute;
-      top: 35%;
-      left: 41%;
+      top: 44%;
+      left: 68%;
  }
+  .it-ford {
+       position: absolute;
+       top: 54%;
+       left: 42%;
+  }
 
  .instruments {
     position: absolute;
@@ -120,14 +139,14 @@
   }
 
  .metricDisplayGreen {
-   color: rgb(18, 234, 18);
-   //color: #CC0000;
+   //color: rgb(18, 234, 18);
+   color: green;
    padding-left: 10px;
    font-weight: bold;
    font-size: large;
  }
  .metricDisplayGrey {
-  color: rgb(248, 205, 205);
+  color: #CC0000;
   padding-left: 10px;
   font-weight: bold;
   font-size: large;
