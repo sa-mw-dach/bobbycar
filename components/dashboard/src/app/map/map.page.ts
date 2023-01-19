@@ -29,6 +29,8 @@ export class MapPage implements OnInit {
     metricsAggregated = new Map();
     speedAlerts = new Map();
 
+    carBg = 'MB';
+
     constructor(
         private platform: Platform,
         private carEventsService: CarEventsService,
@@ -39,6 +41,7 @@ export class MapPage implements OnInit {
         private router: Router
         ) {
             this.initialPosition = configService.INITIAL_MAP_POSITION;
+            this.carBg = this.configService.DEFAULT_CAR_BRAND;
         }
 
     initializeMap() {
@@ -131,9 +134,24 @@ export class MapPage implements OnInit {
 
             const icon = {
                 // BMW: https://assets.stickpng.com/images/580b57fcd9996e24bc43c46e.png
-                url: "https://cdn1.iconfinder.com/data/icons/cars-5/512/mercedes-pointer-point-car-auto-poi-map-place-geo-512.png", // url
-                scaledSize: new google.maps.Size(40, 40), // scaled size
+                // url: "https://cdn1.iconfinder.com/data/icons/cars-5/512/mercedes-pointer-point-car-auto-poi-map-place-geo-512.png", // url
+                url: "assets/mb-marker.png",
+                scaledSize: new google.maps.Size(30, 30) // scaled size
             };
+
+            if(this.carBg === 'VW') {
+                icon.url = "assets/vw-marker.png"
+            } else if (this.carBg === 'BMW'){
+                icon.url = "assets/bmw-marker.png"
+            } else if (this.carBg === 'MB'){
+                icon.url = "assets/mb-marker.png"
+            } else if (this.carBg === 'P'){
+                icon.url = "assets/porsche-marker.png";
+                icon.scaledSize = new google.maps.Size(24,30);
+            } else if (this.carBg === 'FORD'){
+                icon.url = "assets/ford-marker.png";
+                icon.scaledSize = new google.maps.Size(40,30);
+            }
 
             const marker = new google.maps.Marker({
                 position: new google.maps.LatLng({ lat: data.lat, lng: data.long }),

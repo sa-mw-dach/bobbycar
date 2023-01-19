@@ -28,7 +28,7 @@ export class CarDetailPage implements OnInit {
   streetName = '';
   showHUD = false;
   showDriverMonitoring = false;
-  carBg = 'S';
+  carBg = 'MB';
   engineOverlayHidden: boolean = true;
   engineData;
   weatherData;
@@ -51,7 +51,9 @@ export class CarDetailPage implements OnInit {
     public toastController: ToastController,
     private predictiveService: PredictiveService,
     private zone: NgZone,
-    ) {}
+    ) {
+        this.carBg = this.configService.DEFAULT_CAR_BRAND;
+    }
 
     // ***********************
     // Presenting a message at the top of the screen
@@ -80,10 +82,23 @@ export class CarDetailPage implements OnInit {
             });
 
             const icon = {
-                // BMW: https://assets.stickpng.com/images/580b57fcd9996e24bc43c46e.png
-                url: "https://cdn1.iconfinder.com/data/icons/cars-5/512/mercedes-pointer-point-car-auto-poi-map-place-geo-512.png", // url
-                scaledSize: new google.maps.Size(40, 40), // scaled size
+                url: "assets/mb-marker.png",
+                scaledSize: new google.maps.Size(30, 30), // scaled size
             };
+
+            if(this.carBg === 'VW') {
+                icon.url = "assets/vw-marker.png"
+            } else if (this.carBg === 'BMW'){
+                icon.url = "assets/bmw-marker.png"
+            } else if (this.carBg === 'MB'){
+                icon.url = "assets/mb-marker.png"
+            } else if (this.carBg === 'P'){
+                icon.url = "assets/porsche-marker.png";
+                icon.scaledSize = new google.maps.Size(24,30);
+            } else if (this.carBg === 'FORD'){
+                icon.url = "assets/ford-marker.png";
+                icon.scaledSize = new google.maps.Size(40,30);
+            }
 
             this.marker = new google.maps.Marker({
                 position: new google.maps.LatLng(this.initialPosition),
@@ -181,7 +196,7 @@ export class CarDetailPage implements OnInit {
         },
         (err) => {
             console.error(err);
-            this.presentToast("The Weather Service API is not available!", 5000);
+            this.presentToast("The Weather Service is not enabled for this vehicle!", 6000);
             }
         );
         if(this.configService.ROAD_CLASSIFICATION_ENABLE === 'true'){

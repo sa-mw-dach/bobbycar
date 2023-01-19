@@ -25,6 +25,7 @@ export class ConfigService {
     INITIAL_MAP_POSITION;
     OCP_API_SERVER;
     OCP_TOKEN;
+    DEFAULT_CAR_BRAND;
 
     constructor(public http: HttpClient) {}
 
@@ -53,6 +54,7 @@ export class ConfigService {
         this.INITIAL_MAP_POSITION = data.INITIAL_MAP_POSITION;
         this.OCP_API_SERVER = data.OCP_API_SERVER;
         this.OCP_TOKEN = data.OCP_TOKEN;
+        this.DEFAULT_CAR_BRAND = data.DEFAULT_CAR_BRAND;
     }
 
 }
