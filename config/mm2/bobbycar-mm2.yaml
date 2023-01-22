@@ -18,7 +18,7 @@ spec:
           sync.topic.acls.enabled: 'false'
       sourceCluster: bobbycar-cluster-source
       targetCluster: bobbycar-managed-cluster-target
-      topicsPattern: .*
+      topicsPattern: "bobbycar-zonechange|bobbycar-speed-alert"
       groupsPattern: .*
   clusters:
     - alias: bobbycar-cluster-source
@@ -33,8 +33,8 @@ spec:
           password: client-secret
           secretName: bobbycar-mm2
         type: plain
-        username: 'b9c53bc2-a033-43fb-9c2e-7de94538401c'
-      bootstrapServers: 'bobbycar-c-ceqlngh-ghn--ramvf-g.bf2.kafka.rhcloud.com:443'
+        username: 'client-id'
+      bootstrapServers: 'bobbycar-cf---k-k-e-mema-vloa.bf2.kafka.rhcloud.com:443'
       tls:
         trustedCertificates: []
   version: 3.2.3
