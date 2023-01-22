@@ -1,0 +1,190 @@
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: ntt-in-vehicle-detectionapplication
+  namespace: bobbycar-hdpp
+  labels:
+    app: ntt-in-vehicle-detectionapplication
+    app.kubernetes.io/component: ntt-in-vehicle-detectionapplication
+    app.kubernetes.io/instance: ntt-in-vehicle-detectionapplication
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      deployment: ntt-in-vehicle-detectionapplication
+  template:
+    metadata:
+      labels:
+        deployment: ntt-in-vehicle-detectionapplication
+    spec:
+      volumes:
+        - name: vehicle-detection
+          persistentVolumeClaim:
+            claimName: vehicle-detection
+        - name: vehicle-config
+          configMap:
+            name: vehicle-application
+            defaultMode: 420
+      containers:
+        - name: ntt-in-vehicle-detectionapplication
+          image: 'quay.io/redhat_emp1/ntt-in-vehicle-detection_application:v1'
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+          resources:
+            limits:
+              cpu: '4'
+              memory: 2Gi
+            requests:
+              cpu: 500m
+              memory: 500Mi
+          volumeMounts:
+            - name: vehicle-detection
+              mountPath: /opt/app-root/src/inputs
+            - name: vehicle-config
+              mountPath: /opt/app-root/src/config
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          imagePullPolicy: Always
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      dnsPolicy: ClusterFirst
+      securityContext: {}
+      imagePullSecrets:
+        - name: quay-pull-secret
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 25%
+      maxSurge: 25%
+  revisionHistoryLimit: 10
+  progressDeadlineSeconds: 600
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: vehicle-application
+  namespace: bobbycar-hdpp
+data:
+  init.json: >-
+    { "logger_level": 20, "video_dir": "./videos", "face_cascade":
+    "./models/haarcascade_frontalface_alt2.xml", "eye_cascade":
+    "./models/haarcascade_eye.xml", "emotion_model":
+    "./models/emotion_model.hdf5", "mark_model":
+    "./models/face_landmark.tflite", "mark_size": 64, "obj_det_model":
+    "./models/ssd_mobilenet_v2_coco.pb", "obj_det_config":
+    "./models/ssd_mobilenet_v2_coco.pbtxt", "objectdetection_size": 300,
+    "scaler": "./models/scalingVectorAllCutLess.csv", "lstm_model":
+    "./models/LSTM_model_first (1).h5", "scaling_vector":
+    "./models/scalingVectorAllCut.csv", "xgbmodel":
+    "./models/finalModelImp.model", "live": false, "timeshift": false, "record":
+    false, "video_device": 0, "weather_update_interval": 10, "openweatherkey":
+    "88095806d1ea5a5786730ceaa417b87a", "weather_font": "./fonts/Elegant Sans
+    Semibold.ttf", "mapboxkey":
+    "pk.eyJ1IjoiZGVhdmxvcGVyIiwiYSI6ImNrOXRvNDcydjFnMGkzdHFwank5aHJuN3cifQ.2EgefgyJFQzp4hVDxzNpPQ",
+    "ntt_logo": "./images/ntt.png", "avl_logo": "./images/avl.png",
+    "USE_EMOTION_RECOG": true, "USE_DRIVE_SCORE": false, "USE_MARK_DETECTOR":
+    true, "USE_DISTRACTION_DETECTOR": true, "USE_OBJ_DETECTOR": true,
+    "USE_WEATHER_INFO": true, "USE_DATA_VISUAL": false, "USE_MAP_LOCATION":
+    true, "traffic_font": "./fonts/Young.ttf", "max_values":
+    "./models/min_max_values.csv", "can_signals": "./config/signals_honda.json",
+    "face_detection_cnn": "./models/face_mask_detection.pb",
+    "file_logger_level": 10, "logger_config": "./config/log.json", "host_name":
+    "gateway-22091", "port": "22091", "stream_endpoint":
+    "http://ntt-stream-hdpp.apps.ansulliv.catchall.azure.devcluster.openshift.com"
+    }
+  launch.json: >-
+    { "r": true, "m": true, "config_path": "./config/init.json", "driver_view":
+    "./inputs/front_cam_driver.avi", "front_view":
+    "./inputs/front_cam_road.avi", "can_data": "./inputs/can_data.csv", "n":
+    true }
+  log.json: >-
+    { "can_analyzer": true, "can_model": true, "can_model_v2": true,
+    "can_model_v3": true, "can_reader": true, "data_visualisation": true,
+    "distraction": true, "driver_monitoring": true, "drive_score_reader": true,
+    "emotion_detector": true, "map_location": true, "mark_detector": true,
+    "mark_detector_v2": true, "mark_detector_v3": true, "object_detection":
+    true, "timer": true, "video_reader": true, "weather_info": true }
+  signals_avl.json: >-
+    { "time":"Time", "gps_latitude":"GPS_Latitude",
+    "gps_longitude":"GPS_Longitude", "vehicle_speed":"VehicleSpeed",
+    "tof_distance":"TOF_Distance_X", "tof_speed":"TOF_Speed_X",
+    "tof_relative_speed":"TOF_RelativeSpeed_X", "tof_timegap":"TOF_TimeGap",
+    "tof_ttc":"TOF_TTC", "lkas_status":"SelectorLever",
+    "acc_status":"GPS_Heading", "r_blinker":"LineType_L_DMU",
+    "l_blinker":"LineType_R_DMU" }
+  signals_honda.json: >-
+    { "time":"t", "gps_latitude":"GPS_Lat", "gps_longitude":"GPS_Lon",
+    "vehicle_speed":"speed", "tof_distance":"TOF_Distance_X_DMU",
+    "tof_speed":"TOF_Speed_X_DMU", "tof_relative_speed":"TOF_RelativeSpeed_X",
+    "tof_timegap":"TOF_TimeGap", "tof_ttc":"TOF_TTC",
+    "lkas_status":"LKAS_Status", "acc_status":"ACC_Status",
+    "r_blinker":"Right_Blinker", "l_blinker":"Left_Blinker"}
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: vehicle-detection
+  namespace: bobbycar-hdpp
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 30Gi
+  volumeMode: Filesystem
+---
+kind: Secret
+apiVersion: v1
+metadata:
+  name: quay-pull-secret
+  namespace: bobbycar-hdpp
+data:
+  .dockerconfigjson: >-
+    secret=
+type: kubernetes.io/dockerconfigjson
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: ntt-in-vehicle-detectionapplication
+  namespace: bobbycar-hdpp
+  labels:
+    app: ntt-in-vehicle-detectionapplication
+    app.kubernetes.io/component: ntt-in-vehicle-detectionapplication
+    app.kubernetes.io/instance: ntt-in-vehicle-detectionapplication
+spec:
+  ports:
+    - name: 8080-tcp
+      protocol: TCP
+      port: 8080
+      targetPort: 8080
+    - name: 5000-tcp
+      protocol: UDP
+      port: 5000
+      targetPort: 5000
+  type: ClusterIP
+  selector:
+    deployment: ntt-in-vehicle-detectionapplication
+---
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  name: ntt-stream
+  namespace: bobbycar-hdpp
+  labels:
+    app: ntt-in-vehicle-detectionapplication
+    app.kubernetes.io/component: ntt-in-vehicle-detectionapplication
+    app.kubernetes.io/instance: ntt-in-vehicle-detectionapplication
+spec:
+  to:
+    kind: Service
+    name: ntt-in-vehicle-detectionapplication
+    weight: 100
+  port:
+    targetPort: 8080-tcp
+  wildcardPolicy: None
+---
+
+
