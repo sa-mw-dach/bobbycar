@@ -48,6 +48,12 @@
      min-height: 100vh;
   }
 
+     .image-box-ford-f150 {
+       background: url("../../assets/f150-cockpit.jpg") center center no-repeat;
+       background-size: cover;
+       min-height: 100vh;
+    }
+
    .image-box-mb {
      background: url("../../assets/cockpit_s.jpg") center center no-repeat;
      background-size: cover;
@@ -124,6 +130,12 @@
        left: 42%;
   }
 
+    .it-ford-f150 {
+         position: absolute;
+         top: 38%;
+         left: 44%;
+    }
+
  .instruments {
     position: absolute;
     top: 0%;
@@ -140,13 +152,13 @@
 
  .metricDisplayGreen {
    //color: rgb(18, 234, 18);
-   color: green;
+   color: var(--color-metrics-green);
    padding-left: 10px;
    font-weight: bold;
    font-size: large;
  }
  .metricDisplayGrey {
-  color: #CC0000;
+  color: var(--color-metrics-grey);
   padding-left: 10px;
   font-weight: bold;
   font-size: large;

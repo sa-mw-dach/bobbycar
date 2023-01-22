@@ -6,6 +6,8 @@
 
   --color-engine-overlay-bg: rgba(244, 245, 248, 0.9);
   --color-rd-conditions-bg: #ddd;
+  --color-metrics-grey: #CC0000;
+  --color-metrics-green: #1d782d;
 
   /** primary **/
   --ion-color-primary: #3880ff;
@@ -88,8 +90,10 @@
 
   body {
 
-    --color-engine-overlay-bg: rgba(0,0,0,0.9);
+    --color-engine-overlay-bg: rgba(20,20,20,0.9);
     --color-rd-conditions-bg: #333;
+    --color-metrics-grey: #CC0000;
+    --color-metrics-green: #42f563;
 
     --ion-color-primary: #428cff;
     --ion-color-primary-rgb: 66,140,255;

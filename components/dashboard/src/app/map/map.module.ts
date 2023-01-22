@@ -11,7 +11,6 @@ import more from 'highcharts/highcharts-more.src';
 import exporting from 'highcharts/modules/exporting.src';
 import stock from 'highcharts/modules/stock.src';
 import solidGauge from 'highcharts/modules/solid-gauge.src';
-import { ChartModule, HIGHCHARTS_MODULES } from 'angular-highcharts';
 import { GoogleMapsModule } from '@angular/google-maps';
 
 @NgModule({
@@ -20,10 +19,9 @@ import { GoogleMapsModule } from '@angular/google-maps';
     FormsModule,
     IonicModule,
     MapPageRoutingModule,
-    ChartModule,
     GoogleMapsModule
   ],
   declarations: [MapPage],
-  providers: [{ provide: HIGHCHARTS_MODULES, useFactory: () => [stock, more, exporting, solidGauge] }]
+  providers: []
 })
 export class MapPageModule {}
