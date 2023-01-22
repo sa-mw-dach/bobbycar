@@ -33,11 +33,11 @@ export class CarDetailPage implements OnInit {
   engineData;
   weatherData;
   roadClassificationResult = {
-                                 "prediction": {
-                                   "Road Condition": "Great",
-                                   "Vehicle Config": "166Y.2"
-                                 }
-                               };
+     "prediction": {
+       "Road Condition": "Great",
+       "Vehicle Config": "166Y.2"
+     }
+   };
   enableStreetView: boolean = true;
 
   constructor(
@@ -52,6 +52,7 @@ export class CarDetailPage implements OnInit {
     private predictiveService: PredictiveService,
     private zone: NgZone,
     ) {
+        console.log('Constructing car-detail-page');
         this.carBg = this.configService.DEFAULT_CAR_BRAND;
     }
 
@@ -98,6 +99,9 @@ export class CarDetailPage implements OnInit {
             } else if (this.carBg === 'FORD'){
                 icon.url = "assets/ford-marker.png";
                 icon.scaledSize = new google.maps.Size(40,30);
+            } else if (this.carBg === 'F150'){
+                icon.url = "assets/ford-marker.png";
+                icon.scaledSize = new google.maps.Size(40,30);
             }
 
             this.marker = new google.maps.Marker({
@@ -118,13 +122,13 @@ export class CarDetailPage implements OnInit {
 
             this.map.setStreetView(this.panorama);
 
-        }, 10);
+        }, 100);
     }
 
     // ***********************
     // Update the marker and Google Streetview for new positions
     // ***********************
-    createOrUpdateMarker(data) {
+    async createOrUpdateMarker(data) {
         if(data.carid === this.carId) {
 
           this.marker.setPosition(new google.maps.LatLng({ lat: data.lat, lng: data.long }));
@@ -133,7 +137,7 @@ export class CarDetailPage implements OnInit {
           this.currentPosition.lat = data.lat;
           this.currentPosition.lon = data.long;
 
-          this.sv.getPanorama({
+          await this.sv.getPanorama({
             location: { lat: data.lat, lng: data.long },
             radius: 50
           }, (result, status) => {
@@ -187,9 +191,9 @@ export class CarDetailPage implements OnInit {
   // ***********************
   // Calling the Weather API and optionally the Road Classification service
   // ***********************
-  async getWeatherData(){
+  getWeatherData(){
     if(this.engineOverlayHidden) {
-        await this.predictiveService.getCurrentWeather(this.currentPosition.lat, this.currentPosition.lon, 'ibm').subscribe(
+        this.predictiveService.getCurrentWeather(this.currentPosition.lat, this.currentPosition.lon, 'ibm').subscribe(
         (data) => {
             this.weatherData = data;
             this.engineOverlayHidden = false;
@@ -200,7 +204,7 @@ export class CarDetailPage implements OnInit {
             }
         );
         if(this.configService.ROAD_CLASSIFICATION_ENABLE === 'true'){
-            await this.predictiveService.getRoadClassification([0.36, 0.20, 9.79, 0.009, -0.13, -0.02, 0.14]).subscribe((data) => {
+            this.predictiveService.getRoadClassification([0.36, 0.20, 9.79, 0.009, -0.13, -0.02, 0.14]).subscribe((data) => {
                 this.roadClassificationResult = data;
                 console.log(data);
             },
@@ -214,11 +218,20 @@ export class CarDetailPage implements OnInit {
   }
 
   // ***********************
+  // Switch cockpit views
+  // ***********************
+  switchCockpitView(viewId) {
+    this.carBg = viewId;
+    // this.configService.DEFAULT_CAR_BRAND = viewId;
+    this.initializeMap();
+  }
+
+  // ***********************
   // Calling the Car Service API to get the current engine configuration
   // ***********************
-  async showConfig() {
+  showConfig() {
     if(this.engineOverlayHidden) {
-        let temp = await this.carService.getCarById(this.carId).subscribe((data) => {
+        let temp = this.carService.getCarById(this.carId).subscribe((data) => {
             console.log(data);
             this.engineData = data;
             this.engineOverlayHidden = false;
@@ -235,7 +248,7 @@ export class CarDetailPage implements OnInit {
   // ***********************
   ionViewWillLeave(){
     console.debug('ionViewWillLeave()');
-    this.carEventsService.close();
+    // this.carEventsService.close();
     this.carMetricsService.close();
     this.zoneChangeService.close();
   }
@@ -243,14 +256,14 @@ export class CarDetailPage implements OnInit {
     // ***********************
     // TODO: Implement data collection and upload to S3 for this specific vehicle id
     // ***********************
-    async scheduleMaintenance(){
+    scheduleMaintenance(){
         this.presentToast('You have scheduled a maintenance appointment. The collection of telemetry data has been enabled and will be forwarded to your car repair shop.', 5000);
     }
 
   // ***********************
   // Initialize the car detail page. This runs at the beginning...
   // ***********************
-  ngOnInit() {
+    ngOnInit() {
 
     this.carId = this.route.snapshot.paramMap.get('id');    // get the car id from the URL
     this.initializeMap();               // initialize the Google Map
@@ -312,10 +325,10 @@ export class CarDetailPage implements OnInit {
           if(msg.carId === this.carId){
             if(msg.nextZoneId !== null){
                 this.carMetric.zone = msg.nextZoneId;
-                this.presentToast('ZONE CHANGE EVENT! The vehicle '+ msg.carId + ' -> is entering the Bobbycarzone: ' + msg.nextZoneId, 5000);
+                this.presentToast('ZONE CHANGE EVENT! The vehicle '+ msg.carId + ' is entering the Bobbycarzone: ' + msg.nextZoneId, 5000);
             } else {
                 this.carMetric.zone = 'Default Zone';
-                this.presentToast('ZONE CHANGE EVENT! The vehicle '+ msg.carId + ' -> is leaving the Bobbycarzone.', 5000);
+                this.presentToast('ZONE CHANGE EVENT! The vehicle '+ msg.carId + ' is leaving the Bobbycarzone.', 5000);
             }
           }
       }, // Called whenever there is a message from the server.

@@ -34,7 +34,7 @@
     </div>
   </div>
 
-  <div class="infotainment" [ngClass]="{'it-ford': carBg === 'FORD', 'it-mb': carBg === 'MB', 'it-vw': carBg === 'VW', 'it-bmw': carBg === 'BMW', 'it-porsche': carBg === 'P'}">
+  <div class="infotainment" [ngClass]="{'it-ford-f150': carBg === 'F150', 'it-ford': carBg === 'FORD', 'it-mb': carBg === 'MB', 'it-vw': carBg === 'VW', 'it-bmw': carBg === 'BMW', 'it-porsche': carBg === 'P'}">
 
     <div>
       <ion-button  (click)="toggleHUD()" color="danger">
@@ -69,7 +69,7 @@
 
   </div>
 
-  <div [ngClass]="{'image-box-ford': carBg === 'FORD', 'image-box-mb': carBg === 'MB', 'image-box-vw': carBg === 'VW', 'image-box-bmw': carBg === 'BMW', 'image-box-porsche': carBg === 'P'}">
+  <div [ngClass]="{'image-box-ford-f150': carBg === 'F150', 'image-box-ford': carBg === 'FORD', 'image-box-mb': carBg === 'MB', 'image-box-vw': carBg === 'VW', 'image-box-bmw': carBg === 'BMW', 'image-box-porsche': carBg === 'P'}">
     <div class="navi">
       <div id="map" style="border-radius:10px;"></div>
     </div>
@@ -89,6 +89,7 @@
               <span class="metricDisplayGrey" *ngIf="carBg==='MB'"> Mercedes-Benz </span>
               <span class="metricDisplayGrey" *ngIf="carBg==='P'"> Porsche </span>
               <span class="metricDisplayGrey" *ngIf="carBg==='FORD'"> Ford </span>
+              <span class="metricDisplayGrey" *ngIf="carBg==='F150'"> Ford </span>
             </ion-item>
             <ion-item> Model:
               <span class="metricDisplayGrey" *ngIf="carBg==='VW'"> Passat Alltrack </span>
@@ -96,6 +97,7 @@
               <span class="metricDisplayGrey" *ngIf="carBg==='MB'"> S 500 </span>
               <span class="metricDisplayGrey" *ngIf="carBg==='P'"> 911 RS </span>
               <span class="metricDisplayGrey" *ngIf="carBg==='FORD'"> Mustang Shelby GT350R </span>
+              <span class="metricDisplayGrey" *ngIf="carBg==='F150'"> F-150 Limited </span>
             </ion-item>
             <ion-item> Street: <span class="metricDisplayGrey"> {{streetName}} </span></ion-item>
             <ion-item> BobbycarZone: <span class="metricDisplayGrey"> {{carMetric.zone}} </span></ion-item>
@@ -123,11 +125,12 @@
 <ion-footer>
   <ion-toolbar color="light">
   <ion-buttons slot="end">
-    <ion-button size="small" (click)="carBg='VW'">VW</ion-button>
-    <ion-button size="small" (click)="carBg='P'">Porsche</ion-button>
-    <ion-button size="small" (click)="carBg='FORD'">Ford</ion-button>
-    <ion-button size="small" (click)="carBg='BMW'">BMW</ion-button>
-    <ion-button size="small" (click)="carBg='MB'">MB</ion-button>
+    <ion-button size="small" (click)="switchCockpitView('VW')">VW</ion-button>
+    <ion-button size="small" (click)="switchCockpitView('P')">Porsche</ion-button>
+    <ion-button size="small" (click)="switchCockpitView('F150')">F-150</ion-button>
+    <ion-button size="small" (click)="switchCockpitView('FORD')">Mustang</ion-button>
+    <ion-button size="small" (click)="switchCockpitView('BMW')">BMW</ion-button>
+    <ion-button size="small" (click)="switchCockpitView('MB')">MB</ion-button>
   </ion-buttons>
   </ion-toolbar>
 </ion-footer>

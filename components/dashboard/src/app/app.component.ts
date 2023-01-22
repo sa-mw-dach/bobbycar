@@ -76,7 +76,7 @@ export class AppComponent {
     const script = document.createElement('script');
     script.id = 'googleMap';
     if (this.configService.GOOGLE_API_KEY) {
-      script.src = 'https://maps.googleapis.com/maps/api/js?key=' + this.configService.GOOGLE_API_KEY;
+      script.src = 'https://maps.googleapis.com/maps/api/js?key=' + this.configService.GOOGLE_API_KEY + '&callback=googleMapLoaded';
     } else {
       script.src = 'https://maps.googleapis.com/maps/api/js?key=';
     }
