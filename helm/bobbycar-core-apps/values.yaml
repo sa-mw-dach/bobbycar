@@ -34,6 +34,10 @@ dashboard:
     googleApiKey:
     threeScaleApiKey: replaceme
     hdppEndpoint: "http://localhost/playlist.m3u8"
+    ocpApiUrl: https://localhost:6443
+    ocpToken:
+    enableRoadClassification: false
+    defaultCarBrand: P
 
 telemetryAggregator:
   config:
