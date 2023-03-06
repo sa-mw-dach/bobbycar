@@ -46,10 +46,18 @@ wait_for_operator() {
 
 source install_cleanup_vars.sh
 
+# If weather api keys are empty, set a default value.
+if [[ -z "$OWM_WEATHER_API_KEY" ]]; then
+  OWM_WEATHER_API_KEY='my-owm-api-key';
+fi;
+if [[ -z "$IBM_WEATHER_API_KEY" ]]; then
+  IBM_WEATHER_API_KEY='my-ibm-api-key';
+fi;
+
 if [[ "$INSTALL_KNATIVE" == true ]]; then
 log "Installing OpenShift Serverless operator"
 oc apply -f config/operators/serverless-operator-subscription.yaml
-sleep 15
+sleep 25
 log "Waiting for OpenShift Serverless operator"
 oc -n openshift-serverless wait --for=condition=Available deployment -l operators.coreos.com/serverless-operator.openshift-serverless --timeout=300s
 log "Installing Knative Serving config"
