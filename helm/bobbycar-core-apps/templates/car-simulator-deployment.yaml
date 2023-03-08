@@ -27,14 +27,44 @@ spec:
           configMap:
             name: car-simulator-us-routes-config
             defaultMode: 420
+{{ if .Values.drogueIoT }}
+        - name: java-truststore
+          emptyDir: {}
+        - name: drogue-ca
+          configMap:
+            name: trust-anchor
+{{ end }}
+{{ if .Values.drogueIoT }}
+      initContainers:
+        - name: truststore
+          image: quay.io/ctrontesting/car-simulator:latest
+          imagePullPolicy: Always
+          command:
+            - bash
+            - -ec
+            - |
+              keytool -storepass 'SetecAstronomy' -import -alias ca -file /etc/drogue/ca/root-cert.pem -keystore /var/log/output/truststore.p12 -deststoretype PKCS12 -noprompt
+          volumeMounts:
+            - name: drogue-ca
+              mountPath: /etc/drogue/ca
+            - name: java-truststore
+              readOnly: false
+              mountPath: /var/log/output
+{{ end }}
       containers:
       - name: {{ .Values.carSimulator.name }}
-        image: quay.io/bobbycar/car-simulator:1.1.1
+        # FIXME: revert before merge
+        image: quay.io/ctrontesting/car-simulator:latest
         imagePullPolicy: Always
         volumeMounts:
             - name: config
               readOnly: true
               mountPath: /opt/routes
+{{ if .Values.drogueIoT }}
+            - name: java-truststore
+              readOnly: true
+              mountPath: /etc/drogue/ca
+{{ end }}
         env:
             - name: com.redhat.bobbycar.carsim.route
               value: '/opt/routes'
@@ -48,7 +78,53 @@ spec:
               value: 'INFO'
             - name: com.redhat.bobbycar.carsim.delay
               value: {{ .Values.carSimulator.config.carsimDelay | quote }}
-            - name: mp.messaging.incoming.zonechange.type
+            - name: com.redhat.bobbycar.carsim.datagrid.url
+              value: 'http://cache-service-{{ .Values.namespace }}.{{ .Values.ocpDomain }}'
+            - name: quarkus.http.cors
+              value: 'true'
+            - name: com.redhat.bobbycar.carsim.instance
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: com.redhat.bobbycar.carsim.drogue.enabled
+              value: {{ .Values.drogueIoT | quote }}
+{{ if .Values.drogueIoT}}
+            - name: JAVA_APP_JAR
+              value: /deployments/drogue/quarkus-run.jar
+            - name: drogue.application
+              value: {{ .Values.drogue.application | quote }}
+            - name: drogue.registry.apiUser
+              valueFrom:
+                secretKeyRef:
+                  name: drogue-iot-commands
+                  key: user
+            - name: drogue.registry.apiKey
+              valueFrom:
+                secretKeyRef:
+                  name: drogue-iot-commands
+                  key: token
+            - name: drogue.gateway.password
+              value: {{ .Values.drogue.gateway.password | quote }}
+            - name: quarkus.rest-client.drogue-device-registry.url
+              value: http://device-management-service:80
+            - name: quarkus.oidc-client.auth-server-url
+              value: http://sso-service:8080/realms/drogue
+            - name: quarkus.oidc-client.client-id
+              valueFrom:
+                secretKeyRef:
+                  name: keycloak-client-secret-services
+                  key: CLIENT_ID
+            - name: quarkus.oidc-client.credentials.secret
+              valueFrom:
+                secretKeyRef:
+                  name: keycloak-client-secret-services
+                  key: CLIENT_SECRET
+            {{- include "mqtt.env-vars" (dict "root" . "direction" "incoming" "channel" "drogue-commands" ) | nindent 12 }}
+            - name: mp.messaging.incoming.drogue-commands.topic
+              value: "command/inbox/#"
+            {{- include "mqtt.env-vars" (dict "root" . "direction" "outgoing" "channel" "drogue-telemetry" ) | nindent 12 }}
+{{ else }}
+            - name: mp.messaging.incoming.zonechange.connector
               value: 'smallrye-mqtt'
             - name: mp.messaging.incoming.zonechange.topic
               value: {{ .Values.mqtt.topic.mqttZoneChangeTopic | quote }}
@@ -56,11 +132,9 @@ spec:
               value: 'bobbycar-amq-mqtt-all-0-svc'
             - name: mp.messaging.incoming.zonechange.port
               value: '61616'
-            - name: com.redhat.bobbycar.carsim.datagrid.url
-              value: 'http://cache-service-{{ .Values.namespace }}.{{ .Values.ocpDomain }}'
             - name: com.redhat.bobbycar.carsim.kafka.url
               value: 'http://bobbycar-{{ .Values.namespace }}.{{ .Values.ocpDomain }}'
-            - name: mp.messaging.outgoing.enginemetrics.type
+            - name: mp.messaging.outgoing.enginemetrics.connector
               value: 'smallrye-mqtt'
             - name: mp.messaging.outgoing.enginemetrics.topic
               value: {{ .Values.mqtt.topic.mqttMetricsTopic | quote }}
@@ -74,10 +148,9 @@ spec:
               value: '61616'
             - name: mp.messaging.incoming.ota-updates.topic
               value: 'ota/+'
-            - name: mp.messaging.incoming.ota-updates.type
+            - name: mp.messaging.incoming.ota-updates.connector
               value: 'smallrye-mqtt'
-            - name: quarkus.http.cors
-              value: 'true'
+{{ end }}
         ports:
           - containerPort: 8080
             name: http

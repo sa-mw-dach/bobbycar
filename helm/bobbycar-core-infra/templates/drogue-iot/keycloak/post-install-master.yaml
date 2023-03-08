@@ -1,0 +1,62 @@
+{{- if .Values.drogueIoT -}}
+kind: Job
+apiVersion: batch/v1
+metadata:
+  name: post-install-fix-keycloak
+  annotations:
+    helm.sh/hook-weight: "2"
+    helm.sh/hook: post-install,post-upgrade
+    helm.sh/hook-delete-policy: before-hook-creation
+spec:
+  backoffLimit: 1000
+  completions: 1
+  parallelism: 1
+  ttlSecondsAfterFinished: 600
+  template:
+    spec:
+
+      restartPolicy: OnFailure
+
+      containers:
+        - name: post-install
+          image: quay.io/keycloak/keycloak:20.0
+          imagePullPolicy: IfNotPresent
+
+          env:
+            - name: ADMIN_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: sso-service-credentials
+                  key: username
+            - name: ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: sso-service-credentials
+                  key: password
+
+            - name: KEYCLOAK_URL
+              value: http://sso-service:8080
+
+            - name: KCADM_PATH
+              value: "/opt/keycloak/bin/kcadm.sh"
+
+          command:
+            - bash
+            - -exc
+            - |
+
+              kcadm() { local cmd="$1" ; shift ; "$KCADM_PATH" "$cmd" --config /tmp/kcadm.config "$@" ; }
+
+              # set up trust store
+              if [[ -n "${CUSTOM_TRUSTSTORE}" ]]; then
+                keytool -importcert -noprompt -trustcacerts -file "${CUSTOM_TRUSTSTORE}" -keystore /tmp/truststore.jks -storepass temp1234 -storetype JKS
+                kcadm config truststore /tmp/truststore.jks --trustpass temp1234
+              fi
+
+              # log in to keycloak
+              kcadm config credentials config --server "$KEYCLOAK_URL" --realm master --user "$ADMIN_USERNAME" --password "$ADMIN_PASSWORD"
+
+              # disable HTTPS on master realm
+              kcadm update realms/master -s sslRequired=NONE
+
+{{- end -}}

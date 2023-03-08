@@ -1,3 +1,4 @@
+{{ if not .Values.drogueIoT }}
 apiVersion: kafka.strimzi.io/v1beta2
 kind: KafkaBridge
 metadata:
@@ -8,3 +9,4 @@ spec:
   bootstrapServers: bobbycar-cluster-kafka-bootstrap:9092
   http:
     port: {{ .Values.kafka.bridge.port }}
+{{ end }}

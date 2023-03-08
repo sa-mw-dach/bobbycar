@@ -1,11 +1,10 @@
 package com.redhat.bobbycar.carsim.rest.model;
 
 import java.time.ZonedDateTime;
-import java.util.UUID;
 
 public class CarSimulationDto {
 
-	private UUID id;
+	private String id;
 	private ZonedDateTime start;
 	private ZonedDateTime end;
 	private CarDto car;
@@ -15,7 +14,7 @@ public class CarSimulationDto {
 		
 	}
 
-	public CarSimulationDto(UUID id, ZonedDateTime start, ZonedDateTime end, CarDto car, RouteDto route) {
+	public CarSimulationDto(String id, ZonedDateTime start, ZonedDateTime end, CarDto car, RouteDto route) {
 		super();
 		this.id = id;
 		this.start = start;
@@ -24,11 +23,11 @@ public class CarSimulationDto {
 		this.route = route;
 	}
 	
-	public UUID getId() {
+	public String getId() {
 		return id;
 	}
 
-	public void setId(UUID id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 

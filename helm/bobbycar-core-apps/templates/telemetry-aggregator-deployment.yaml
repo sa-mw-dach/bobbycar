@@ -18,7 +18,9 @@ spec:
     spec:
       containers:
         - name: bc-telemetry-aggregator-jvm
-          image: 'quay.io/bobbycar/bc-telemetry-aggregator:jvm-1.0.0'
+          #image: 'quay.io/bobbycar/bc-telemetry-aggregator:jvm-1.0.0'
+          image: 'quay.io/ctrontesting/bc-telemetry-aggregator:latest'
+          imagePullPolicy: Always
           ports:
             - containerPort: 8080
               protocol: TCP
@@ -29,22 +31,30 @@ spec:
           env:
             - name: quarkus.kafka-streams.bootstrap-servers
               value: {{ .Values.kafka.bootstrap.servers | quote }}
-            - name: quarkus.kafka-streams.topics
-              value: {{ .Values.kafka.topic.metrics | quote }}
             - name: com.redhat.bobbycar.streams.metrics.aggregated.topic
               value: {{ .Values.kafka.topic.metricsAggregated | quote }}
             - name: com.redhat.bobbycar.streams.speedalert.topic
               value: {{ .Values.kafka.topic.speedAlerts | quote }}
-            - name: com.redhat.bobbycar.streams.metrics.topic
-              value: {{ .Values.kafka.topic.metrics | quote }}
             - name: com.redhat.bobbycar.streams.speedalert.threshold
               value: {{ .Values.telemetryAggregator.config.speedAlert | quote }}
             - name: com.redhat.bobbycar.streams.metrics.windowsize.minutes
               value: {{ .Values.telemetryAggregator.config.windowsize | quote}}
+{{ if .Values.drogueIoT }}
+            - name: com.redhat.bobbycar.streams.mode
+              value: DROGUE
+            - name: quarkus.kafka-streams.topics
+              value: {{ .Values.kafka.topic.drogueEvents | quote }}
+            - name: com.redhat.bobbycar.streams.metrics.topic
+              value: {{ .Values.kafka.topic.drogueEvents | quote }}
+{{ else }}
+            - name: quarkus.kafka-streams.topics
+              value: {{ .Values.kafka.topic.metrics | quote }}
+            - name: com.redhat.bobbycar.streams.metrics.topic
+              value: {{ .Values.kafka.topic.metrics | quote }}
+{{ end }}
           resources: {}
           terminationMessagePath: /dev/termination-log
           terminationMessagePolicy: File
-          imagePullPolicy: Always
       restartPolicy: Always
       terminationGracePeriodSeconds: 30
       dnsPolicy: ClusterFirst

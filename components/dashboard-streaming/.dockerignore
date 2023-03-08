@@ -2,4 +2,5 @@
 !target/*-runner
 !target/*-runner.jar
 !target/lib/*
-!target/quarkus-app/*
+!target/direct-quarkus-app/*
+!target/drogue-quarkus-app/*
