@@ -1,7 +1,6 @@
 package com.redhat.bobbycar.carsim.cars;
 
 import java.util.Optional;
-import java.util.UUID;
 
 import org.eclipse.microprofile.metrics.Gauge;
 import org.eclipse.microprofile.metrics.Metadata;
@@ -26,7 +25,7 @@ public class EngineMetrics {
 	private static final Logger LOGGER = LoggerFactory.getLogger(EngineMetrics.class);
 	private Optional<EngineData> engineData;
 
-	public EngineMetrics(MetricRegistry registry, UUID driverId, String routeName) {
+	public EngineMetrics(MetricRegistry registry, String driverId, String routeName) {
 		super();
 		String routeNameOrUnknown = (routeName != null && routeName.trim().length() > 0) ? routeName : "unknown";
 		LOGGER.debug("Register metrics with tags driver='{}' and route='{}'", driverId, routeName);
@@ -53,11 +52,11 @@ public class EngineMetrics {
 				"", registry, driverId, routeNameOrUnknown);
 	}
 
-	private void register(String name, Gauge<?> gauge, String unit, MetricRegistry registry, UUID driverId,
+	private void register(String name, Gauge<?> gauge, String unit, MetricRegistry registry, String driverId,
 			String routeName) {
 		Metadata metadata = Metadata.builder().withName(name).withType(MetricType.GAUGE).withUnit(unit).build();
 		registry.register(metadata, gauge, 
-				new Tag(TAG_DRIVER, driverId.toString()), 
+				new Tag(TAG_DRIVER, driverId),
 				new Tag(TAG_ROUTE, routeName));
 	}
 

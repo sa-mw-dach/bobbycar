@@ -2,6 +2,8 @@ namespace:
 appName: Bobbycar
 ocpDomain:
 
+drogueIoT: false
+
 datagrid:
   replicas: 1
   type: DataGrid

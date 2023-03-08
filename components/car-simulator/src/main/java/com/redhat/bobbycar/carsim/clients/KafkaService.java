@@ -17,6 +17,5 @@ public interface KafkaService {
 	@POST
 	@Consumes("application/vnd.kafka.json.v2+json")
 	@Produces("application/vnd.kafka.v2+json")
-	@Path("")
 	public void publishCarEvent(@QueryParam("user_key") String apiKey, KafkaCarEvent carEvent);
 }

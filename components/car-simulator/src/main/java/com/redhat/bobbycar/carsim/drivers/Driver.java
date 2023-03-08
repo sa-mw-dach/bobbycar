@@ -4,12 +4,12 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.MoreObjects;
 import com.redhat.bobbycar.carsim.CarEvent;
 import com.redhat.bobbycar.carsim.CarEventListener;
 import com.redhat.bobbycar.carsim.routes.Route;
@@ -24,7 +24,7 @@ public class Driver implements Runnable{
 	private Optional<RoutePoint> lastPoint = Optional.empty();
 	private final DrivingStrategy drivingStrategy;
 	private final Optional<DriverMetrics> metrics;
-	private final UUID id;
+	private final String id;
 	private final String routeName;
 	private final boolean repeat;
 	private final long startDelay;
@@ -87,7 +87,7 @@ public class Driver implements Runnable{
 		}
 	}
 
-	public UUID getId() {
+	public String getId() {
 		return id;
 	}
 
@@ -118,7 +118,7 @@ public class Driver implements Runnable{
 		private DriverMetrics metrics;
 		private long startDelay = 0;
 		private boolean repeat;
-		private UUID id;
+		private String id;
 
 		private Builder() {
 		}
@@ -148,7 +148,7 @@ public class Driver implements Runnable{
 			return this;
 		}
 		
-		public Builder withId(UUID id) {
+		public Builder withId(String id) {
 			this.id = id;
 			return this;
 		}
@@ -156,6 +156,20 @@ public class Driver implements Runnable{
 		public Driver build() {
 			return new Driver(this);
 		}
+	}
+
+	@Override
+	public String toString() {
+		return MoreObjects.toStringHelper(this)
+				.add("lastPoint", lastPoint)
+				.add("drivingStrategy", drivingStrategy)
+				.add("id", id)
+				.add("routeName", routeName)
+				.add("repeat", repeat)
+				.add("startDelay", startDelay)
+				.add("start", start)
+				.add("end", end)
+				.toString();
 	}
 
 }

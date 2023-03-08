@@ -1,0 +1,60 @@
+{{ if .Values.drogueIoT }}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: sso
+  labels:
+    app.kubernetes.io/component: bobbycar
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/name: sso
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: {{ .Release.Name }}
+      app.kubernetes.io/name: sso
+  serviceName: sso
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: bobbycar
+        app.kubernetes.io/instance: {{ .Release.Name }}
+        app.kubernetes.io/name: sso
+    spec:
+      containers:
+        - name: sso
+          image: quay.io/keycloak/keycloak:20.0.1
+          imagePullPolicy: IfNotPresent
+          args:
+            - start-dev
+          env:
+            - name: KEYCLOAK_ADMIN
+              value: admin
+            - name: KEYCLOAK_ADMIN_PASSWORD
+              value: admin123456
+            - name: KC_DB
+              value: postgres
+            - name: KC_DB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: admin.username
+            - name: KC_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: admin.password
+            - name: KC_DB_URL
+              # we re-use the device registry database here
+              value: jdbc:postgresql://postgres/registry
+            - name: KC_HOSTNAME
+              value: sso-{{ .Release.Namespace }}.{{ .Values.ocpDomain }}
+            - name: KC_PROXY
+              value: edge
+          ports:
+            - containerPort: 8080
+              name: web
+          livenessProbe:
+            httpGet:
+              port: web
+              path: /
+{{ end }}

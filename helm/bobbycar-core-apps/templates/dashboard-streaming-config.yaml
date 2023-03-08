@@ -5,10 +5,21 @@ metadata:
   namespace: {{ .Values.namespace }}
 data:
   kafka.bootstrap.servers: {{ .Values.kafka.bootstrap.servers }}
+{{ if .Values.drogueIoT }}
+  mp.messaging.incoming.drogue-events.broadcast: 'true'
+  mp.messaging.incoming.drogue-events.topic: {{ .Values.kafka.topic.drogueEvents }}
+  mp.messaging.incoming.drogue-events.connector: smallrye-kafka
+  mp.messaging.incoming.drogue-events.value.deserializer: 'io.cloudevents.kafka.CloudEventDeserializer'
+  mp.messaging.incoming.drogue-events.cloud-events: 'false'
+  quarkus.reactive-messaging.kafka.serializer-generation.enabled: 'false'
+{{ else }}
+  mp.messaging.incoming.bobbycar-gps.connector: smallrye-kafka
   mp.messaging.incoming.bobbycar-gps.broadcast: 'true'
   mp.messaging.incoming.bobbycar-gps.topic: {{ .Values.kafka.topic.gps }}
+  mp.messaging.incoming.bobbycar-metrics.connector: smallrye-kafka
   mp.messaging.incoming.bobbycar-metrics.broadcast: 'true'
   mp.messaging.incoming.bobbycar-metrics.topic: {{ .Values.kafka.topic.metrics }}
+{{ end }}
   mp.messaging.incoming.bobbycar-zonechange.broadcast: 'true'
   mp.messaging.incoming.bobbycar-zonechange.topic: {{ .Values.kafka.topic.zonechange }}
   mp.messaging.incoming.bobbycar-metrics-aggregated.broadcast: 'true'

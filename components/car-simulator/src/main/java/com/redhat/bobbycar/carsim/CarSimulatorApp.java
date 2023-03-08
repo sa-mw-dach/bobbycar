@@ -5,6 +5,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 
 import java.io.FileNotFoundException;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -22,12 +23,12 @@ import java.util.stream.LongStream;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
-import javax.net.ssl.SSLException;
 import javax.ws.rs.core.MediaType;
 import javax.xml.bind.JAXBException;
 
+import com.redhat.bobbycar.carsim.cloud.Provisioner;
+import com.redhat.bobbycar.carsim.cloud.Telemetry;
 import com.redhat.bobbycar.carsim.consumer.OTAConsumer;
-import com.redhat.bobbycar.carsim.consumer.OTAListener;
 import com.redhat.bobbycar.carsim.data.CarDao;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.metrics.MetricRegistry;
@@ -44,10 +45,7 @@ import com.redhat.bobbycar.carsim.cars.TimedEngine;
 import com.redhat.bobbycar.carsim.cars.events.CarMetricsEvent;
 import com.redhat.bobbycar.carsim.cars.events.CarMetricsEventPublisher;
 import com.redhat.bobbycar.carsim.clients.DataGridService;
-import com.redhat.bobbycar.carsim.clients.KafkaService;
-import com.redhat.bobbycar.carsim.clients.model.KafkaCarEvent;
 import com.redhat.bobbycar.carsim.clients.model.KafkaCarPosition;
-import com.redhat.bobbycar.carsim.clients.model.KafkaCarRecord;
 import com.redhat.bobbycar.carsim.consumer.ZoneChangeConsumer;
 import com.redhat.bobbycar.carsim.consumer.ZoneChangeListener;
 import com.redhat.bobbycar.carsim.data.DriverDao;
@@ -82,8 +80,6 @@ public class CarSimulatorApp {
 	double factor;
 	@ConfigProperty(name = "com.redhat.bobbycar.carsim.repeat", defaultValue = "false")
 	boolean repeat;
-	@ConfigProperty(name = "com.redhat.bobbycar.carsim.kafka.apiKey")
-	Optional<String> apiKey;
 	@ConfigProperty(name = "com.redhat.bobbycar.carsim.mockHttp", defaultValue = "false")
 	boolean mockHttp;
 	
@@ -108,17 +104,18 @@ public class CarSimulatorApp {
 	OTAConsumer otaConsumer;
 	@Inject
 	CarMetricsEventPublisher carMetricsPublisher;
-	// Rest Clients
-	@Inject
-    @RestClient
-    KafkaService kafkaService;
 	@RestClient
     @Inject
     DataGridService dataGridService;
+	@Inject
+	Provisioner provisioner;
+	@Inject
+	Telemetry telemetry;
+
 	
 	// Attributes
     private RouteSelectionStrategy routeSelectionStrategy;
-	private final Map<UUID, CompletableFuture<Void>> futures;
+	private final Map<String, CompletableFuture<Void>> futures;
 	private WireMockServer wireMockServer;
 
 	public CarSimulatorApp() throws JAXBException {
@@ -130,10 +127,11 @@ public class CarSimulatorApp {
 		ThreadPoolExecutor carPoolExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(cars);
 		ThreadPoolExecutor enginePoolExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(cars);
         LOGGER.info("The application is starting... ");
+		LOGGER.info("Using telemetry implementation {}", telemetry);
         LOGGER.info("Reading routes from {}", pathToRoutes);
         LongStream.range(0, cars).forEach(c -> {
         	try {
-	        	UUID id = UUID.randomUUID();
+				String id = provisioner.provisionDevice(c);
 		    	Route route = getRouteSelectionStrategy().selectRoute();
 		    	EngineMetrics engineMetrics = new EngineMetrics(registry, id, route.getName());
 		    	TimedEngine engine = TimedEngine.builder().withSpeedVariationInKmH(5).withStartingPoint(route.getPoints().findFirst().orElse(null))
@@ -141,9 +139,9 @@ public class CarSimulatorApp {
 		    	Car car = Car.builder().withModel("M3 Coupe").withManufacturer("BMW")
 						.withEngine(engine)
 						.withDriverId(id)
-						.withVin(id.toString())
+						.withVin(id)
 						.build();
-				otaConsumer.registerOTAListener(id.toString(), car);
+				otaConsumer.registerOTAListener(id, car);
 		    	engine.registerEventListener(e -> carMetricsPublisher.publish(CarMetricsEvent.create(car, e.getEngineData())));
 				zoneChangeConsumer.registerZoneChangeListener(onZoneChange(id));
 				TimedDrivingStrategy strategy = TimedDrivingStrategy.builder()
@@ -212,9 +210,9 @@ public class CarSimulatorApp {
 		
 	}
 
-	private ZoneChangeListener onZoneChange(UUID driverId) {
+	private ZoneChangeListener onZoneChange(String driverId) {
 		return evt -> {
-			if (driverId.toString().equals(evt.getCarId())) {
+			if (driverId.equals(evt.getCarId())) {
 				retrieveZoneData(evt.getNextZoneId());
 			}
 		};
@@ -230,24 +228,18 @@ public class CarSimulatorApp {
 	}
 
 	private void onCarEvent(Driver driver) {
-		driver.registerCarEventListener(evt -> publishToKafka(driver, evt));
+		driver.registerCarEventListener(evt -> publishCarEvent(driver, evt));
 	}
 
-	private void publishToKafka(Driver driver, CarEvent evt) {
-		List<KafkaCarRecord> records = new ArrayList<>();
-		 records.add(new KafkaCarRecord(driver.getId().toString(), new KafkaCarPosition(evt.getLatitude().doubleValue(), evt.getLongitude().doubleValue(), evt.getElevation().doubleValue(), driver.getId().toString(), evt.getTime().orElse(null), evt.getVin())));
-		 KafkaCarEvent event = new KafkaCarEvent(records);
-		 try {
-			 kafkaService.publishCarEvent(apiKey.orElse(null), event);
-		 } catch(Exception e) {
-			 LOGGER.error("Error publishing car event to kafka", e);
-			 if (e.getCause() instanceof SSLException) {
-				 LOGGER.error("Cannot recover from SSL error. Shutting down.");
-				 throw e;
-				 //TODO Shutdown Service or set health check to unhealthy state
-			 }
-		 }
+	private void publishCarEvent(Driver driver, CarEvent evt) {
+		var event = new KafkaCarPosition(
+				evt.getLatitude().doubleValue(),
+				evt.getLongitude().doubleValue(),
+				evt.getElevation().doubleValue(),
+				driver.getId(),
+				evt.getTime().orElseGet(ZonedDateTime::now),
+				evt.getVin());
+		LOGGER.debug("Publish car metrics: {} -> {}", driver, event);
+		this.telemetry.publishCarEvent(driver, event);
 	}
-
-	
 }

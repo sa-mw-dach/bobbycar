@@ -39,3 +39,10 @@ maintainers:
     name: Ortwin Schneider
   - email: bschmeli@redhat.com
     name: Dr. Benjamin Schmeling  
+
+dependencies:
+  - name: drogue-cloud-core
+    version: 0.7.10
+    alias: drogueCloudCore
+    condition: drogueIoT
+    repository: https://drogue-iot.github.io/drogue-cloud-helm-charts/
