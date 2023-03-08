@@ -5,17 +5,21 @@ metadata:
     app: {{ .Values.carSimulator.name }}
     app.kubernetes.io/part-of: {{ .Values.appName }}
   name: {{ .Values.carSimulator.name }}
+  namespace: {{ .Values.namespace }}
 spec:
   replicas: {{ .Values.carSimulator.replicas }}
-  revisionHistoryLimit: 10
   selector:
     matchLabels:
-      deploymentConfig: {{ .Values.carSimulator.name }}
+      app: {{ .Values.carSimulator.name }}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 25%
+      maxSurge: 25%
   template:
     metadata:
       labels:
         app: {{ .Values.carSimulator.name }}
-        deploymentConfig: {{ .Values.carSimulator.name }}
       name: {{ .Values.carSimulator.name }}
     spec:
       volumes:
@@ -23,7 +27,6 @@ spec:
           configMap:
             name: car-simulator-us-routes-config
             defaultMode: 420
-
 {{ if .Values.drogueIoT }}
         - name: java-truststore
           emptyDir: {}
@@ -31,7 +34,6 @@ spec:
           configMap:
             name: trust-anchor
 {{ end }}
-
 {{ if .Values.drogueIoT }}
       initContainers:
         - name: truststore
@@ -49,7 +51,6 @@ spec:
               readOnly: false
               mountPath: /var/log/output
 {{ end }}
-
       containers:
       - name: {{ .Values.carSimulator.name }}
         # FIXME: revert before merge
@@ -81,19 +82,15 @@ spec:
               value: 'http://cache-service-{{ .Values.namespace }}.{{ .Values.ocpDomain }}'
             - name: quarkus.http.cors
               value: 'true'
-
             - name: com.redhat.bobbycar.carsim.instance
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.name
-
             - name: com.redhat.bobbycar.carsim.drogue.enabled
               value: {{ .Values.drogueIoT | quote }}
-
 {{ if .Values.drogueIoT}}
             - name: JAVA_APP_JAR
               value: /deployments/drogue/quarkus-run.jar
-
             - name: drogue.application
               value: {{ .Values.drogue.application | quote }}
             - name: drogue.registry.apiUser
@@ -108,12 +105,10 @@ spec:
                   key: token
             - name: drogue.gateway.password
               value: {{ .Values.drogue.gateway.password | quote }}
-
             - name: quarkus.rest-client.drogue-device-registry.url
               value: http://device-management-service:80
             - name: quarkus.oidc-client.auth-server-url
               value: http://sso-service:8080/realms/drogue
-
             - name: quarkus.oidc-client.client-id
               valueFrom:
                 secretKeyRef:
@@ -124,7 +119,6 @@ spec:
                 secretKeyRef:
                   name: keycloak-client-secret-services
                   key: CLIENT_SECRET
-
             {{- include "mqtt.env-vars" (dict "root" . "direction" "incoming" "channel" "drogue-commands" ) | nindent 12 }}
             - name: mp.messaging.incoming.drogue-commands.topic
               value: "command/inbox/#"
@@ -157,7 +151,6 @@ spec:
             - name: mp.messaging.incoming.ota-updates.connector
               value: 'smallrye-mqtt'
 {{ end }}
-
         ports:
           - containerPort: 8080
             name: http

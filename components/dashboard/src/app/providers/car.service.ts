@@ -19,4 +19,20 @@ export class CarService {
         //const headers = new HttpHeaders().set('Content-Type', 'text/plain; charset=utf-8');
         return this.http.get<any[]>(this.configService.CAR_ENDPOINT+"/metrics");
     }
+    scaleDeployment(replicas) {
+        const headers = { 'Authorization': 'Bearer '+this.configService.OCP_TOKEN, 'Content-Type': 'application/json'};
+        const body = {
+                       "kind": "Scale",
+                       "apiVersion": "autoscaling/v1",
+                       "metadata": {
+                         "name": "car-simulator",
+                         "namespace": "bobbycar"
+                       },
+                       "spec": {
+                         "replicas": parseInt(replicas)
+                       }
+                     };
+
+        return this.http.put<any[]>(this.configService.OCP_API_SERVER+"/apis/apps/v1/namespaces/bobbycar/deployments/car-simulator/scale", body, { headers });
+    }
 }

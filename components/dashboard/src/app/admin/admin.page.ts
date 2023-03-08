@@ -4,6 +4,7 @@ import { CacheService } from '../providers/cache.service';
 import { CarService } from '../providers/car.service';
 import { PredictiveService } from '../providers/predictive.service';
 import { OTAService } from '../providers/ota.service';
+import { ConfigService } from '../providers/config.service';
 
 @Component({
   selector: 'app-admin',
@@ -23,12 +24,14 @@ export class AdminPage {
   otaCampaignIdSearch = 1;
   latitudeSearch = 41.11804887672318;
   longitudeSearch = -73.7198836780401;
+  carSimReplicas: number = 1;
 
   constructor(
     private cacheService: CacheService,
     private carService: CarService,
     private predictiveService: PredictiveService,
     private otaService: OTAService,
+    private configService: ConfigService,
     private toastController: ToastController,
     ) {}
 
@@ -137,6 +140,14 @@ export class AdminPage {
         } else {
             this.weatherData = undefined;
         }
+    }
+
+    async scaleCarSim(){
+        this.carService.scaleDeployment(this.carSimReplicas).subscribe((data) => {
+            console.dir(data);
+            this.clearCache();
+            this.presentToast(JSON.stringify(data, null, 2), 5000);
+        });
     }
 
     async ngOnInit() {

@@ -29,6 +29,8 @@ export class MapPage implements OnInit {
     metricsAggregated = new Map();
     speedAlerts = new Map();
 
+    carBg = 'MB';
+
     constructor(
         private platform: Platform,
         private carEventsService: CarEventsService,
@@ -39,30 +41,36 @@ export class MapPage implements OnInit {
         private router: Router
         ) {
             this.initialPosition = configService.INITIAL_MAP_POSITION;
+            this.carBg = this.configService.DEFAULT_CAR_BRAND;
         }
 
-    initializeMap() {
-        setTimeout(() => {
+    async initializeMap() {
+        await setTimeout(() => {
             this.map = new google.maps.Map(document.getElementById('map'), {
                 center: this.initialPosition,
-                zoom: 11,
+                zoom: 12,
+                mapTypeId: 'terrain'
                 // mapTypeId: google.maps.MapTypeId.HYBRID,
             });
             this.infowindow = new google.maps.InfoWindow({
                 content: ''
             });
             const icon = {
-                url: "https://cdn-icons-png.flaticon.com/512/882/882829.png", // url
+                url: "assets/ibm-hq-marker.png", // url
                 scaledSize: new google.maps.Size(50, 50), // scaled size
             };
 
             const marker = new google.maps.Marker({
-                        position: new google.maps.LatLng({ lat: 41.10847153962609, lng: -73.72042478641728 }),
-                        // label: 'IBM HQ Armonk',
-                        icon: icon,
-                        map: this.map
-                    });
-        }, 10);
+                position: new google.maps.LatLng({ lat: 41.10847153962609, lng: -73.72042478641728 }),
+                // label: 'IBM HQ Armonk',
+                icon: icon,
+                map: this.map
+            });
+
+            //this.markerCluster = new MarkerClusterer({marker});
+            //this.markerCluster.setMap(this.map);
+
+        }, 100);
     }
 
     displaySpeedAlerts(){
@@ -103,7 +111,7 @@ export class MapPage implements OnInit {
         }
     }
 
-    getDistanceFromLatLonInKm(lat1,lon1,lat2,lon2) {
+    private getDistanceFromLatLonInKm(lat1,lon1,lat2,lon2) {
         const R = 6371; // Radius of the earth in km
         const dLat = this.deg2rad(lat2-lat1);  // deg2rad below
         const dLon = this.deg2rad(lon2-lon1);
@@ -117,23 +125,49 @@ export class MapPage implements OnInit {
     }
 
     // degree to radius
-    deg2rad(deg) {
+    private deg2rad(deg) {
         return deg * (Math.PI/180);
     }
 
-    createOrUpdateMarker(data){
+    private createOrUpdateMarker(data){
 
         if(this.bobbycars.has(data.carid)){
             this.bobbycars.get(data.carid).setPosition(new google.maps.LatLng({ lat: data.lat, lng: data.long }));
+            //this.markerCluster.removeMarker(mark);
+            //this.markerCluster.addMarker(mark);
         } else {
-            console.debug('create marker for carid: ' + data.carid);
+            // console.debug('create marker for carid: ' + data.carid);
+            const icon = {
+                url: "assets/mb-marker.png",
+                scaledSize: new google.maps.Size(30, 30) // scaled size
+            };
+
+            if(this.carBg === 'VW') {
+                icon.url = "assets/vw-marker.png"
+            } else if (this.carBg === 'BMW'){
+                icon.url = "assets/bmw-marker.png"
+            } else if (this.carBg === 'MB'){
+                icon.url = "assets/mb-marker.png"
+                icon.scaledSize = new google.maps.Size(40,40);
+            } else if (this.carBg === 'P'){
+                icon.url = "assets/porsche-marker.png";
+                icon.scaledSize = new google.maps.Size(24,30);
+            } else if (this.carBg === 'FORD'){
+                icon.url = "assets/ford-marker.png";
+                icon.scaledSize = new google.maps.Size(40,30);
+            } else if (this.carBg === 'F150'){
+                icon.url = "assets/ford-marker.png";
+                icon.scaledSize = new google.maps.Size(40,30);
+            }
+
             const marker = new google.maps.Marker({
                 position: new google.maps.LatLng({ lat: data.lat, lng: data.long }),
                 title: data.carid,
                 map: this.map,
-                animation: google.maps.Animation.DROP,
-                // label: data.carid,
-                draggable: false
+                icon: icon,
+                // animation: google.maps.Animation.DROP,
+                draggable: false,
+                optimized: true
             });
 
             // tslint:disable-next-line:only-arrow-functions
@@ -141,9 +175,9 @@ export class MapPage implements OnInit {
                 return function() {
                     infowindow.setContent(
                         `<span style="color: #000000;">
-                            <h4>Bobbycar Id:</h4>
+                            <h4>Bobbycar VIN:</h4>
                             <p>`+content.carid+`<br/>
-                            <h4>Zone:</h4>`+content?.zone?.spec.name+`</p><br/>
+                            <h4>Bobbycar Zone:</h4>`+content?.zone?.spec.name+`</p><br/>
                             <ion-button color="danger" href="/car-detail/`+content.carid+`">Car Detail</ion-button>
                         </span>`);
                     infowindow.open(this.map, marker);
@@ -154,29 +188,7 @@ export class MapPage implements OnInit {
         }
     }
 
-    realtimeQuery(){
-        if(!this.searchArea) {
-            this.searchArea = new google.maps.Circle({
-                strokeColor: '#eeeeee',
-                strokeOpacity: 0.7,
-                strokeWeight: 1,
-                fillColor: '#444444',
-                fillOpacity: 0.35,
-                map: this.map,
-                center: this.map.getCenter(),
-                editable: true,
-                radius: 3000
-            });
-        } else if(this.searchArea && !this.searchArea.getVisible()) {
-            this.searchArea.setCenter(this.map.getCenter());
-            this.searchArea.setVisible(true);
-        } else {
-            this.searchArea.setVisible(false);
-        }
-
-    }
-
-    createZone(){
+    public createZone(){
         const circle = new google.maps.Circle({
             strokeColor: '#FF0000',
             strokeOpacity: 0.7,
@@ -210,7 +222,7 @@ export class MapPage implements OnInit {
           });
     }
 
-    resetMap() {
+    public resetMap() {
         this.bobbycars.forEach(el => {
             el.setMap(null);
         });
@@ -220,14 +232,6 @@ export class MapPage implements OnInit {
             element.setMap(null);
         });
         this.zones = [];
-
-        this.cacheService.getCars()
-        .subscribe((data) => {
-            console.log(data);
-            data.forEach(element => {
-                this.createOrUpdateMarker(element);
-            });
-        });
 
         this.cacheService.getZones()
         .subscribe((data) => {
@@ -248,19 +252,18 @@ export class MapPage implements OnInit {
                 });
             }
         });
+
+        this.cacheService.getCars()
+        .subscribe((data) => {
+            data.forEach(element => {
+                this.createOrUpdateMarker(element);
+            });
+        });
     }
 
-    ionViewWillLeave(){
-        console.debug('ionViewWillLeave()');
-        this.carEventsService.close();
-        this.metricsAggregatedService.close();
-    }
-
-    async ngOnInit() {
-
+    ionViewWillEnter(){
+        console.debug('ionViewWillEnter()');
         this.initializeMap();
-        this.carEventsService.connect();
-        //this.metricsAggregatedService.connect();
 
         this.cacheService.getZones().subscribe((data) => {
             if(this.map){
@@ -282,18 +285,30 @@ export class MapPage implements OnInit {
         });
 
         this.cacheService.getCars().subscribe((data) => {
-            console.log(data);
+            // console.log(data);
             data.forEach(element => {
                 this.createOrUpdateMarker(element);
             });
         });
+    }
 
+    ionViewWillLeave(){
+        console.debug('ionViewWillLeave()');
+        this.bobbycars.clear();
+        this.zones = [];
+        //this.carEventsService.close();
+        //this.metricsAggregatedService.close();
+    }
+
+    ngOnInit() {
+
+        this.carEventsService.connect();
         this.carEventsService.getMessages().pipe(retryWhen((errors) => errors.pipe(delay(1_000)))).subscribe(
             msg => {
                 this.createOrUpdateMarker(msg);
             }, // Called whenever there is a message from the server.
             err => console.error(err), // Called if at any point WebSocket API signals some kind of error.
-            () => console.log('complete') // Called when connection is closed (for whatever reason).
+            () => console.log('Connection has been closed') // Called when connection is closed (for whatever reason).
         );
 
     }
