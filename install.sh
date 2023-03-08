@@ -47,6 +47,33 @@ wait_for_operator() {
 source install_cleanup_vars.sh
 test -f .env && source .env
 
+# If weather api keys are empty, set a default value.
+if [[ -z "$OWM_WEATHER_API_KEY" ]]; then
+  OWM_WEATHER_API_KEY='my-owm-api-key';
+fi;
+if [[ -z "$IBM_WEATHER_API_KEY" ]]; then
+  IBM_WEATHER_API_KEY='my-ibm-api-key';
+fi;
+
+if [[ "$INSTALL_KNATIVE" == true ]]; then
+log "Installing OpenShift Serverless operator"
+oc apply -f config/operators/serverless-operator-subscription.yaml
+sleep 25
+log "Waiting for OpenShift Serverless operator"
+oc -n openshift-serverless wait --for=condition=Available deployment -l operators.coreos.com/serverless-operator.openshift-serverless --timeout=300s
+log "Installing Knative Serving config"
+oc apply -f config/knative/knative-serving.yaml
+log "Installing Knative Eventing config"
+oc apply -f config/knative/knative-eventing.yaml
+log "Installing Knative Kafka config"
+oc apply -f config/knative/knative-kafka.yaml
+sleep 10
+oc wait --for=condition=Ready knativeservings.v1beta1.operator.knative.dev/knative-serving --timeout 500s -n knative-serving
+oc wait --for=condition=Ready knativeeventings.v1beta1.operator.knative.dev/knative-eventing --timeout 500s -n knative-eventing
+oc wait --for=condition=Ready knativekafkas.v1alpha1.operator.serverless.openshift.io/knative-kafka --timeout 500s -n knative-eventing
+log "OpenShift Serverless Installation has been completed!!"
+fi ;
+
 if [[ "$INSTALL_OPERATORS" == true ]]; then
 log "Creating namespace $NAMESPACE for Bobbycar demo"
 oc new-project "$NAMESPACE" || true
@@ -116,6 +143,7 @@ helm upgrade --install "$HELM_APP_RELEASE_NAME" helm/bobbycar-core-apps \
 --set-string dashboard.config.googleApiKey="$GOOGLE_API_KEY" \
 --set-string weatherService.owm.api.key="$OWM_WEATHER_API_KEY" \
 --set-string weatherService.ibm.api.key="$IBM_WEATHER_API_KEY" \
+--set-string dashboard.config.ocpApiUrl="https://$API_DOMAIN:6443"
 --set drogueIoT="$DROGUE_IOT"
 
 sleep 30
@@ -126,6 +154,11 @@ log "Waiting for Bobbycar Dashboard pod"
 oc wait --for=condition=Available dc/dashboard --timeout 300s
 log "Waiting for Dashboard Streaming service pod"
 oc wait --for=condition=Available deployment/dashboard-streaming --timeout 300s
+
+log "Installing the Serverless Helm release: $HELM_SERVERLESS_RELEASE_NAME"
+helm upgrade --install "$HELM_SERVERLESS_RELEASE_NAME" helm/bobbycar-opt-serverless \
+--set-string namespace="$NAMESPACE" \
+--set-string otaServer.url="http://ota-server-bobbycar.$APP_DOMAIN"
 
 log "Waiting for Camel-K integrations to complete..."
 oc wait --for=condition=Ready integration/cache-service --timeout 1800s

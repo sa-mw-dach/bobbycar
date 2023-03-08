@@ -6,14 +6,9 @@ import { ZoneChangeService } from '../providers/zonechange.service';
 import { CacheService } from '../providers/cache.service';
 import { CarService } from '../providers/car.service';
 import { PredictiveService } from '../providers/predictive.service';
+import { ConfigService } from '../providers/config.service';
 import { ToastController } from '@ionic/angular';
 import { map, tap, delay, retryWhen, delayWhen } from 'rxjs/operators';
-
-import * as am4core from "@amcharts/amcharts4/core";
-import * as am4charts from "@amcharts/amcharts4/charts";
-import am4themes_animated from "@amcharts/amcharts4/themes/animated";
-
-am4core.useTheme(am4themes_animated);
 
 @Component({
   selector: 'app-car-detail',
@@ -22,7 +17,6 @@ am4core.useTheme(am4themes_animated);
 })
 export class CarDetailPage implements OnInit {
 
-  private chart: am4charts.XYChart;
   map: google.maps.Map;
   initialPosition = { lat: 50.1146997, lng: 8.6185411 };
   currentPosition = { lat: 0, lon: 0 };
@@ -34,16 +28,16 @@ export class CarDetailPage implements OnInit {
   streetName = '';
   showHUD = false;
   showDriverMonitoring = false;
-  carBg = 'S';
+  carBg = 'MB';
   engineOverlayHidden: boolean = true;
   engineData;
   weatherData;
   roadClassificationResult = {
-                                 "prediction": {
-                                   "Road Condition": "Great",
-                                   "Vehicle Config": "166Y.2"
-                                 }
-                               };
+     "prediction": {
+       "Road Condition": "Great",
+       "Vehicle Config": "166Y.2"
+     }
+   };
   enableStreetView: boolean = true;
 
   constructor(
@@ -52,53 +46,118 @@ export class CarDetailPage implements OnInit {
     private cacheService: CacheService,
     private carService: CarService,
     private zoneChangeService: ZoneChangeService,
+    private configService: ConfigService,
     private route: ActivatedRoute,
     public toastController: ToastController,
     private predictiveService: PredictiveService,
     private zone: NgZone,
-    ) {}
+    ) {
+        console.log('Constructing car-detail-page');
+        this.carBg = this.configService.DEFAULT_CAR_BRAND;
+    }
 
-  initializeMap() {
-
-    setTimeout(() => {
-
-        this.map = new google.maps.Map(document.getElementById('map'), {
-            center: this.initialPosition,
-            zoom: 13,
-            disableDefaultUI: true,
-            mapTypeControl: false,
-        });
-
-        this.marker = new google.maps.Marker({
-          position: new google.maps.LatLng(this.initialPosition),
-          title: 'Car Detail',
-          map: this.map,
-          draggable: false
+    // ***********************
+    // Presenting a message at the top of the screen
+    // ***********************
+    async presentToast(msg, duration) {
+      const toast = await this.toastController.create({
+        message: msg,
+        duration: duration,
+        color: 'danger',
+        position: 'top'
       });
+      toast.present();
+    }
 
-      this.panorama = new google.maps.StreetViewPanorama(
-        document.getElementById('pano'),
-        {
-          position: this.initialPosition,
-          pov: {heading: 360, pitch: 0},
-          zoom: 1
-        });
+    // ***********************
+    // Initialize the Google Map, Google Streetview and set the marker for the vehicle
+    // ***********************
+    initializeMap() {
+        setTimeout(() => {
+            this.map = new google.maps.Map(document.getElementById('map'), {
+                center: this.initialPosition,
+                zoom: 13,
+                disableDefaultUI: true,
+                mapTypeControl: false,
+                mapTypeId: 'terrain'
+            });
 
-        this.map.setStreetView(this.panorama);
+            const icon = {
+                url: "assets/mb-marker.png",
+                scaledSize: new google.maps.Size(30, 30), // scaled size
+            };
 
-    }, 10);
-  }
+            if(this.carBg === 'VW') {
+                icon.url = "assets/vw-marker.png"
+            } else if (this.carBg === 'BMW'){
+                icon.url = "assets/bmw-marker.png"
+            } else if (this.carBg === 'MB'){
+                icon.url = "assets/mb-marker.png"
+            } else if (this.carBg === 'P'){
+                icon.url = "assets/porsche-marker.png";
+                icon.scaledSize = new google.maps.Size(24,30);
+            } else if (this.carBg === 'FORD'){
+                icon.url = "assets/ford-marker.png";
+                icon.scaledSize = new google.maps.Size(40,30);
+            } else if (this.carBg === 'F150'){
+                icon.url = "assets/ford-marker.png";
+                icon.scaledSize = new google.maps.Size(40,30);
+            }
 
-  async scheduleMaintenance(){
-    let toast = await this.toastController.create({
-          message: 'You have scheduled a maintenance appointment. The collection of telemetry data has been enabled and will be forwarded to your car repair shop.',
-          duration: 5000,
-          color: 'danger',
-          position: 'top'
-        });
-        toast.present();
-  }
+            this.marker = new google.maps.Marker({
+                position: new google.maps.LatLng(this.initialPosition),
+                title: 'Car Detail',
+                map: this.map,
+                icon: icon,
+                draggable: false
+            });
 
+            this.panorama = new google.maps.StreetViewPanorama(
+                document.getElementById('pano'),
+                {
+                    position: this.initialPosition,
+                    pov: {heading: 360, pitch: 0},
+                    zoom: 1
+                });
+
+            this.map.setStreetView(this.panorama);
+
+        }, 100);
+    }
+
+    // ***********************
+    // Update the marker and Google Streetview for new positions
+    // ***********************
+    async createOrUpdateMarker(data) {
+        if(data.carid === this.carId) {
+
+          this.marker.setPosition(new google.maps.LatLng({ lat: data.lat, lng: data.long }));
+          this.map.setCenter({ lat: data.lat, lng: data.long });
+
+          this.currentPosition.lat = data.lat;
+          this.currentPosition.lon = data.long;
+
+          await this.sv.getPanorama({
+            location: { lat: data.lat, lng: data.long },
+            radius: 50
+          }, (result, status) => {
+                  // console.log(result);
+                  if (status === google.maps.StreetViewStatus.OK && this.enableStreetView) {
+                      this.panorama.setPosition({ lat: data.lat, lng: data.long });
+                      this.streetName = result.location.description;
+                      // const calcHeading = google.maps.geometry.spherical.computeHeading(result.location.latLng, result.location.latLng);
+                      this.panorama.setPov({
+                          heading: result.tiles.centerHeading,
+                          pitch: -2
+                      });
+                  }
+          });
+        }
+    }
+
+  // ***********************
+  // Show or hide the Heads-Up display with the telemetry data
+  // ***********************
   toggleHUD(){
     if(this.showHUD) {
       this.showHUD = false;
@@ -107,33 +166,50 @@ export class CarDetailPage implements OnInit {
     }
   }
 
-  toggleInfotainment(){
-      if(this.showDriverMonitoring) {
+    // ***********************
+    // Show or hide the Driver Monitoring application in the Infotainment section.
+    // ***********************
+    toggleInfotainment(){
+        if(this.showDriverMonitoring) {
         this.showDriverMonitoring = false;
-      } else {
+        } else {
         this.showDriverMonitoring = true;
-      }
+        }
     }
 
+    // ***********************
+    // Enable or disable Google Streetview updates
+    // ***********************
     toggleStreetView(){
         if(this.enableStreetView) {
           this.enableStreetView = false;
         } else {
           this.enableStreetView = true;
         }
-      }
+    }
 
-  async getWeatherData(){
+  // ***********************
+  // Calling the Weather API and optionally the Road Classification service
+  // ***********************
+  getWeatherData(){
     if(this.engineOverlayHidden) {
-        this.predictiveService.getCurrentWeather(this.currentPosition.lat, this.currentPosition.lon, 'ibm').subscribe((data) => {
+        this.predictiveService.getCurrentWeather(this.currentPosition.lat, this.currentPosition.lon, 'ibm').subscribe(
+        (data) => {
             this.weatherData = data;
             this.engineOverlayHidden = false;
-        });
-        this.predictiveService.getRoadClassification([0.36, 0.20, 9.79, 0.009, -0.13, -0.02, 0.14]).subscribe((data) => {
-            this.roadClassificationResult = data;
-            console.log(data);
         },
-        err => console.error(err));
+        (err) => {
+            console.error(err);
+            this.presentToast("The Weather Service is not enabled for this vehicle!", 6000);
+            }
+        );
+        if(this.configService.ROAD_CLASSIFICATION_ENABLE === 'true'){
+            this.predictiveService.getRoadClassification([0.36, 0.20, 9.79, 0.009, -0.13, -0.02, 0.14]).subscribe((data) => {
+                this.roadClassificationResult = data;
+                console.log(data);
+            },
+            err => console.error(err));
+        }
     } else {
         this.engineOverlayHidden = true;
         this.weatherData = undefined;
@@ -141,9 +217,21 @@ export class CarDetailPage implements OnInit {
     }
   }
 
-  async showConfig(){
+  // ***********************
+  // Switch cockpit views
+  // ***********************
+  switchCockpitView(viewId) {
+    this.carBg = viewId;
+    // this.configService.DEFAULT_CAR_BRAND = viewId;
+    this.initializeMap();
+  }
+
+  // ***********************
+  // Calling the Car Service API to get the current engine configuration
+  // ***********************
+  showConfig() {
     if(this.engineOverlayHidden) {
-        let temp = await this.carService.getCarById(this.carId).subscribe((data) => {
+        let temp = this.carService.getCarById(this.carId).subscribe((data) => {
             console.log(data);
             this.engineData = data;
             this.engineOverlayHidden = false;
@@ -153,64 +241,37 @@ export class CarDetailPage implements OnInit {
         this.engineOverlayHidden = true;
         this.engineData = undefined;
     }
-
   }
 
-  async presentToast() {
-    const toast = await this.toastController.create({
-      message: 'ZONE CHANGE EVENT: Applying new zone configuration.',
-      duration: 4000,
-      color: 'danger',
-      position: 'top'
-    });
-    toast.present();
-  }
-
+  // ***********************
+  // Closing the Websocket connections when leaving the page
+  // ***********************
   ionViewWillLeave(){
     console.debug('ionViewWillLeave()');
-    this.carEventsService.close();
+    // this.carEventsService.close();
     this.carMetricsService.close();
     this.zoneChangeService.close();
   }
 
-
-
-  createOrUpdateMarker(data){
-    if(data.carid === this.carId){
-      this.marker.setPosition(new google.maps.LatLng({ lat: data.lat, lng: data.long }));
-      this.map.setCenter({ lat: data.lat, lng: data.long });
-
-      this.currentPosition.lat = data.lat;
-      this.currentPosition.lon = data.long;
-
-      this.sv.getPanorama({
-        location: { lat: data.lat, lng: data.long },
-        radius: 50
-    }, (result, status) => {
-          // console.log(result);
-          if (status === google.maps.StreetViewStatus.OK && this.enableStreetView) {
-              this.panorama.setPosition({ lat: data.lat, lng: data.long });
-              this.streetName = result.location.description;
-              // const calcHeading = google.maps.geometry.spherical.computeHeading(result.location.latLng, result.location.latLng);
-                this.panorama.setPov({
-                  heading: result.tiles.centerHeading,
-                  pitch: -2
-              });
-          }
-     });
-
+    // ***********************
+    // TODO: Implement data collection and upload to S3 for this specific vehicle id
+    // ***********************
+    scheduleMaintenance(){
+        this.presentToast('You have scheduled a maintenance appointment. The collection of telemetry data has been enabled and will be forwarded to your car repair shop.', 5000);
     }
-}
 
-  ngOnInit() {
+  // ***********************
+  // Initialize the car detail page. This runs at the beginning...
+  // ***********************
+    ngOnInit() {
 
-    this.carId = this.route.snapshot.paramMap.get('id');
-    this.initializeMap();
-    this.carEventsService.connect();
-    this.carMetricsService.connect();
-    this.zoneChangeService.connect();
+    this.carId = this.route.snapshot.paramMap.get('id');    // get the car id from the URL
+    this.initializeMap();               // initialize the Google Map
+    this.carEventsService.connect();    // Open Websocket connection to retrieve GPS positions
+    this.carMetricsService.connect();   // Open Websocket connection to retrieve car metrics
+    this.zoneChangeService.connect();   // Open Websocket connection to retrieve zonechange events
 
-    this.cacheService.getZones()
+    this.cacheService.getZones()    // Retrieve the Bobbycarzones from the cache and create circles on the map
         .subscribe((data) => {
             if(this.map){
                 data.forEach(element => {
@@ -230,6 +291,7 @@ export class CarDetailPage implements OnInit {
             }
         });
 
+    // Retrieving new GPS postions and updating the marker and Google Streetview
     this.carEventsService.getMessages().pipe(retryWhen((errors) => errors.pipe(delay(1_000)))).subscribe(
       msg => {
           this.createOrUpdateMarker(msg);
@@ -238,6 +300,7 @@ export class CarDetailPage implements OnInit {
       () => console.log('complete') // Called when connection is closed (for whatever reason).
     );
 
+    // Retrieving new car metrics
     this.carMetricsService.getMessages().pipe(retryWhen((errors) => errors.pipe(delay(1_000)))).subscribe(
       msg => {
           if(msg.driverId === this.carId){
@@ -256,14 +319,16 @@ export class CarDetailPage implements OnInit {
       () => console.log('complete') // Called when connection is closed (for whatever reason).
     );
 
+    // Retrieving zone change events and displaying them
     this.zoneChangeService.getMessages().pipe(retryWhen((errors) => errors.pipe(delay(1_000)))).subscribe(
       msg => {
           if(msg.carId === this.carId){
-            this.presentToast();
             if(msg.nextZoneId !== null){
                 this.carMetric.zone = msg.nextZoneId;
+                this.presentToast('ZONE CHANGE EVENT! The vehicle '+ msg.carId + ' is entering the Bobbycarzone: ' + msg.nextZoneId, 5000);
             } else {
                 this.carMetric.zone = 'Default Zone';
+                this.presentToast('ZONE CHANGE EVENT! The vehicle '+ msg.carId + ' is leaving the Bobbycarzone.', 5000);
             }
           }
       }, // Called whenever there is a message from the server.

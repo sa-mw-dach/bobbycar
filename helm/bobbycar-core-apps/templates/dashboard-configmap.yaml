@@ -20,5 +20,9 @@ data:
         "WEATHER_API_ENDPOINT": "http://weather-service-{{ .Values.namespace }}.{{ .Values.ocpDomain }}",
         "OTA_SERVER_ENDPOINT": "http://ota-server-{{ .Values.namespace }}.{{ .Values.ocpDomain }}",
         "ROAD_CLASSIFICATION_ENDPOINT": "https://road-roughness-condition-git-roadconditions.{{ .Values.ocpDomain }}",
-        "INITIAL_MAP_POSITION": { "lat": 41.11804887672318, "lng": -73.7198836780401 }
+        "ROAD_CLASSIFICATION_ENABLE": "{{ .Values.dashboard.config.enableRoadClassification }}",
+        "INITIAL_MAP_POSITION": { "lat": 41.11804887672318, "lng": -73.7198836780401 },
+        "OCP_API_SERVER": "{{ .Values.dashboard.config.ocpApiUrl }}",
+        "OCP_TOKEN": "{{ .Values.dashboard.config.ocpToken }}",
+        "DEFAULT_CAR_BRAND": "{{ .Values.dashboard.config.defaultCarBrand }}"
     }
