@@ -4,7 +4,7 @@ metadata:
   name: amq-broker-rhel8
   namespace: {{NAMESPACE}}
 spec:
-  channel: 7.x
+  channel: 7.10.x
   #installPlanApproval: Automatic
   name: amq-broker-rhel8
   source: redhat-operators
