@@ -83,9 +83,8 @@ if [[ "$DROGUE_IOT" != true ]]; then
   log "Installing the AMQ Broker operator"
   sed "s:{{NAMESPACE}}:$NAMESPACE:g" config/operators/amq-operator-subscription.yaml | oc apply -f -
 fi
-# FIXME: take back in before merging
-#log "Installing the AMQ Streams operator"
-#sed "s:{{NAMESPACE}}:$NAMESPACE:g" config/operators/amq-streams-operator-subscription.yaml | oc apply -f -
+log "Installing the AMQ Streams operator"
+sed "s:{{NAMESPACE}}:$NAMESPACE:g" config/operators/amq-streams-operator-subscription.yaml | oc apply -f -
 log "Installing the Datagrid operator"
 sed "s:{{NAMESPACE}}:$NAMESPACE:g" config/operators/datagrid-subscription.yaml | oc apply -f -
 log "Installing the Camel-K operator"
@@ -96,8 +95,7 @@ sed "s:{{NAMESPACE}}:$NAMESPACE:g" config/operators/camel-k-operator-subscriptio
 if [[ "$DROGUE_IOT" != true ]]; then
   wait_for_operator "AMQ Broker" amq-broker-rhel8
 fi
-# FIXME: take back in before merging
-#wait_for_operator "AMQ Streams" amq-streams
+wait_for_operator "AMQ Streams" amq-streams
 wait_for_operator "Datagrid" datagrid
 wait_for_operator "Camel-K" red-hat-camel-k
 
@@ -108,6 +106,7 @@ INFRA_OPTS=("-f" "helm/bobbycar-core-infra/values.yaml")
 if [[ "$DROGUE_IOT" == true ]]; then
   INFRA_OPTS+=("-f" "helm/bobbycar-core-infra/values.drogue.yaml")
   INFRA_OPTS+=("--set-string" "global.domain=-${NAMESPACE}.${APP_DOMAIN}")
+  helm repo add drogue-iot https://drogue-iot.github.io/drogue-cloud-helm-charts/
   helm dependency build helm/bobbycar-core-infra
 fi
 
@@ -117,7 +116,7 @@ helm upgrade --install "$HELM_INFRA_RELEASE_NAME" helm/bobbycar-core-infra/ \
 --set-string ocpDomain="$APP_DOMAIN" \
 --set drogueIoT="$DROGUE_IOT"
 
-#sleep 30
+sleep 30
 
 if [[ "$DROGUE_IOT" != true ]]; then
 log "Waiting for AMQ Broker pod"
@@ -143,7 +142,7 @@ helm upgrade --install "$HELM_APP_RELEASE_NAME" helm/bobbycar-core-apps \
 --set-string dashboard.config.googleApiKey="$GOOGLE_API_KEY" \
 --set-string weatherService.owm.api.key="$OWM_WEATHER_API_KEY" \
 --set-string weatherService.ibm.api.key="$IBM_WEATHER_API_KEY" \
---set-string dashboard.config.ocpApiUrl="https://$API_DOMAIN:6443"
+--set-string dashboard.config.ocpApiUrl="https://$API_DOMAIN:6443" \
 --set drogueIoT="$DROGUE_IOT"
 
 sleep 30
