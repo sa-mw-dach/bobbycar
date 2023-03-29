@@ -74,9 +74,10 @@ oc wait --for=condition=Ready knativekafkas.v1alpha1.operator.serverless.openshi
 log "OpenShift Serverless Installation has been completed!!"
 fi ;
 
-if [[ "$INSTALL_OPERATORS" == true ]]; then
 log "Creating namespace $NAMESPACE for Bobbycar demo"
 oc new-project "$NAMESPACE" || true
+
+if [[ "$INSTALL_OPERATORS" == true ]]; then
 log "Installing operator group"
 sed "s:{{NAMESPACE}}:$NAMESPACE:g" config/operators/operator-group.yaml | oc apply -f -
 if [[ "$DROGUE_IOT" != true ]]; then
