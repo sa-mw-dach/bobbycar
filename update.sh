@@ -25,7 +25,7 @@ APPS_OPTS=("-f" "helm/bobbycar-core-apps/values.yaml")
 if [[ "$DROGUE_IOT" == true ]]; then
   APPS_OPTS+=("-f" "helm/bobbycar-core-apps/values.drogue.yaml")
 fi
-helm upgrade --dry-run "$HELM_APP_RELEASE_NAME" helm/bobbycar-core-apps \
+helm upgrade --install "$HELM_APP_RELEASE_NAME" helm/bobbycar-core-apps \
 "${APPS_OPTS[@]}" \
 --set-string ocpDomain="$APP_DOMAIN" \
 --set-string ocpApi="$API_DOMAIN" \

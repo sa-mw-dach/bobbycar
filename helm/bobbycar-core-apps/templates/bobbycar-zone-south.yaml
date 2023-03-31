@@ -1,0 +1,12 @@
+apiVersion: bobbycar.redhat.com/v1alpha1
+kind: BobbycarZone
+metadata:
+  name: de-aldenhoven-south
+spec:
+  name: "Oval Aldenhoven Zone South"
+  type: "circle"
+  priority: 10
+  position:
+    lat: 50.90630068099827
+    lng: 6.2253320913284735
+  radius: 500
