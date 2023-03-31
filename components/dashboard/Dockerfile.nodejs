@@ -10,10 +10,15 @@ COPY .s2i/assemble ./assemble
 # build the app
 RUN ./assemble
 
+RUN pwd && ls -la
+
 FROM registry.access.redhat.com/ubi8/nginx-120
 
+RUN pwd && ls -la
+
 # copy the assets
-COPY --from=build ./public .
+COPY --from=build /opt/app-root/src/public /opt/app-root/src
+#COPY --from=build ./public .
 COPY nginx.conf /etc/nginx/nginx.conf
 
 RUN pwd && ls -la
