@@ -7,6 +7,6 @@ spec:
   type: "circle"
   priority: 10
   position:
-    lat: 50.91339038671225
-    lng: 6.230417559417351
-  radius: 500
+    lat: 50.91248012292968
+    lng: 6.229674962441358
+  radius: 200
