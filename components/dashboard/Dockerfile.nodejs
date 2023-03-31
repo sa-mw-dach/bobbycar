@@ -3,11 +3,16 @@ FROM registry.access.redhat.com/ubi8/nodejs-14 as build
 
 ENV OUTPUT_DIR=public
 
+# copy the sources
+COPY ./ .
 COPY .s2i/assemble ./assemble
+
+# build the app
 RUN ./assemble
 
 FROM registry.access.redhat.com/ubi8/nginx-120
 
+# copy the assets
 COPY --from=build ./public .
 COPY nginx.conf /etc/nginx/nginx.conf
 
