@@ -1,5 +1,7 @@
 FROM registry.access.redhat.com/ubi8/nodejs-14
 
+RUN pwd && ls -la
+
 RUN /usr/libexec/s2i/assemble
 
 RUN pwd && ls -la
