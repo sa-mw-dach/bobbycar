@@ -1,15 +1,14 @@
-FROM registry.access.redhat.com/ubi8/nodejs-14
 
-ENV OUTPUT_DIR=www
+FROM registry.access.redhat.com/ubi8/nodejs-14 as build
 
-COPY ./ .
-
-RUN pwd && ls -la
+ENV OUTPUT_DIR=public
 
 COPY .s2i/assemble ./assemble
 RUN ./assemble
 
-#COPY ./www/ .
+FROM registry.access.redhat.com/ubi8/nginx-120
+
+COPY --from=build ./public .
 COPY nginx.conf /etc/nginx/nginx.conf
 
 RUN pwd && ls -la
