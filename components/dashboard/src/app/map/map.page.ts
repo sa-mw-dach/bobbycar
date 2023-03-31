@@ -48,28 +48,12 @@ export class MapPage implements OnInit {
         await setTimeout(() => {
             this.map = new google.maps.Map(document.getElementById('map'), {
                 center: this.initialPosition,
-                zoom: 12,
-                mapTypeId: 'terrain'
-                // mapTypeId: google.maps.MapTypeId.HYBRID,
+                zoom: 16,
+                mapTypeId: google.maps.MapTypeId.HYBRID,
             });
             this.infowindow = new google.maps.InfoWindow({
                 content: ''
             });
-            const icon = {
-                url: "assets/ibm-hq-marker.png", // url
-                scaledSize: new google.maps.Size(50, 50), // scaled size
-            };
-
-            const marker = new google.maps.Marker({
-                position: new google.maps.LatLng({ lat: 41.10847153962609, lng: -73.72042478641728 }),
-                // label: 'IBM HQ Armonk',
-                icon: icon,
-                map: this.map
-            });
-
-            //this.markerCluster = new MarkerClusterer({marker});
-            //this.markerCluster.setMap(this.map);
-
         }, 100);
     }
 
@@ -138,10 +122,11 @@ export class MapPage implements OnInit {
         } else {
             // console.debug('create marker for carid: ' + data.carid);
             const icon = {
-                url: "assets/mb-marker.png",
+                url: "assets/luxoft-marker.png",
                 scaledSize: new google.maps.Size(30, 30) // scaled size
             };
 
+            /*
             if(this.carBg === 'VW') {
                 icon.url = "assets/vw-marker.png"
             } else if (this.carBg === 'BMW'){
@@ -159,6 +144,7 @@ export class MapPage implements OnInit {
                 icon.url = "assets/ford-marker.png";
                 icon.scaledSize = new google.maps.Size(40,30);
             }
+            */
 
             const marker = new google.maps.Marker({
                 position: new google.maps.LatLng({ lat: data.lat, lng: data.long }),

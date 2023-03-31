@@ -83,10 +83,11 @@ export class CarDetailPage implements OnInit {
             });
 
             const icon = {
-                url: "assets/mb-marker.png",
+                url: "assets/luxoft-marker.png",
                 scaledSize: new google.maps.Size(30, 30), // scaled size
             };
 
+            /*
             if(this.carBg === 'VW') {
                 icon.url = "assets/vw-marker.png"
             } else if (this.carBg === 'BMW'){
@@ -103,6 +104,7 @@ export class CarDetailPage implements OnInit {
                 icon.url = "assets/ford-marker.png";
                 icon.scaledSize = new google.maps.Size(40,30);
             }
+            */
 
             this.marker = new google.maps.Marker({
                 position: new google.maps.LatLng(this.initialPosition),
