@@ -48,8 +48,8 @@ export class MapPage implements OnInit {
         await setTimeout(() => {
             this.map = new google.maps.Map(document.getElementById('map'), {
                 center: this.initialPosition,
-                zoom: 16,
-                mapTypeId: google.maps.MapTypeId.HYBRID,
+                zoom: 15,
+                mapTypeId: google.maps.MapTypeId.TERRAIN,
             });
             this.infowindow = new google.maps.InfoWindow({
                 content: ''

@@ -14,7 +14,7 @@
     "OTA_SERVER_ENDPOINT": "http://ota-server-bobbycar.apps.cluster-zxf6m.zxf6m.sandbox1856.opentlc.com",
     "ROAD_CLASSIFICATION_ENDPOINT": "https://road-roughness-condition-git-roadconditions.apps.cluster-zxf6m.zxf6m.sandbox1856.opentlc.com",
     "ROAD_CLASSIFICATION_ENABLE": "false",
-    "INITIAL_MAP_POSITION": { "lat": 50.90912455578115, "lng": 6.230211055370008 },
+    "INITIAL_MAP_POSITION": { "lat": 39.79667333125868, "lng": -86.23884966601445 },
     "OCP_API_SERVER": "https://api.cluster-zxf6m.zxf6m.sandbox1856.opentlc.com:6443",
     "OCP_TOKEN": "token",
     "DEFAULT_CAR_BRAND": "P"
