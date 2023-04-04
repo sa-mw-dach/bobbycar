@@ -1,12 +1,12 @@
 apiVersion: bobbycar.redhat.com/v1alpha1
 kind: BobbycarZone
 metadata:
-  name: de-aldenhoven-north
+  name: ims-north
 spec:
-  name: "Oval Aldenhoven Zone North"
+  name: "Indianapolis Motor Speedway Zone North"
   type: "circle"
   priority: 10
   position:
-    lat: 50.91248012292968
-    lng: 6.229674962441358
-  radius: 200
+    lat: 39.800276459869984
+    lng: -86.23695748627102
+  radius: 250

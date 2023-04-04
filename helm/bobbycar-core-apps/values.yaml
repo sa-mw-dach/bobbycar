@@ -58,7 +58,7 @@ carSimulator:
   name: car-simulator 
   replicas: 1
   config:
-    carsimCars: 5
+    carsimCars: 1
     carsimFactor: 1
     carsimRepeat: true
     carsimDelay: 1000
