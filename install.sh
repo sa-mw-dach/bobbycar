@@ -21,7 +21,6 @@ fi;
 log "Creating namespace $NAMESPACE for Bobbycar demo"
 oc new-project "$NAMESPACE" || true
 
-
 log "Installing the infra Helm release: $HELM_INFRA_RELEASE_NAME"
 INFRA_OPTS=("-f" "helm/bobbycar-core-infra/values.yaml")
 INFRA_OPTS+=("-f" "helm/bobbycar-core-infra/values.drogue.yaml")
@@ -36,14 +35,16 @@ helm upgrade --install "$HELM_INFRA_RELEASE_NAME" helm/bobbycar-core-infra/ \
 --set-string ocpDomain="$APP_DOMAIN" \
 --set drogueIoT="$DROGUE_IOT"
 
-sleep 30
+sleep 60
 
 log "Waiting for Datagrid pod"
 oc wait --for=condition=Ready pod/bobbycar-dg-0 --timeout 300s
+
 log "Waiting for Kafka Broker pod"
 oc wait --for=condition=Ready pod/bobbycar-cluster-kafka-0 --timeout 300s
 
 log "Installing the apps Helm release: $HELM_APP_RELEASE_NAME"
+
 APPS_OPTS=("-f" "helm/bobbycar-core-apps/values.yaml")
 APPS_OPTS+=("-f" "helm/bobbycar-core-apps/values.drogue.yaml")
 
@@ -58,7 +59,7 @@ helm upgrade --install "$HELM_APP_RELEASE_NAME" helm/bobbycar-core-apps \
 --set-string dashboard.config.ocpApiUrl="https://$API_DOMAIN:6443" \
 --set drogueIoT="$DROGUE_IOT"
 
-sleep 30
+sleep 60
 
 log "Waiting for Bobbycar pod"
 oc wait --for=condition=Available deployment/car-simulator --timeout 300s
@@ -66,6 +67,8 @@ log "Waiting for Bobbycar Dashboard pod"
 oc wait --for=condition=Available dc/dashboard --timeout 300s
 log "Waiting for Dashboard Streaming service pod"
 oc wait --for=condition=Available deployment/dashboard-streaming --timeout 300s
+
+sleep 60
 
 log "Installing the Serverless Helm release: $HELM_SERVERLESS_RELEASE_NAME"
 helm upgrade --install "$HELM_SERVERLESS_RELEASE_NAME" helm/bobbycar-opt-serverless \
@@ -75,6 +78,5 @@ helm upgrade --install "$HELM_SERVERLESS_RELEASE_NAME" helm/bobbycar-opt-serverl
 log "Waiting for Camel-K integrations to complete..."
 oc wait --for=condition=Ready integration/cache-service --timeout 1800s
 oc wait --for=condition=Ready integration/kafka2datagrid --timeout 1800s
-[[ "$DROGUE_IOT" != true ]] && oc wait --for=condition=Ready integration/mqtt2kafka --timeout 1800s
 
 log "Installation completed!"
