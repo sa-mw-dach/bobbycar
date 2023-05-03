@@ -1,8 +1,9 @@
 <ion-header>
   <ion-toolbar color="light">
-    <ion-title> Red Hat Connected Vehicle Architecture - Map ({{bobbycars.size}})</ion-title>
+    <ion-title>Red Hat Connected Vehicle Architecture Demo (a.k.a. "Bobbycar")</ion-title>
   </ion-toolbar>
   <ion-toolbar>
+    <!--
     <ion-button (click)="createZone()" fill="outline">
       <ion-icon name="create-outline"></ion-icon>&nbsp;
       Create Zone
@@ -15,9 +16,14 @@
       <ion-icon name="alert-circle-outline"></ion-icon>&nbsp;
       Speed Alerts
     </ion-button>
+    -->
     <ion-button color="dark" (click)="resetMap()" fill="outline">
       <ion-icon name="refresh-outline"></ion-icon>&nbsp;
       Reset Map
+    </ion-button>
+    <ion-button (click)="clearCache()" color="danger" fill="outline">
+      <ion-icon name="refresh"></ion-icon>&nbsp;
+      Clear Cache
     </ion-button>
   </ion-toolbar>
   <ion-toolbar *ngIf="searchArea?.getVisible()">

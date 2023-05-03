@@ -18,7 +18,8 @@ import { map, tap, delay, retryWhen, delayWhen } from 'rxjs/operators';
 export class CarDetailPage implements OnInit {
 
   map: google.maps.Map;
-  initialPosition = { lat: 50.1146997, lng: 8.6185411 };
+  //initialPosition = { lat: 39.79667333125868, lng: -86.23884966601445 };
+  initialPosition = { lat: this.configService.INITIAL_MAP_POSITION.lat, lng: this.configService.INITIAL_MAP_POSITION.lng };
   currentPosition = { lat: 0, lon: 0 };
   carId = '';
   carMetric = { driverId: '', manufacturer: '', model: '', co2: '', fuel: '', gear: '', rpm: '', speed: '', zone: 'Default Zone', vin: '' };
@@ -28,7 +29,7 @@ export class CarDetailPage implements OnInit {
   streetName = '';
   showHUD = false;
   showDriverMonitoring = false;
-  carBg = 'MB';
+  carBg = 'CAR1';
   engineOverlayHidden: boolean = true;
   engineData;
   weatherData;
@@ -83,7 +84,7 @@ export class CarDetailPage implements OnInit {
             });
 
             const icon = {
-                url: "assets/luxoft-marker.png",
+                url: "assets/luxoft-marker-white.png",
                 scaledSize: new google.maps.Size(30, 30), // scaled size
             };
 

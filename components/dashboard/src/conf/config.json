@@ -1,5 +1,5 @@
 {
-    "GOOGLE_API_KEY": "replaceme",
+    "GOOGLE_API_KEY": "AIzaSyCmJOCTW82bAFYImOZOOgWeAyzxSTDLXos",
     "BOBBYCAR_API_KEY": "replaceme",
     "SSE_ENDPOINT": "",
     "CAR_EVENTS_ENDPOINT": "ws://dashboard-streaming-bobbycar.apps.sdv.sdv.luxoft.com/api/carevents?sendToAll=true",
@@ -17,5 +17,5 @@
     "INITIAL_MAP_POSITION": { "lat": 39.79667333125868, "lng": -86.23884966601445 },
     "OCP_API_SERVER": "https://api.sdv.sdv.luxoft.com:6443",
     "OCP_TOKEN": "token",
-    "DEFAULT_CAR_BRAND": "P"
+    "DEFAULT_CAR_BRAND": "CAR1"
 }

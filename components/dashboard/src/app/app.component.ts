@@ -14,26 +14,32 @@ export class AppComponent {
   
   public selectedIndex = 0;
   public appPages = [
+    /*
     {
       title: 'Home',
       url: '/home',
       icon: 'home'
     },
+    */
     {
       title: 'Map',
       url: '/map',
       icon: 'map'
     },
+    /*
     {
       title: 'Driver Monitoring',
       url: '/hddp',
       icon: 'speedometer-outline'
     },
+    */
+    /*
     {
       title: 'Settings',
       url: '/admin',
       icon: 'keypad-outline'
     }
+    */
   ];
 
   constructor(

@@ -1,11 +1,13 @@
 import { Component, OnInit } from '@angular/core';
+import { ToastController } from '@ionic/angular';
 import { Platform } from '@ionic/angular';
 import { Router } from '@angular/router';
+
 import { ConfigService } from '../providers/config.service';
 import { CarEventsService } from '../providers/ws.service';
-import { CarMetricsAggregatedService } from '../providers/carmetrics-aggregated.service';
-import { SpeedAlertService } from '../providers/speed-alert.service';
 import { CacheService } from '../providers/cache.service';
+import { ZoneChangeService } from '../providers/zonechange.service';
+
 import { map, tap, delay, retryWhen, delayWhen } from 'rxjs/operators';
 
 @Component({
@@ -21,28 +23,24 @@ export class MapPage implements OnInit {
     searchArea: google.maps.Circle;
     initialPosition: any;
 
-    isQuery = false;
-    showSpeedAlerts = false;
-
     zones = [];
-    bobbycars = new Map();
-    metricsAggregated = new Map();
-    speedAlerts = new Map();
+    carMarker = new Map();
+    carZones = new Map()
 
-    carBg = 'MB';
+    carBg = 'CAR1';
 
     constructor(
         private platform: Platform,
         private carEventsService: CarEventsService,
         private cacheService: CacheService,
-        private metricsAggregatedService: CarMetricsAggregatedService,
-        private speedAlertService: SpeedAlertService,
+        private zoneChangeService: ZoneChangeService,
         private configService: ConfigService,
-        private router: Router
-        ) {
-            this.initialPosition = configService.INITIAL_MAP_POSITION;
-            this.carBg = this.configService.DEFAULT_CAR_BRAND;
-        }
+        private router: Router,
+        private toastController: ToastController,
+    ) {
+        this.initialPosition = configService.INITIAL_MAP_POSITION;
+        this.carBg = this.configService.DEFAULT_CAR_BRAND;
+    }
 
     async initializeMap() {
         await setTimeout(() => {
@@ -57,162 +55,80 @@ export class MapPage implements OnInit {
         }, 100);
     }
 
-    displaySpeedAlerts(){
-        if(this.showSpeedAlerts){
-            this.showSpeedAlerts = false;
-            this.speedAlertService.close();
-            this.speedAlerts.clear();
+    async presentToast(msg, duration, color) {
+        const toast = await this.toastController.create({
+            message: msg,
+            duration: duration,
+            color: color,
+            position: 'top'
+        });
+        toast.present();
+    }
+
+    async clearCache() {
+        this.cacheService.clearCache().subscribe((data) => {
+            console.log(data);
+            this.presentToast('The Zones and Cars Cache has been cleared.', 3000, 'danger');
+        });
+    }
+
+    public getCarInZone(carid) {
+        if (this.carZones.has(carid)) {
+            return this.carZones.get(carid)
         } else {
-            this.showSpeedAlerts = true;
-            this.speedAlertService.connect();
-            this.speedAlertService.getMessages().pipe(retryWhen((errors) => errors.pipe(delay(1_000)))).subscribe(
-                msg => {
-                    this.speedAlerts.set(msg.vin, msg);
-                    console.log(msg);
-                }, // Called whenever there is a message from the server.
-                err => console.error(err), // Called if at any point WebSocket API signals some kind of error.
-                () => console.log('complete') // Called when connection is closed (for whatever reason).
-            );
+            return 'red'
         }
     }
 
-    simulateQuery(){
-        if(this.isQuery){
-            this.isQuery = false;
-            this.metricsAggregatedService.close();
-            this.metricsAggregated.clear();
-        } else {
-            this.isQuery = true;
-            this.metricsAggregatedService.connect();
-            this.metricsAggregatedService.getMessages().pipe(retryWhen((errors) => errors.pipe(delay(1_000)))).subscribe(
-                msg => {
-                    this.metricsAggregated.set(msg.vin, msg);
-                    //console.log(this.metricsAggregated);
-                }, // Called whenever there is a message from the server.
-                err => console.error(err), // Called if at any point WebSocket API signals some kind of error.
-                () => console.log('complete') // Called when connection is closed (for whatever reason).
-            );
-        }
+    private createMarker(carid, map, lat, long, zone) {
+        const icon = {
+            url: "assets/luxoft-marker-white.png",
+            scaledSize: new google.maps.Size(30, 30) // scaled size
+        };
+
+        const marker = new google.maps.Marker({
+            position: new google.maps.LatLng({ lat: lat, lng: long }),
+            title: carid,
+            map: map,
+            icon: icon,
+            // animation: google.maps.Animation.DROP,
+            draggable: false,
+            optimized: true
+        });
+
+        return marker
     }
 
-    private getDistanceFromLatLonInKm(lat1,lon1,lat2,lon2) {
-        const R = 6371; // Radius of the earth in km
-        const dLat = this.deg2rad(lat2-lat1);  // deg2rad below
-        const dLon = this.deg2rad(lon2-lon1);
-        const a =
-            Math.sin(dLat/2) * Math.sin(dLat/2) +
-            Math.cos(this.deg2rad(lat1)) * Math.cos(this.deg2rad(lat2)) *
-            Math.sin(dLon/2) * Math.sin(dLon/2);
-        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-        const d = R * c; // Distance in km
-        return d;
-    }
+    private createOrUpdateMarker(data) {
 
-    // degree to radius
-    private deg2rad(deg) {
-        return deg * (Math.PI/180);
-    }
+        if (this.carMarker.has(data.carid)) {
+            this.carMarker.get(data.carid).setPosition(new google.maps.LatLng({ lat: data.lat, lng: data.long }));
+            console.log(data)
+        } else {            
+            const marker = this.createMarker(data.carid, this.map, data.lat, data.long, 'red')
 
-    private createOrUpdateMarker(data){
-
-        if(this.bobbycars.has(data.carid)){
-            this.bobbycars.get(data.carid).setPosition(new google.maps.LatLng({ lat: data.lat, lng: data.long }));
-            //this.markerCluster.removeMarker(mark);
-            //this.markerCluster.addMarker(mark);
-        } else {
-            // console.debug('create marker for carid: ' + data.carid);
-            const icon = {
-                url: "assets/luxoft-marker.png",
-                scaledSize: new google.maps.Size(30, 30) // scaled size
-            };
-
-            /*
-            if(this.carBg === 'VW') {
-                icon.url = "assets/vw-marker.png"
-            } else if (this.carBg === 'BMW'){
-                icon.url = "assets/bmw-marker.png"
-            } else if (this.carBg === 'MB'){
-                icon.url = "assets/mb-marker.png"
-                icon.scaledSize = new google.maps.Size(40,40);
-            } else if (this.carBg === 'P'){
-                icon.url = "assets/porsche-marker.png";
-                icon.scaledSize = new google.maps.Size(24,30);
-            } else if (this.carBg === 'FORD'){
-                icon.url = "assets/ford-marker.png";
-                icon.scaledSize = new google.maps.Size(40,30);
-            } else if (this.carBg === 'F150'){
-                icon.url = "assets/ford-marker.png";
-                icon.scaledSize = new google.maps.Size(40,30);
-            }
-            */
-
-            const marker = new google.maps.Marker({
-                position: new google.maps.LatLng({ lat: data.lat, lng: data.long }),
-                title: data.carid,
-                map: this.map,
-                icon: icon,
-                // animation: google.maps.Animation.DROP,
-                draggable: false,
-                optimized: true
-            });
-
-            // tslint:disable-next-line:only-arrow-functions
-            google.maps.event.addListener(marker, 'click', (function(marker, content, infowindow) {
-                return function() {
+            google.maps.event.addListener(marker, 'click', (function (marker, content, infowindow, zones) {
+                return function () {
                     infowindow.setContent(
                         `<span style="color: #000000;">
-                            <h4>Bobbycar VIN:</h4>
-                            <p>`+content.carid+`<br/>
-                            <h4>Bobbycar Zone:</h4>`+content?.zone?.spec.name+`</p><br/>
-                            <ion-button color="danger" href="/car-detail/`+content.carid+`">Car Detail</ion-button>
+                            <b>`+ content.carid + `</b>
+                            <br>Zone: `+ zones.get(content.carid) + `</br>
                         </span>`);
                     infowindow.open(this.map, marker);
                 }
-            })(marker, data, this.infowindow));
+            })(marker, data, this.infowindow, this.carZones));
 
-            this.bobbycars.set(data.carid, marker);
+            this.carMarker.set(data.carid, marker);
+            this.carZones.set(data.carid, 'red')
         }
     }
 
-    public createZone(){
-        const circle = new google.maps.Circle({
-            strokeColor: '#FF0000',
-            strokeOpacity: 0.7,
-            strokeWeight: 1,
-            fillColor: '#FF0000',
-            fillOpacity: 0.35,
-            map: this.map,
-            center: this.map.getCenter(),
-            editable: true,
-            radius: 3000
-        });
-        // this.addCircleListener(circle);
-        this.addZoneContextListener(circle);
-        this.zones.push(circle);
-    }
-
-    addCircleListener(circle: google.maps.Circle) {
-        google.maps.event.addListener(circle, 'click', (event) => {
-            console.log(event.latLng.toString());
-            console.log(circle.getCenter().toString());
-            console.log(circle.getRadius());
-            console.log(this.getDistanceFromLatLonInKm(event.latLng.lat(), event.latLng.lng(),
-                circle.getCenter().lat(), circle.getCenter().lng()))
-          });
-    }
-
-    addZoneContextListener(circle: google.maps.Circle) {
-        google.maps.event.addListener(circle, 'rightclick', (event) => {
-            // alert(circle.getCenter().toString()+' '+circle.getRadius());
-            circle.setMap(null);
-          });
-    }
-
     public resetMap() {
-        this.bobbycars.forEach(el => {
+        this.carMarker.forEach(el => {
             el.setMap(null);
         });
-        this.bobbycars.clear();
+        this.carMarker.clear();
+        this.carZones.clear();
 
         this.zones.forEach(element => {
             element.setMap(null);
@@ -220,39 +136,39 @@ export class MapPage implements OnInit {
         this.zones = [];
 
         this.cacheService.getZones()
-        .subscribe((data) => {
-            if(this.map){
-                data.forEach(element => {
-                    const zone = new google.maps.Circle({
-                        strokeColor: '#FF0000',
-                        strokeOpacity: 0.7,
-                        strokeWeight: 1,
-                        fillColor: '#FF0000',
-                        fillOpacity: 0.35,
-                        map: this.map,
-                        center: { lat: element.spec.position.lat, lng: element.spec.position.lng },
-                        editable: false,
-                        radius: element.spec.radius
+            .subscribe((data) => {
+                if (this.map) {
+                    data.forEach(element => {
+                        const zone = new google.maps.Circle({
+                            strokeColor: '#FF0000',
+                            strokeOpacity: 0.7,
+                            strokeWeight: 1,
+                            fillColor: '#FF0000',
+                            fillOpacity: 0.35,
+                            map: this.map,
+                            center: { lat: element.spec.position.lat, lng: element.spec.position.lng },
+                            editable: false,
+                            radius: element.spec.radius
+                        });
+                        this.zones.push(zone);
                     });
-                    this.zones.push(zone);
-                });
-            }
-        });
+                }
+            });
 
         this.cacheService.getCars()
-        .subscribe((data) => {
-            data.forEach(element => {
-                this.createOrUpdateMarker(element);
+            .subscribe((data) => {
+                data.forEach(element => {
+                    this.createOrUpdateMarker(element);
+                });
             });
-        });
     }
 
-    ionViewWillEnter(){
+    ionViewWillEnter() {
         console.debug('ionViewWillEnter()');
         this.initializeMap();
 
         this.cacheService.getZones().subscribe((data) => {
-            if(this.map){
+            if (this.map) {
                 data.forEach(element => {
                     const zone = new google.maps.Circle({
                         strokeColor: '#FF0000',
@@ -278,12 +194,15 @@ export class MapPage implements OnInit {
         });
     }
 
-    ionViewWillLeave(){
+    ionViewWillLeave() {
         console.debug('ionViewWillLeave()');
-        this.bobbycars.clear();
+        this.carMarker.clear();
+        this.carZones.clear();
+
         this.zones = [];
-        //this.carEventsService.close();
-        //this.metricsAggregatedService.close();
+
+        this.carEventsService.close();
+        this.zoneChangeService.close();
     }
 
     ngOnInit() {
@@ -292,9 +211,30 @@ export class MapPage implements OnInit {
         this.carEventsService.getMessages().pipe(retryWhen((errors) => errors.pipe(delay(1_000)))).subscribe(
             msg => {
                 this.createOrUpdateMarker(msg);
-            }, // Called whenever there is a message from the server.
-            err => console.error(err), // Called if at any point WebSocket API signals some kind of error.
-            () => console.log('Connection has been closed') // Called when connection is closed (for whatever reason).
+            },
+            err => console.error(err),
+            () => console.log('Connection has been closed')
+        );
+
+        // Retrieving zone change events and displaying them
+        this.zoneChangeService.connect();
+        this.zoneChangeService.getMessages().pipe(retryWhen((errors) => errors.pipe(delay(1_000)))).subscribe(
+            msg => {
+                //console.log(msg)
+                
+                this.cacheService.getCar(msg.carId).subscribe(car => {
+                    console.log(car)
+                });
+                    
+
+                console.log(this.cacheService.getCar(msg.carId))
+                if (msg.nextZoneId !== null) {
+                    this.carZones.set(msg.carId, msg.nextZoneId);
+                    this.presentToast('Vehicle ' + msg.carId + ' is entering the Zone: ' + msg.nextZoneId, 5000, 'primary');
+                }
+            },
+            err => console.error(err),
+            () => console.log('complete')
         );
 
     }

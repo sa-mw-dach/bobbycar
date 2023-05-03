@@ -14,14 +14,18 @@ export class CacheService {
     }
 
     getZones() {
-        return this.http.get<any[]>(this.configService.CACHE_ENDPOINT+this.zonesUrl+'?user_key='+this.configService.BOBBYCAR_API_KEY);
+        return this.http.get<any[]>(this.configService.CACHE_ENDPOINT + this.zonesUrl + '?user_key=' + this.configService.BOBBYCAR_API_KEY);
     }
 
     getCars() {
-        return this.http.get<any[]>(this.configService.CACHE_ENDPOINT+this.carsUrl+'?user_key='+this.configService.BOBBYCAR_API_KEY);
+        return this.http.get<any[]>(this.configService.CACHE_ENDPOINT + this.carsUrl + '?user_key=' + this.configService.BOBBYCAR_API_KEY);
+    }
+
+    getCar(carid) {
+        return this.http.get<any[]>(this.configService.CACHE_ENDPOINT + this.carsUrl + '/' + carid + '?user_key=' + this.configService.BOBBYCAR_API_KEY);
     }
 
     clearCache() {
-        return this.http.get<any[]>(this.configService.CACHE_ENDPOINT+'/clearCache');
+        return this.http.get<any[]>(this.configService.CACHE_ENDPOINT + '/clearCache');
     }
 }
