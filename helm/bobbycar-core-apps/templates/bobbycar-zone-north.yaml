@@ -1,12 +1,13 @@
 apiVersion: bobbycar.redhat.com/v1alpha1
 kind: BobbycarZone
 metadata:
-  name: ims-north
+  name: zone-north
 spec:
   name: "Indianapolis Motor Speedway Zone North"
   type: "circle"
   priority: 10
   position:
-    lat: 39.800276459869984
-    lng: -86.23695748627102
-  radius: 250
+    lat: 39.79101410974978
+    lng: -86.23039087177717
+  radius: 150
+#39.79101410974978, -86.23039087177717

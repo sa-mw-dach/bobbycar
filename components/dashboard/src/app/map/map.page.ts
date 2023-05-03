@@ -82,7 +82,7 @@ export class MapPage implements OnInit {
 
     private createMarker(carid, map, lat, long, zone) {
         const icon = {
-            url: "assets/luxoft-marker-white.png",
+            url: "assets/" + zone + ".png",
             scaledSize: new google.maps.Size(30, 30) // scaled size
         };
 
@@ -216,21 +216,30 @@ export class MapPage implements OnInit {
             () => console.log('Connection has been closed')
         );
 
-        // Retrieving zone change events and displaying them
+        // subscribe to zone change events
         this.zoneChangeService.connect();
         this.zoneChangeService.getMessages().pipe(retryWhen((errors) => errors.pipe(delay(1_000)))).subscribe(
             msg => {
                 //console.log(msg)
                 
-                this.cacheService.getCar(msg.carId).subscribe(car => {
-                    console.log(car)
-                });
-                    
-
-                console.log(this.cacheService.getCar(msg.carId))
                 if (msg.nextZoneId !== null) {
-                    this.carZones.set(msg.carId, msg.nextZoneId);
-                    this.presentToast('Vehicle ' + msg.carId + ' is entering the Zone: ' + msg.nextZoneId, 5000, 'primary');
+
+                    // find the car, what a hack 🙈
+                    this.cacheService.getCars().subscribe(cars => {
+                        cars.forEach(car => {
+                            if (car.carid == msg.carId) {
+                                // update the zone info
+                                this.carZones.set(msg.carId, msg.nextZoneId);
+                                // create a new the marker
+                                const marker = this.createMarker(car.carid, this.map, car.lat, car.long, msg.nextZoneId)
+                                // remove the old marker and set the new one
+                                this.carMarker.get(car.carid).setMap(null);
+                                this.carMarker.set(car.carid, marker);
+                                // show an alert
+                                this.presentToast('Vehicle ' + msg.carId + ' is entering the Zone: ' + msg.nextZoneId, 5000, 'primary');
+                            }
+                        });
+                    });
                 }
             },
             err => console.error(err),
