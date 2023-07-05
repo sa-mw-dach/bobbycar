@@ -10,3 +10,4 @@ Bobbycar core infrastructure components:
 - AMQ Streams Kafka Cluster
 - AMQ Streams Kafka HTTP Bridge Cluster and Route
 - 5 Kafka Topics
+- Optional Kafdrop Deployment
