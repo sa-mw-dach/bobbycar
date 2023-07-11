@@ -1,0 +1,16 @@
+{{ if .Values.drogueIoT }}
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: sso
+  labels:
+    app.kubernetes.io/component: bobbycar
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/name: sso
+spec:
+  to:
+    kind: Service
+    name: sso-service
+  port:
+    targetPort: 8080
+{{ end }}

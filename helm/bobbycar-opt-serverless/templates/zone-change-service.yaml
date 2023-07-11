@@ -10,6 +10,7 @@ spec:
         autoscaling.knative.dev/target: "1"
         autoscaling.knative.dev/metric: "rps"
         autoscaling.knative.dev/window: "10s"
+        autoscaling.knative.dev/max-scale: "10"
     spec:
       containers:
         - image: quay.io/bobbycar/zone-change-service:1.0-jvm

@@ -1,6 +1,7 @@
 package com.redhat.bobbycar.routes;
 
 import java.io.ByteArrayInputStream;
+import java.util.Base64;
 import java.util.Iterator;
 import java.util.List;
 
@@ -10,7 +11,12 @@ import org.apache.camel.PropertyInject;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.aws.s3.S3Constants;
 import org.apache.camel.model.OnCompletionDefinition;
+import org.apache.camel.model.OutputExpressionNode;
+import org.apache.camel.model.ProcessorDefinition;
+import org.apache.camel.model.RouteDefinition;
 import org.apache.camel.processor.aggregate.GroupedBodyAggregationStrategy;
+import org.apache.camel.util.json.JsonObject;
+import org.apache.camel.util.json.Jsoner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,6 +53,10 @@ public class Kafka2S3Route extends RouteBuilder {
 	
 	@PropertyInject("s3.region")
     private String s3_region;
+
+	// This is also the trigger to enable Drogue IoT specific processing.
+	@PropertyInject(value = "com.redhat.bobbycar.camelk.drogue.application")
+	private String drogueApplication;
 
 	@Override
 	public void configure() throws Exception {
@@ -87,8 +97,23 @@ public class Kafka2S3Route extends RouteBuilder {
 
 	}
 
+	private boolean isDrogue() {
+		return drogueApplication != null && !drogueApplication.isEmpty();
+	}
+
 	private void storeGpsInS3() {
-		from("kafka:{{kafka.broker.topic.gps}}?brokers={{kafka.broker.uri}}")
+
+		if (isDrogue()) {
+			from("kafka:{{kafka.broker.topic.gps}}?brokers={{kafka.broker.uri}}")
+					.process(Kafka2S3Route::processCloudEvent)
+					.filter(simple("${header[ce_subject]} == 'car'"))
+					.to("direct:storeGps");
+		} else {
+			from("kafka:{{kafka.broker.topic.gps}}?brokers={{kafka.broker.uri}}")
+					.to("direct:storeGps");
+		}
+
+		from("direct:storeGps")
 			.convertBodyTo(String.class)
 			.aggregate(simple("true"), new GroupedBodyAggregationStrategy()).completionInterval(Long.valueOf(s3_message_aggregation_interval))
 			.process(new Processor() {
@@ -112,5 +137,50 @@ public class Kafka2S3Route extends RouteBuilder {
 	@Override
 	public OnCompletionDefinition onCompletion() {
 		return super.onCompletion();
+	}
+
+	/**
+	 * Process Cloud Events.
+	 * <p>
+	 * This is a very basic processing of Cloud Events. It simply normalizes the events on the binary encoding. We need to do this since:
+	 * a) Camel doesn't haven good support for Cloud Events so far and b) the sender may choose the format (binary, structured) and we need to
+	 * handle either of them.
+	 * <p>
+	 * So this method will normalize on the binary encoding, so that functionality following this call can always expect the same format.
+	 */
+	private static void processCloudEvent(Exchange ex) throws Exception {
+		var contentType = ex.getIn().getHeader("content-type", String.class);
+		if (contentType != null && contentType.startsWith("application/cloudevents+json")) {
+			// structured mode
+			var value = Jsoner.deserialize(ex.getIn(String.class));
+			if ( !(value instanceof JsonObject)) {
+				return;
+			}
+			var json = (JsonObject)value;
+
+			for (var entry : json.entrySet()) {
+				switch (entry.getKey()) {
+				case "datacontenttype":
+					ex.getIn().setHeader("content-type", entry.getValue());
+					break;
+				case "data":
+					ex.getIn().setBody(Jsoner.serialize(entry.getValue()));
+					break;
+				case "data_base64":
+					if(entry.getValue() != null) {
+						var data = Base64.getDecoder().decode(entry.getValue().toString());
+						ex.getIn().setBody(data);
+					}
+					break;
+				default:
+					ex.getIn().setHeader("ce_" + entry.getKey(), entry.getValue());
+					break;
+				}
+
+			}
+		} else {
+			// binary mode
+			// nothing to do
+		}
 	}
 }

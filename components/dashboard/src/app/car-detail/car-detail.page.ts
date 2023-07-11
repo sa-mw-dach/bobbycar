@@ -69,6 +69,15 @@ export class CarDetailPage implements OnInit {
       toast.present();
     }
 
+    hotelReservation() {
+      this.presentToast("<h3 style='padding 10px;'>Booking confirmation.<br/>I've made a Hotel reservation for <b>tonight</b> at<br/><br/>11 Kittle Rd, Chappaqua, NY 10514, United States</h1>", 10000);
+    } 
+
+    notActivated() {
+      this.presentToast("<h3>This service is not activated.</h3>", 3000);
+    } 
+
+
     // ***********************
     // Initialize the Google Map, Google Streetview and set the marker for the vehicle
     // ***********************

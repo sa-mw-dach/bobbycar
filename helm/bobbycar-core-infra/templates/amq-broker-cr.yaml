@@ -1,3 +1,4 @@
+{{ if not .Values.drogueIoT }}
 apiVersion: broker.amq.io/v2alpha5
 kind: ActiveMQArtemis
 metadata:
@@ -17,3 +18,4 @@ spec:
     - name: all
       port: 61616
       expose: true
+{{ end }}
