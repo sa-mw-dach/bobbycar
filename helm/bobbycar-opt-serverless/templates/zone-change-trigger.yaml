@@ -7,9 +7,13 @@ spec:
   broker: {{ .Values.broker.name }}
   filter:
     attributes:
+      {{ if .Values.drogueIoT }}
+      type: io.drogue.event.v1
+      {{ else }}
       source: >-
-        /apis/v1/namespaces/bobbycar/kafkasources/zone-change-kafka-source#{{ .Values.kafkaTopic }}
+        /apis/v1/namespaces/{{ .Values.namespace }}/kafkasources/zone-change-kafka-source#{{ .Values.kafkaTopic }}
       type: dev.knative.kafka.event
+      {{ end }}
   subscriber:
     ref:
       apiVersion: serving.knative.dev/v1
