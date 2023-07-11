@@ -5,8 +5,8 @@ metadata:
   namespace: {{ .Values.namespace }}
 spec:
   bootstrapServers:
-    - 'bobbycar-cluster-kafka-bootstrap.bobbycar.svc:9092'
-    - 'bobbycar-cluster-kafka-bootstrap.bobbycar.svc:9093'
+    - 'bobbycar-cluster-kafka-bootstrap.{{ .Values.namespace }}.svc:9092'
+    - 'bobbycar-cluster-kafka-bootstrap.{{ .Values.namespace }}.svc:9093'
   consumerGroup: KnativeZoneChangeSource
   net:
     sasl:
