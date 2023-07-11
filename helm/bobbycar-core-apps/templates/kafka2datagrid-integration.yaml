@@ -13,6 +13,7 @@ spec:
   profile: OpenShift
   dependencies:
     - camel:netty-http
+    - camel:scheduler
   sources:
     - content: {{ .Files.Get "data/java/KafkaToDatagridRoute.java" | quote }}
       name: KafkaToDatagridRoute.java
