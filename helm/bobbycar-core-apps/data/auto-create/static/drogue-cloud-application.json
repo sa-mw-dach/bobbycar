@@ -1,0 +1,5 @@
+{
+  "metadata": {
+    "name": {{ .Values.drogue.application | quote }}
+}
+}

@@ -1,0 +1,136 @@
+{{ if .Values.drogueIoT }}
+---
+kind: ServiceAccount
+apiVersion: v1
+metadata:
+  name: post-install-auto-create
+  labels:
+    app.kubernetes.io/name: post-install-auto-create
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/component: drogue-iot
+    app.kubernetes.io/part-of: {{ .Values.appName }}
+---
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: post-install-auto-create
+  labels:
+    app.kubernetes.io/name: post-install-auto-create
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/component: drogue-iot
+    app.kubernetes.io/part-of: {{ .Values.appName }}
+rules:
+  - verbs:
+      - create
+      - update
+      - get
+      - patch
+    apiGroups:
+      - ""
+    resources:
+      - secrets
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: post-install-auto-create
+  labels:
+    app.kubernetes.io/name: post-install-auto-create
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/component: drogue-iot
+    app.kubernetes.io/part-of: {{ .Values.appName }}
+roleRef:
+  kind: Role
+  apiGroup: rbac.authorization.k8s.io
+  name: post-install-auto-create
+subjects:
+  - kind: ServiceAccount
+    name: post-install-auto-create
+---
+kind: Job
+apiVersion: batch/v1
+metadata:
+  name: post-install-auto-create
+  labels:
+    app.kubernetes.io/name: post-install-auto-create
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/component: drogue-iot
+    app.kubernetes.io/part-of: {{ .Values.appName }}
+  annotations:
+    helm.sh/hook: post-install,post-upgrade
+    helm.sh/hook-delete-policy: before-hook-creation
+    helm.sh/hook-weight: "100"
+spec:
+  backoffLimit: 1000
+  completions: 1
+  parallelism: 1
+  ttlSecondsAfterFinished: 600
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: post-install-auto-create
+        app.kubernetes.io/instance: {{ .Release.Name }}
+        app.kubernetes.io/component: drogue-iot
+    spec:
+      serviceAccountName: post-install-auto-create
+      restartPolicy: OnFailure
+      containers:
+        - name: "post-install"
+          image: "ghcr.io/ctron/kubectl:1.21"
+          env:
+            - name: DROGUE_ADMIN_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: post-install-drogue-admin
+                  key: username
+            - name: DROGUE_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: post-install-drogue-admin
+                  key: password
+            - name: DROGUE_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: keycloak-client-secret-direct
+                  key: CLIENT_ID
+            - name: DROGUE_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: keycloak-client-secret-direct
+                  key: CLIENT_SECRET
+            - name: DROGUE_CONSOLE_BACKEND
+              value: http://console-backend:80
+            - name: DROGUE_REGISTRY_URL
+              value: http://device-management-service:80
+          command:
+            - /bin/bash
+            - -exc
+            - |
+              # get SSO endpoint
+              ISSUER_URL="$(curl -svL ${DROGUE_CONSOLE_BACKEND}/.well-known/drogue-endpoints | jq -r .issuer_url )"
+              echo
+              # get bearer token for client
+              DROGUE_TOKEN="$(curl -sL -k -o - -X POST -H "Content-Type: application/x-www-form-urlencoded" -d "client_id=$DROGUE_CLIENT_ID" -d audience=direct -d "client_secret=$DROGUE_CLIENT_SECRET" -d "username=$DROGUE_ADMIN_USERNAME" -d "password=$DROGUE_ADMIN_PASSWORD" -d "grant_type=password" ${ISSUER_URL}/protocol/openid-connect/token | jq -r .access_token)"
+              echo
+              # test access
+              curl -svL -f -X GET -H "Authorization: Bearer $DROGUE_TOKEN" -H "Content-Type: application/json" ${DROGUE_REGISTRY_URL}/api/registry/v1alpha1/apps
+              echo
+              # create Drogue Cloud application
+              curl -svL -f -X POST -H "Authorization: Bearer $DROGUE_TOKEN" -H "Content-Type: application/json" --data-binary @/etc/post-install/drogue-cloud-application.json ${DROGUE_REGISTRY_URL}/api/registry/v1alpha1/apps || true
+              echo
+              # create Drogue Cloud access token
+              if ! kubectl get secret drogue-iot-commands &> /dev/null; then
+                token=$(curl -svL -f -X POST -H "Authorization: Bearer $DROGUE_TOKEN" -H "Accept: application/json" ${DROGUE_CONSOLE_BACKEND}/api/tokens/v1alpha1 | jq -r .token || true)
+                kubectl create secret generic drogue-iot-commands --from-literal=user=$DROGUE_ADMIN_USERNAME --from-literal=token=${token}
+              fi
+              echo
+          volumeMounts:
+            - name: data
+              mountPath: "/etc/post-install"
+              readOnly: true
+
+      volumes:
+        - name: data
+          secret:
+            secretName: post-install-auto-create
+{{ end }}

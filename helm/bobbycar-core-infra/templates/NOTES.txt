@@ -1,7 +1,13 @@
 Bobbycar core infrastructure components:
 
+{{ if .Values.drogueIoT -}}
 - AMQ Broker CR
+{{- else }}
+- Drogue IoT
+- Single Sign-On
+{{- end }}
 - Datagrid CR and Route
 - AMQ Streams Kafka Cluster
 - AMQ Streams Kafka HTTP Bridge Cluster and Route
 - 5 Kafka Topics
+- Optional Kafdrop Deployment

@@ -1,0 +1,119 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: bobbycar-repo
+---
+apiVersion: apps.open-cluster-management.io/v1
+kind: Channel
+metadata:
+  name: bobbycar-charts
+  namespace: bobbycar-repo
+spec:
+  pathname: https://sa-mw-dach.github.io/bobbycar-charts/
+  type: HelmRepo
+---
+apiVersion: app.k8s.io/v1beta1
+kind: Application
+metadata:
+  name: bobbycar-rhacm
+  namespace: bobbycar-rhacm
+spec:
+  componentKinds:
+    - group: apps.open-cluster-management.io
+      kind: Subscription
+  descriptor: {}
+  selector:
+    matchExpressions:
+      - key: app
+        operator: In
+        values:
+          - bobbycar
+---
+apiVersion: apps.open-cluster-management.io/v1
+kind: Subscription
+metadata:
+  name: bobbycar-core-apps
+  namespace: bobbycar-rhacm
+  labels:
+    app: bobbycar
+spec:
+  name: bobbycar-core-apps
+  channel: bobbycar-repo/bobbycar-charts
+  packageOverrides:
+    - packageAlias: bobbycar-core-apps
+      packageName: bobbycar-core-apps
+      packageOverrides:
+        - path: spec
+          value:
+            namespace: bobbycar-rhacm
+            dashboard:
+              config:
+                googleApiKey: apiKey
+            datagrid:
+              account:
+                password: test
+            ocpApi: api.ocp3.stormshift.coe.muc.redhat.com
+            ocpDomain: apps.ocp3.stormshift.coe.muc.redhat.com
+  placement:
+    placementRef:
+      name: bobbycar-placement
+      kind: PlacementRule
+---
+apiVersion: apps.open-cluster-management.io/v1
+kind: PlacementRule
+metadata:
+  name: bobbycar-placement
+  namespace: bobbycar-rhacm
+  labels:
+    app: bobbycar
+spec:
+  clusterSelector:
+    matchLabels:
+      bcDeploy: 'true'
+---
+apiVersion: apps.open-cluster-management.io/v1
+kind: Subscription
+metadata:
+  name: bobbycar-core-infra
+  namespace: bobbycar-rhacm
+  labels:
+    app: bobbycar
+spec:
+  name: bobbycar-core-infra
+  channel: bobbycar-repo/bobbycar-charts
+  packageOverrides:
+    - packageAlias: bobbycar-core-infra
+      packageName: bobbycar-core-infra
+      packageOverrides:
+        - path: spec
+          value:
+            namespace: bobbycar-rhacm
+            ocpDomain: apps.ocp3.stormshift.coe.muc.redhat.com
+  placement:
+    placementRef:
+      name: bobbycar-placement
+      kind: PlacementRule
+---
+apiVersion: apps.open-cluster-management.io/v1
+kind: Subscription
+metadata:
+  name: bobbycar-core-operators
+  namespace: bobbycar-rhacm
+  labels:
+    app: bobbycar
+  selfLink: /apis/apps.open-cluster-management.io/v1/namespaces/bobbycar-rhacm/subscriptions/bobbycar-core-operators
+spec:
+  name: bobbycar-core-operators
+  channel: bobbycar-repo/bobbycar-charts
+  packageOverrides:
+    - packageAlias: bobbycar-core-operators
+      packageName: bobbycar-core-operators
+      packageOverrides:
+        - path: spec
+          value:
+            namespace: bobbycar-rhacm
+            installCamelK: false
+  placement:
+    placementRef:
+      name: bobbycar-placement
+      kind: PlacementRule
