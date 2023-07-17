@@ -23,7 +23,7 @@ spec:
     spec:
       containers:
         - name: ota-server
-          image: quay.io/bobbycar/ota-server:1.0-jvm
+          image: quay.io/bobbycar/ota-server:1.1-jvm
           ports:
             - containerPort: 8080
               protocol: TCP

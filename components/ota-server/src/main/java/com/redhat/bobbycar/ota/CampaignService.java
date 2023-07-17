@@ -5,9 +5,7 @@ import com.redhat.bobbycar.ota.model.EngineBehavior;
 import io.quarkus.runtime.Startup;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
 import java.io.IOException;
-import java.nio.file.Paths;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Startup
@@ -16,12 +14,19 @@ public class CampaignService {
 
     private ConcurrentHashMap<String, EngineBehavior> campaigns = new ConcurrentHashMap<>();
     private static final String DEFAULT_ENGINE_CONFIG_JSON = "/engines/default.json";
+    private static final String US_ZONE_1_ENGINE_CONFIG_JSON = "/engines/us-zone-1.json";
+    private static final String US_ZONE_2_ENGINE_CONFIG_JSON = "/engines/us-zone-2.json";
+    private static final String US_ZONE_3_ENGINE_CONFIG_JSON = "/engines/us-zone-3.json";
+    private static final String US_ZONE_4_ENGINE_CONFIG_JSON = "/engines/us-zone-4.json";
+
 
     public CampaignService(){
-        EngineBehavior defaultConfig = null;
         try {
-            defaultConfig = readConfiguration();
-            addCampaign("1", defaultConfig);
+            addCampaign("1", readConfiguration(CampaignService.DEFAULT_ENGINE_CONFIG_JSON));
+            addCampaign("us-zone-1", readConfiguration(US_ZONE_1_ENGINE_CONFIG_JSON));
+            addCampaign("us-zone-2", readConfiguration(US_ZONE_2_ENGINE_CONFIG_JSON));
+            addCampaign("us-zone-3", readConfiguration(US_ZONE_3_ENGINE_CONFIG_JSON));
+            addCampaign("us-zone-4", readConfiguration(US_ZONE_4_ENGINE_CONFIG_JSON));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -43,9 +48,9 @@ public class CampaignService {
         return campaigns.get(id);
     }
 
-    private EngineBehavior readConfiguration() throws IOException {
+    private EngineBehavior readConfiguration(String engineConfig) throws IOException {
             ObjectMapper mapper = new ObjectMapper();
-            return mapper.readValue(getClass().getResourceAsStream(CampaignService.DEFAULT_ENGINE_CONFIG_JSON),
+            return mapper.readValue(getClass().getResourceAsStream(engineConfig),
                     EngineBehavior.class);
     }
 
