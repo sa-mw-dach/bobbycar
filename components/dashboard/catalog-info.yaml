@@ -1,0 +1,20 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: bobbycar-dashboard
+  description: Angular Dashborad that visualizes the connected vehicles
+  labels:
+    app/name: dashboard
+  tags:
+    - angular
+    - ionic
+  links:
+    - url: https://admin.example-org.com
+      title: Bobbycar Dashboard
+      icon: dashboard
+      type: admin-dashboard
+spec:
+  type: website
+  lifecycle: production
+  owner: guest
+  system: regional-iot-cloud
