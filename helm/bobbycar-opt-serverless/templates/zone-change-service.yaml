@@ -3,6 +3,9 @@ kind: Service
 metadata:
   name: zone-change-faas
   namespace: {{ .Values.namespace }}
+  annotations:
+    argocd.argoproj.io/compare-options: IgnoreExtraneous
+    argocd.argoproj.io/sync-options: Prune=false
 spec:
   template:
     metadata:

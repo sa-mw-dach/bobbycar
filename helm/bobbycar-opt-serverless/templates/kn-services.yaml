@@ -3,6 +3,9 @@ kind: Service
 metadata:
   name: bobbycar-zone-audit
   namespace: {{ .Values.namespace }}
+  annotations:
+    argocd.argoproj.io/compare-options: IgnoreExtraneous
+    argocd.argoproj.io/sync-options: Prune=false
 spec:
   template:
     metadata:
@@ -18,6 +21,9 @@ kind: Service
 metadata:
   name: bobbycar-zone-approval
   namespace: {{ .Values.namespace }}
+  annotations:
+    argocd.argoproj.io/compare-options: IgnoreExtraneous
+    argocd.argoproj.io/sync-options: Prune=false
 spec:
   template:
     metadata:
