@@ -1,0 +1,87 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: bobbycar-regional
+  namespace: openshift-gitops
+spec:
+  generators:
+    - clusterDecisionResource:
+        configMapRef: acm-placement
+        labelSelector:
+          matchLabels:
+            cluster.open-cluster-management.io/placement: bobbycar-placement
+        requeueAfterSeconds: 180
+  template:
+    metadata:
+      name: bobbycar-{{name}}
+      labels:
+        velero.io/exclude-from-backup: "true"
+    spec:
+      project: default
+      sources:
+        - chart: bobbycar-core-infra
+          helm:
+            parameters:
+              - name: namespace
+                value: bobbycar
+              - name: ocpDomain
+                value: apps.cluster-frn87.frn87.sandbox29.opentlc.com
+            releaseName: bobbycar-infra
+          repoURL: https://sa-mw-dach.github.io/bobbycar-charts/
+          targetRevision: 1.3.0
+        - chart: bobbycar-core-apps
+          helm:
+            parameters:
+              - name: namespace
+                value: bobbycar
+              - name: ocpDomain
+                value: apps.cluster-frn87.frn87.sandbox29.opentlc.com
+              - name: ocpApi
+                value: api.cluster-frn87.frn87.sandbox29.opentlc.com
+              - name: dashboard.config.googleApiKey
+                value: apiKey
+              - name: weatherService.ibm.api.key
+                value: apiKey
+            releaseName: bobbycar-apps
+          repoURL: https://sa-mw-dach.github.io/bobbycar-charts/
+          targetRevision: 1.3.0
+        - chart: bobbycar-opt-serverless
+          helm:
+            parameters:
+              - name: namespace
+                value: bobbycar
+              - name: drogueIoT
+                value: "false"
+              - name: otaServer.url
+                value: http://ota-server-bobbycar.apps.cluster-frn87.frn87.sandbox29.opentlc.com
+            releaseName: bobbycar-serverless
+          repoURL: https://sa-mw-dach.github.io/bobbycar-charts/
+          targetRevision: 1.1.1
+      source:
+        repoURL: ""
+      destination:
+        namespace: bobbycar
+        server: "{{server}}"
+      syncPolicy:
+        automated:
+          selfHeal: true
+          prune: true
+        syncOptions:
+          - CreateNamespace=true
+          - PruneLast=true
+          - ApplyOutOfSyncOnly=true
+---
+apiVersion: cluster.open-cluster-management.io/v1beta1
+kind: Placement
+metadata:
+  name: bobbycar-placement
+  namespace: openshift-gitops
+spec:
+  predicates:
+    - requiredClusterSelector:
+        labelSelector:
+          matchExpressions:
+            - key: bobbycar
+              operator: In
+              values:
+                - regional
