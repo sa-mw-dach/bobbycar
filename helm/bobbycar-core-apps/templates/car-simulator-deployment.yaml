@@ -53,8 +53,7 @@ spec:
 {{ end }}
       containers:
       - name: {{ .Values.carSimulator.name }}
-        # FIXME: revert before merge
-        image: quay.io/ctrontesting/car-simulator:latest
+        image: quay.io/bobbycar/car-simulator:1.2.0
         imagePullPolicy: Always
         volumeMounts:
             - name: config
