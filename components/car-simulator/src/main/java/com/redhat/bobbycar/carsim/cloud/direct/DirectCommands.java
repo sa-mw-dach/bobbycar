@@ -46,13 +46,13 @@ public class DirectCommands {
 
     @Incoming("ota-updates")
     @Outgoing(InternalChannels.OTA_UPDATE)
-    public DeviceCommand<String> consume(MqttMessage<String> message) {
+    public DeviceCommand<String> consume(MqttMessage<byte[]> message) {
         LOGGER.debug("Consuming MQTT over-the-air update event");
 
-        LOGGER.info("Received OTA payload: {}\n from topic {}", message.getPayload(), message.getTopic());
+        LOGGER.info("Received OTA payload: {}\n from topic {}", new String(message.getPayload()), message.getTopic());
         var vin = message.getTopic().substring(4);
 
-        return new DeviceCommand<>(vin, message.getPayload());
+        return new DeviceCommand<>(vin, new String(message.getPayload()));
     }
 
 }
