@@ -3,7 +3,7 @@ kind: Component
 metadata:
   name: bobbycar-dashboard
   annotations:
-    'quay.io/repository-slug': `bobbycar/dashboard'
+    quay.io/repository-slug: bobbycar/dashboard
   description: Angular Dashborad that visualizes the connected vehicles
   labels:
     app/name: dashboard
