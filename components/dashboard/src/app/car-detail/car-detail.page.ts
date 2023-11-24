@@ -29,6 +29,7 @@ export class CarDetailPage implements OnInit {
   showHUD = false;
   showDriverMonitoring = false;
   carBg = 'MB';
+  defaultWeatherApi = '';
   engineOverlayHidden: boolean = true;
   engineData;
   weatherData;
@@ -54,6 +55,7 @@ export class CarDetailPage implements OnInit {
     ) {
         console.log('Constructing car-detail-page');
         this.carBg = this.configService.DEFAULT_CAR_BRAND;
+        this.defaultWeatherApi = this.configService.DEFAULT_WEATHER_API;
     }
 
     // ***********************
@@ -202,7 +204,8 @@ export class CarDetailPage implements OnInit {
   // ***********************
   getWeatherData(){
     if(this.engineOverlayHidden) {
-        this.predictiveService.getCurrentWeather(this.currentPosition.lat, this.currentPosition.lon, 'ibm').subscribe(
+
+        this.predictiveService.getCurrentWeather(this.currentPosition.lat, this.currentPosition.lon, this.defaultWeatherApi).subscribe(
         (data) => {
             this.weatherData = data;
             this.engineOverlayHidden = false;

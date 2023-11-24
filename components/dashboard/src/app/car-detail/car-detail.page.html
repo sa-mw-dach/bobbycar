@@ -21,7 +21,7 @@
         <h2>Road Classification Result:</h2>
         <pre><p>{{ roadClassificationResult | json }}</p></pre>
         <h4>Current Weather Observation:</h4>
-        <img src="https://cdn.freebiesupply.com/images/large/2x/weather-logo-white.png" class="ibm_logo" />
+        <img src="https://cdn.freebiesupply.com/images/large/2x/weather-logo-white.png" class="ibm_logo" *ngIf="defaultWeatherApi == 'IBM'"/>
         <pre><p>{{ weatherData | json }}</p></pre>
 
       </span>
