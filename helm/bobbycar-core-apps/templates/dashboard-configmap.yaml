@@ -24,5 +24,6 @@ data:
         "INITIAL_MAP_POSITION": { "lat": 41.11804887672318, "lng": -73.7198836780401 },
         "OCP_API_SERVER": "{{ .Values.dashboard.config.ocpApiUrl }}",
         "OCP_TOKEN": "{{ .Values.dashboard.config.ocpToken }}",
-        "DEFAULT_CAR_BRAND": "{{ .Values.dashboard.config.defaultCarBrand }}"
+        "DEFAULT_CAR_BRAND": "{{ .Values.dashboard.config.defaultCarBrand }}",
+        "DEFAULT_WEATHER_API": "{{ .Values.dashboard.config.defaultWeatherApi }}"
     }
