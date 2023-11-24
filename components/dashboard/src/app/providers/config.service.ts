@@ -26,6 +26,7 @@ export class ConfigService {
     OCP_API_SERVER;
     OCP_TOKEN;
     DEFAULT_CAR_BRAND;
+    DEFAULT_WEATHER_API;
 
     constructor(public http: HttpClient) {}
 
@@ -55,6 +56,7 @@ export class ConfigService {
         this.OCP_API_SERVER = data.OCP_API_SERVER;
         this.OCP_TOKEN = data.OCP_TOKEN;
         this.DEFAULT_CAR_BRAND = data.DEFAULT_CAR_BRAND;
+        this.DEFAULT_WEATHER_API = data.DEFAULT_WEATHER_API;
     }
 
 }
