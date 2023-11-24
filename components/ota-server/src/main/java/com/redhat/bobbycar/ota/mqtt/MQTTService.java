@@ -29,24 +29,41 @@ public class MQTTService {
     MqttClient mqttClient;
 
     @PostConstruct
-    public void init(){
+    public void init() throws InterruptedException{
         try {
-            this.mqttClient = new MqttClient(broker, clientId, new MemoryPersistence());
-            MqttConnectOptions connOpts = new MqttConnectOptions();
-            connOpts.setCleanSession(true);
-            connOpts.setAutomaticReconnect(true);
-            System.out.println("Connecting to broker: "+broker);
-            // this.mqttClient.setCallback(this);
-            this.mqttClient.connect(connOpts);
-            System.out.println("Connected");
+            this.connectBroker();
         } catch(MqttException me) {
-            System.out.println("reason "+me.getReasonCode());
-            System.out.println("msg "+me.getMessage());
-            System.out.println("loc "+me.getLocalizedMessage());
-            System.out.println("cause "+me.getCause());
-            System.out.println("excep "+me);
+            System.out.println("reason: "+me.getReasonCode());
+            System.out.println("msg: "+me.getMessage());
+            System.out.println("loc: "+me.getLocalizedMessage());
+            System.out.println("cause: "+me.getCause());
+            System.out.println("exception: "+me);
             me.printStackTrace();
+            while(!this.mqttClient.isConnected()){
+                Thread.sleep(5000);
+                try {
+                    this.connectBroker();
+                } catch (Exception e) {
+                    System.out.println("reason: "+me.getReasonCode());
+                    System.out.println("msg: "+me.getMessage());
+                    System.out.println("loc: "+me.getLocalizedMessage());
+                    System.out.println("cause: "+me.getCause());
+                    System.out.println("exception: "+me);
+                }
+                
+            }
         }
+    }
+
+    private void connectBroker() throws MqttException{
+        this.mqttClient = new MqttClient(broker, clientId, new MemoryPersistence());
+        MqttConnectOptions connOpts = new MqttConnectOptions();
+        connOpts.setCleanSession(true);
+        connOpts.setAutomaticReconnect(true);
+        System.out.println("Connecting to broker: "+broker);
+        // this.mqttClient.setCallback(this);
+        this.mqttClient.connect(connOpts);
+        System.out.println("Successfully connected to MQTT broker!!");
     }
 
     public void sendMessage(String payload, String topic, int qos){
