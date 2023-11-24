@@ -12,6 +12,8 @@ spec:
       bootstrapServers: 'bobbycar-cluster-kafka-bootstrap.bobbycar.svc.cluster.local:9092'
   source:
     enabled: true
+  sink:
+    enabled: true  
   channel:
     enabled: true
     bootstrapServers: 'bobbycar-cluster-kafka-bootstrap.bobbycar.svc.cluster.local:9092'
